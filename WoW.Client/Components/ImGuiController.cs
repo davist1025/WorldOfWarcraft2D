@@ -32,60 +32,75 @@ namespace WoW.Client.Components
         {
             Scene currentScene = Entity.Scene;
 
-            if (Game1.NetState == GameNetworkState.Auth)
+            switch (Game1.NetState)
             {
-                // todo: show a debug text based on the state of the login (logging in, retrieving realmlist, etc)
-                if (Realmlist.Count > 0)
-                {
+                case GameNetworkState.Offline:
+                    ImGui.Begin("Login");
+                    ImGui.InputText("Account Name", ref _accountNameInput, 32);
+                    // todo: password.
+                    //ImGui.InputText("Passowrd")
 
-                    ImGui.Begin("Realmlist");
-                    ImGui.Columns(3);
-                    ImGui.Text("Name");
-                    ImGui.NextColumn();
-                    ImGui.Text("IP");
-                    ImGui.NextColumn();
-                    ImGui.Text("Port");
-                    ImGui.NextColumn();
-
-                    for (int i = 0; i < Realmlist.Count; i++)
+                    if (ImGui.Button("Connect"))
                     {
-                        Realmserver realmserver = Realmlist[i];
-
-                        if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
-                        {
-                            if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                            {
-                                Game1.NetState = GameNetworkState.Realm;
-                                Game1.LastRealm = realmserver;
-
-                                Game1.ClientNetwork.DisconnectAll();
-                                Game1.ClientNetwork.Connect(realmserver.Ip, realmserver.Port, "");
-                                Game1.SubNetState = SubNetworkState.Realm_Verifying;
-                            }
-                        }
-
-                        ImGui.SameLine();
-                        ImGui.Text(realmserver.Name);
-                        ImGui.NextColumn();
-                        ImGui.Text(realmserver.Ip);
-                        ImGui.NextColumn();
-                        ImGui.Text(realmserver.Port.ToString());
+                        Game1.AccountName = _accountNameInput;
+                        Game1.ClientNetwork.Connect("127.0.0.1", 8070, "");
                     }
                     ImGui.End();
-                }
-                else
-                {
+                    break;
+                case GameNetworkState.Auth_LoggingIn:
                     ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, Game1.GraphicsDevice.Viewport.Height - 40));
                     ImGui.SetNextWindowSize(new System.Numerics.Vector2(125, 25));
                     ImGui.Begin("debug_text", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
                     ImGui.Text("Logging in...");
                     ImGui.End();
-                }
-            }
-            else if (Game1.NetState == GameNetworkState.Realm)
-            {
-                if (Game1.SubNetState == SubNetworkState.Realm_Characters)
-                {
+                    break;
+                case GameNetworkState.Auth_Realmlist:
+                    if (Realmlist.Count > 0)
+                    {
+
+                        ImGui.Begin("Realmlist");
+                        ImGui.Columns(3);
+                        ImGui.Text("Name");
+                        ImGui.NextColumn();
+                        ImGui.Text("IP");
+                        ImGui.NextColumn();
+                        ImGui.Text("Port");
+                        ImGui.NextColumn();
+
+                        for (int i = 0; i < Realmlist.Count; i++)
+                        {
+                            Realmserver realmserver = Realmlist[i];
+
+                            if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
+                            {
+                                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                                {
+                                    Game1.NetState = GameNetworkState.Realm;
+                                    Game1.LastRealm = realmserver;
+
+                                    Game1.ClientNetwork.DisconnectAll();
+                                    Game1.ClientNetwork.Connect(realmserver.Ip, realmserver.Port, "");
+                                }
+                            }
+
+                            ImGui.SameLine();
+                            ImGui.Text(realmserver.Name);
+                            ImGui.NextColumn();
+                            ImGui.Text(realmserver.Ip);
+                            ImGui.NextColumn();
+                            ImGui.Text(realmserver.Port.ToString());
+                        }
+                        ImGui.End();
+                    }
+                    break;
+                case GameNetworkState.Realm:
+                    ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, Game1.GraphicsDevice.Viewport.Height - 40));
+                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(185, 25));
+                    ImGui.Begin("debug_text", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
+                    ImGui.Text("Retrieving characters..."); // todo: fix this not being long enough.
+                    ImGui.End();
+                    break;
+                case GameNetworkState.Realm_Characters:
                     ImGui.Begin("Characters");
                     if (Characters.Count > 0)
                     {
@@ -129,72 +144,36 @@ namespace WoW.Client.Components
                         }
                         ImGui.Columns(0);
                     }
-
                     ImGui.Button("Create Character");
 
                     ImGui.End();
-                }
-                else if (Game1.SubNetState == SubNetworkState.Realm_Verifying)
-                {
+                    break;
+                case GameNetworkState.World:
+                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
+
+                    ImGui.Begin("Chat");
+
+                    if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
                     {
-                        ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, Game1.GraphicsDevice.Viewport.Height - 40));
-                        ImGui.SetNextWindowSize(new System.Numerics.Vector2(185, 25));
-                        ImGui.Begin("debug_text", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
-                        ImGui.Text("Retrieving characters..."); // todo: fix this not being long enough.
-                        ImGui.End();
+                        for (int i = 0; i < Chat.Count; i++)
+                            ImGui.TextUnformatted(Chat[i]);
+
+                        ImGui.EndChild();
                     }
-                }
-            }
-            else if (Game1.NetState == GameNetworkState.World)
-            {
-                ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
 
-                ImGui.Begin("Chat");
+                    ImGui.Separator();
 
-                if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
-                {
-                    for (int i = 0; i < Chat.Count; i++)
-                        ImGui.TextUnformatted(Chat[i]);
+                    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
+                    {
+                        // todo: print our own chat.
+                        // should we just have the server send us back our own message?
+                        Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                        _chatInput = "";
+                    }
 
-                    ImGui.EndChild();
-                }
-
-                ImGui.Separator();
-
-                if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
-                {
-                    // todo: print our own chat.
-                    // should we just have the server send us back our own message?
-                    Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
-                    _chatInput = "";
-                }
-
-                ImGui.End();
-
-            }
-            else if (Game1.NetState == GameNetworkState.Offline)
-            {
-                ImGui.Begin("Login");
-                ImGui.InputText("Account Name", ref _accountNameInput, 32);
-                // todo: password.
-                //ImGui.InputText("Passowrd")
-
-                if (ImGui.Button("Connect"))
-                    BuildAuthConnection();
-                ImGui.End();
-            }
-        }
-
-        /// <summary>
-        /// Structures some connection data and sends it off to the authserver.
-        /// 
-        /// Sends the initial logon packet, containing a username and an encrypted password hash.
-        /// </summary>
-        [Obsolete("Should be placed in Game1.")]
-        private void BuildAuthConnection()
-        {
-            Game1.AccountName = _accountNameInput;
-            Game1.ClientNetwork.Connect("127.0.0.1", 8070, "");
+                    ImGui.End();
+                    break;
+            };
         }
 
         public void Update()

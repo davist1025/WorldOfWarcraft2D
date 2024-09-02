@@ -18,21 +18,16 @@ namespace WoW.Client
     public enum GameNetworkState
     {
         Offline,
-        Auth,
+        Auth_LoggingIn,
+        Auth_Realmlist,
         Realm,
-        World
-    }
-
-    public enum SubNetworkState
-    {
-        Realm_Verifying,
         Realm_Characters,
+        World
     }
 
     public class Game1 : Core
     {
         public static GameNetworkState NetState = GameNetworkState.Offline;
-        public static SubNetworkState SubNetState;
         public static NetManager ClientNetwork;
         public static EventBasedNetListener ClientListener;
         private static NetPacketProcessor _netProcessor;
@@ -55,9 +50,9 @@ namespace WoW.Client
             ClientListener.PeerConnectedEvent += (peer) =>
             {
                 if (NetState == GameNetworkState.Offline)
-                    NetState = GameNetworkState.Auth;
+                    NetState = GameNetworkState.Auth_LoggingIn;
 
-                if (NetState == GameNetworkState.Auth)
+                if (NetState == GameNetworkState.Auth_LoggingIn)
                     Send(new ClientAuth_Logon() { AccountName = AccountName });
 
                 if (NetState == GameNetworkState.Realm)
@@ -141,6 +136,7 @@ namespace WoW.Client
             _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) =>
             {
                 SessionId = logon.SessionId;
+                // server sends the realmlist automatically.
 
                 // do we need to send a realmlist req. packet here or should we just have the server send it?
             });
@@ -153,6 +149,7 @@ namespace WoW.Client
                 var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
 
                 gui.Realmlist.Add(new Realmserver(realmlist.Name, realmlist.Ip, realmlist.Port));
+                NetState = GameNetworkState.Auth_Realmlist;
             });
 
             _netProcessor.SubscribeNetSerializable<RealmClient_CharacterList>((characterList) =>
@@ -161,7 +158,7 @@ namespace WoW.Client
 
                 var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
                 gui.Characters.AddRange(characterList.Characters);
-                SubNetState = SubNetworkState.Realm_Characters;
+                NetState = GameNetworkState.Realm_Characters;
             });
 
             ClientNetwork = new NetManager(ClientListener);
@@ -192,9 +189,5 @@ namespace WoW.Client
 
         public static void Send<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(ClientNetwork, packet, delivery);
-
-        [Obsolete("Checking connected to the realmserver is obsolete. Remove later?")]
-        public static bool IsConnectedToRealmserver()
-            => ClientNetwork?.FirstPeer?.ConnectionState == ConnectionState.Connected;
     }
 }
