@@ -1,0 +1,47 @@
+version: 0.0.{build}
+
+skip_non_tags: false
+
+image: Visual Studio 2017
+
+configuration: Debug
+
+shallow_clone: true
+
+environment:
+  NUGET_FLAGS: "-Verbosity quiet -Prop Configuration=Debug -OutputDirectory dist"
+
+# Install MonoGame 3.6
+init:
+- ps: >-
+    (New-Object Net.WebClient).DownloadFile('https://github.com/MonoGame/MonoGame/releases/download/v3.7/MonoGameSetup.exe', 'C:\MonoGameSetup.exe')
+
+    Invoke-Command -ScriptBlock {C:\MonoGameSetup.exe /S /v/qn}
+
+before_build:
+- cmd: nuget restore -Verbosity quiet Nez.sln
+
+build:
+  project: Nez.sln # path to Visual Studio solution or project relative to the original build directory
+
+# Build NuGet packages
+after_build:
+- cmd: >-
+    if %APPVEYOR_REPO_TAG% neq false (set NUGET_FLAGS=%NUGET_FLAGS% -Version %APPVEYOR_REPO_TAG_NAME%) else (set NUGET_FLAGS=%NUGET_FLAGS% -Version %APPVEYOR_BUILD_VERSION%)
+
+    nuget pack %NUGET_FLAGS% ./Nez.Portable/Nez.nuspec
+
+    nuget pack %NUGET_FLAGS% ./Nez.FarseerPhysics/Nez.FarseerPhysics.nuspec
+    
+    nuget pack %NUGET_FLAGS% ./Nez.Persistence/Nez.Persistence.nuspec
+
+artifacts:
+- path: dist\*.nupkg
+  name: NuGet
+
+deploy:
+- provider: NuGet
+  on:
+    appveyor_repo_tag: true
+  api_key:
+    secure: "GYHI+InIaDkq+/cWnyxKsCB+aeZCEQEhSNF4sp+ZnDY="

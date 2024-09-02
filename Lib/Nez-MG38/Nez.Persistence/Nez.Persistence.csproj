@@ -1,0 +1,25 @@
+<Project ToolsVersion="15.0">
+    <PropertyGroup>
+        <BaseIntermediateOutputPath>obj\Nez.Persistence</BaseIntermediateOutputPath>
+    </PropertyGroup>
+    <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net471</TargetFramework>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <RootNamespace>Nez.Persistence</RootNamespace>
+        <AssemblyName>Nez.Persistence</AssemblyName>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*.*</DefaultItemExcludes>
+    </PropertyGroup>
+
+    <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
+</Project>
