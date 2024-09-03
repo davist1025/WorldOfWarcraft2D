@@ -92,8 +92,11 @@ namespace WoW.Client
                     return;
                 }
 
+                var guiController = guiEntity.GetComponent<ImGuiController>();
                 Entity playerById;
-                if (!string.Equals(SessionId, newChat.Id))
+                string chatFormat = "";
+
+                if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
                 {
                     playerById = netTestScene.FindEntity(newChat.Id);
                     if (playerById == null)
@@ -102,15 +105,16 @@ namespace WoW.Client
                         return;
                     }
 
-                    // todo: fix chat message formatting if its our player's message.
                     var netPlayerController = playerById.GetComponent<NetPlayerController>();
-                    newChat.Message = $"[{netPlayerController.Username}] {newChat.Message}";
-
-                    var guiController = guiEntity.GetComponent<ImGuiController>();
-                    guiController.Chat.Add(newChat.Message);
+                    chatFormat = $"[{netPlayerController.Username}] {newChat.Message}";
                 }
                 else
+                {
                     playerById = netTestScene.FindEntity("player");
+                    chatFormat = $"[{playerById.GetComponent<PlayerController>().GetName()}] {newChat.Message}";
+                }
+
+                guiController.Chat.Add(chatFormat);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>

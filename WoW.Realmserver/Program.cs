@@ -93,7 +93,7 @@ namespace WoW.Realmserver
                     _transferSessions.Remove(session.User.SessionId);
 
                     WorldSession newSession = new WorldSession(session.User);
-                    EntityHeadless newEntity = _world.CreateEntity(newSession.Account.SessionId.ToUpper());
+                    EntityHeadless newEntity = _world.CreateEntity(newSession.Account.SessionId);
                     newEntity.AddComponent(newSession);
                     sessionPeer.Tag = newEntity;
 
