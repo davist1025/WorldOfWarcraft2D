@@ -313,14 +313,6 @@ namespace WoW.Realmserver
         public static void SendToAuthserver<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(_authNetManager, packet, delivery);
 
-        /// <summary>
-        /// Generates a global identifier for an active game object.
-        /// These are shared from client/server to efficiently ID an existing object.
-        /// </summary>
-        /// <returns></returns>
-        public static string GenerateGObjectId()
-            => Guid.NewGuid().ToString().Replace("-", ""); // using guid here is probably not the best idea as the amount of "unique" id's depends on hardware.
-
         static void Main(string[] args)
             => new Program();
     }
