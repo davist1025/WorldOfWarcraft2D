@@ -180,73 +180,9 @@ namespace WoW.Realmserver
                             }, DeliveryMethod.ReliableOrdered);
 
                             SendSerializable(onlinePeer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedCharacter });
-
-                            //_netProcessor.Send(peer, new RealmClient_Connect({ Id})
-                            // todo: send connect packet to new peer for the above entity.
                         }
                     }
                 }
-
-                //var transferCharacter = Database.GetCharactersByAccountId(session.Account.Id).Where(c => c.LocalCharacterId == transfer.LocalCharacterId).Single();
-
-                //if (transferCharacter != null)
-                //{
-                //    session.ActiveCharacterId = transferCharacter.LocalCharacterId;
-
-                //    foreach (var onlinePeer in _netManager.ConnectedPeerList)
-                //    {
-                //        if (onlinePeer != peer)
-                //        {
-                //            var onlinePeerEntity = onlinePeer.Tag as EntityHeadless;
-                //            var otherSession = onlinePeerEntity.GetComponent<WorldSession>();
-                //            var thisPeerEntity = peer.Tag as EntityHeadless;
-
-                //            // send all players to the new player.
-
-                //            // alert the new client to create a new entity.
-                //            _netProcessor.Send(peer,
-                //                new RealmClient_EntityCreate()
-                //                {
-                //                    EntityType = WorldEntityType.Player,
-                //                    Id = otherSession.Account.SessionId,
-                //                    X = otherSession.WorldPosition.X,
-                //                    Y = otherSession.WorldPosition.Y,
-                //                }, DeliveryMethod.ReliableOrdered);
-
-                //            _netProcessor.Send(peer,
-                //                new RealmClient_Connect()
-                //                {
-                //                    Id = otherSession.Account.SessionId,
-                //                    // todo: should we just send the whole character object?
-                //                    Name = Database.GetCharacterByIdOnAccount(otherSession.Account.Id, otherSession.ActiveCharacterId).Name
-                //                }, DeliveryMethod.ReliableOrdered);
-
-                //            // send the new peer to all online players.
-                //            _netProcessor.Send(onlinePeer,
-                //                new RealmClient_EntityCreate()
-                //                {
-                //                    EntityType = WorldEntityType.Player,
-                //                    Id = session.Account.SessionId,
-                //                    X = session.WorldPosition.X,
-                //                    Y = session.WorldPosition.Y,
-                //                }, DeliveryMethod.ReliableOrdered);
-
-                //            _netProcessor.Send(onlinePeer,
-                //                new RealmClient_Connect()
-                //                {
-                //                    Id = session.Account.SessionId,
-                //                    Name = Database.GetCharacterByIdOnAccount(session.Account.Id, session.ActiveCharacterId).Name
-                //                }, DeliveryMethod.ReliableOrdered);
-                //        }
-                //        // todo: send all character data to the player to initialize their player object controller.
-                //        // how should inventory be handled? currently "UserCharacter" is passed as an object directly to the game client, which contains the name, level, etc of the character.
-                //        // in theory, this object should contain the inventory information but i dont think the player should have access to that at the realm screen(?).
-
-                //        // todo: send this character to all online players
-
-                //        // check for name change flag, etc.
-                //    }
-                //}
             });
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
