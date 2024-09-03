@@ -29,7 +29,9 @@ Below is a general overall roadmap for the current goals of the project:
 - In-game support systems:
 	- [ ] GM tickets
 	- [ ] Unstuck
-- [ ] MySQL support
+- [x] MySQL support
+	- EFCore (code-first) MySQL support has been added. Still determining whether to use file managerment for rapid development, though. 
+	Having to migrate, update, delete and backtrack database updates is time consuming.
 - [ ] Client plugin/addon support
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
