@@ -13,10 +13,12 @@ using WoW.Client.Shared.Serializable;
 
 namespace WoW.Client.Components
 {
-    internal class PlayerController : Component, IUpdatable
+    internal class LocalPlayerController : Component, IUpdatable
     {
         private SerializableCharacter _character;
         private PrototypeSpriteRenderer _renderer;
+
+        // todo: create a renderer based on the character race.
 
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
@@ -25,7 +27,7 @@ namespace WoW.Client.Components
 
         private int _tickCount = 0;
 
-        public PlayerController(SerializableCharacter character)
+        public LocalPlayerController(SerializableCharacter character)
             => _character = character;
 
         public override void OnAddedToEntity()

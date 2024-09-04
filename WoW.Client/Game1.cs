@@ -111,7 +111,7 @@ namespace WoW.Client
                 else
                 {
                     playerById = netTestScene.FindEntity("player");
-                    chatFormat = $"[{playerById.GetComponent<PlayerController>().GetName()}] {newChat.Message}";
+                    chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
                 }
 
                 guiController.Chat.Add(chatFormat);

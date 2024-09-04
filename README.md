@@ -48,6 +48,7 @@ Use at your own risk.
 
 ## Resources
 XP To Level - https://wowwiki-archive.fandom.com/wiki/Formulas:XP_To_Level
+
 Damage/DPS - https://vanilla-wow-archive.fandom.com/wiki/Damage_per_second#Weapon_Damage_Per_Second_(DPS)_Formula
 
 ## License

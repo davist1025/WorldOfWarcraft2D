@@ -14,11 +14,11 @@ namespace WoW.Client.Scenes
     public class NetworkTestScene : Scene
     {
         private Entity _thePlayer;
-        private PlayerController _theController;
+        private LocalPlayerController _theController;
 
         public NetworkTestScene(SerializableCharacter character)
         {
-            _theController = new PlayerController(character);
+            _theController = new LocalPlayerController(character);
         }
 
         public override void OnStart()
