@@ -115,11 +115,6 @@ namespace WoW.Realmserver
 
                         SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = serializableCharacters });
                     }
-
-                    //UserCharacter[] characters = Database.GetCharactersByAccountId(session.User.Id);
-                    //Console.WriteLine($"Sending {characters.Length} characters to {session.User.SessionId}...");
-
-                    //SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = characters.ToList() });
                 }
             });
 
@@ -128,7 +123,6 @@ namespace WoW.Realmserver
                 EntityHeadless entity = peer.Tag as EntityHeadless;
                 WorldSession session = entity.GetComponent<WorldSession>();
 
-                // todo: re-implement player world transfer.
                 using (var ctx = new RealmContext())
                 {
                     var playingCharacter = ctx.Characters
@@ -170,7 +164,7 @@ namespace WoW.Realmserver
                                 otherCharacter.Class);
                             SendSerializable(peer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedOtherCharacter });
 
-
+                            // send the new client to all other players.
                             _netProcessor.Send(onlinePeer, new RealmClient_EntityCreate()
                             {
                                 EntityType = WorldEntityType.Player,
@@ -229,6 +223,13 @@ namespace WoW.Realmserver
         private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(peer, packet, delivery);
 
+        /// <summary>
+        /// Used to send an object which is not readily recognized by LNL.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="peer"></param>
+        /// <param name="packet"></param>
+        /// <param name="delivery"></param>
         private static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(peer, packet, delivery);
 

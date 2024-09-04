@@ -88,6 +88,7 @@ namespace WoW.Authserver
                     {
                         Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
 
+                        // todo: send all realms in one packet.
                         foreach (Realmserver realm in Realmlist)
                         {
                             AuthClient_Realmserver realmserver = new AuthClient_Realmserver()
