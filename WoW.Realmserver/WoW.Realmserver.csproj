@@ -25,4 +25,8 @@
     <ProjectReference Include="..\WoW.Server.Shared\WoW.Server.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Content\Data\Tiled\" />
+  </ItemGroup>
+
 </Project>

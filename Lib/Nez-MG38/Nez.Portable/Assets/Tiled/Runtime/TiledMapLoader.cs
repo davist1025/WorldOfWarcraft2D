@@ -25,6 +25,24 @@ namespace Nez.Tiled
 			}
 		}
 
+		/// <summary>
+		/// Creates a FileStream instead of using the container to create one.
+		/// </summary>
+		/// <param name="map"></param>
+		/// <param name="filePath"></param>
+		/// <returns></returns>
+		public static TmxMap LoadTmxMapHeadless(this TmxMap map, string filePath)
+		{
+			using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			{
+				var xDoc = XDocument.Load(stream);
+				map.TmxDirectory = Path.GetDirectoryName(filePath);
+				map.LoadTmxMap(xDoc);
+
+				return map;
+			}
+		}
+
 		public static TmxMap LoadTmxMap(this TmxMap map, XDocument xDoc)
 		{
 			var xMap = xDoc.Element("map");

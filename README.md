@@ -48,9 +48,12 @@ This project is undergoing rapid change in its codebase, data structures, object
 Use at your own risk.
 
 ## Resources
-XP To Level - https://wowwiki-archive.fandom.com/wiki/Formulas:XP_To_Level
+[XP To Level](https://wowwiki-archive.fandom.com/wiki/Formulas:XP_To_Level)
 
-Damage/DPS - https://vanilla-wow-archive.fandom.com/wiki/Damage_per_second#Weapon_Damage_Per_Second_(DPS)_Formula
+[Damage/DPS](https://vanilla-wow-archive.fandom.com/wiki/Damage_per_second)
+
+## Credits
+- [16x16 tileset for testing](https://wildlifestudios.itch.io/free-16x16-tileset-pixel-art) 
 
 ## License
 None, just don't be malicious.

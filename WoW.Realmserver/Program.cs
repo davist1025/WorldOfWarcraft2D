@@ -10,6 +10,7 @@ using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Realm;
 using WoW.Client.Shared.Serializable;
+using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
 using WoW.Server.Shared;
@@ -18,14 +19,13 @@ namespace WoW.Realmserver
 {
     internal class Program : CoreHeadless
     {
-        private StartupState _startupState = StartupState.Running; // todo: utilize the startup state later.
-
         private static NetManager _netManager;
         private static NetManager _authNetManager;
         private EventBasedNetListener _netEventListener;
         private EventBasedNetListener _authListener;
         private static NetPacketProcessor _netProcessor;
 
+        public static WorldContentManager Content;
         private World _world;
 
         public static float DeltaTime = 0f;
@@ -37,6 +37,7 @@ namespace WoW.Realmserver
             Console.Title = "Realmserver";
             IsFixedTimeStep = true;
 
+            Content = new WorldContentManager();
             _world = new World();
             _netProcessor = new NetPacketProcessor();
 
@@ -218,11 +219,9 @@ namespace WoW.Realmserver
 
         public override void Update(float deltaTime)
         {
-            if (_startupState == StartupState.Running)
-            {
-                DeltaTime = deltaTime;
-                _world.Update();
-            }
+            DeltaTime = deltaTime;
+
+            _world.Update();
         }
 
         private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
