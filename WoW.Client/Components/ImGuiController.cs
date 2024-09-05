@@ -78,6 +78,7 @@ namespace WoW.Client.Components
                                     Game1.NetState = GameNetworkState.Realm;
                                     Game1.LastRealm = realmserver;
 
+                                    // todo: save last used realm for auto-connection later.
                                     Game1.ClientNetwork.DisconnectAll();
                                     Game1.ClientNetwork.Connect(realmserver.Ip, realmserver.Port, "");
                                 }
