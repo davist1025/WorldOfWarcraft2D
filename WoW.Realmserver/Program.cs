@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Nez;
 using Nez.ECS.Headless;
+using Nez.Systems;
 using System.Diagnostics;
 using System.Net;
 using WoW.Client.Shared;
@@ -17,6 +18,8 @@ namespace WoW.Realmserver
 {
     internal class Program : CoreHeadless
     {
+        private StartupState _startupState = StartupState.Running; // todo: utilize the startup state later.
+
         private static NetManager _netManager;
         private static NetManager _authNetManager;
         private EventBasedNetListener _netEventListener;
@@ -215,9 +218,11 @@ namespace WoW.Realmserver
 
         public override void Update(float deltaTime)
         {
-            DeltaTime = deltaTime;
-
-            _world.Update();
+            if (_startupState == StartupState.Running)
+            {
+                DeltaTime = deltaTime;
+                _world.Update();
+            }
         }
 
         private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()

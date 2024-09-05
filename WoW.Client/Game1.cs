@@ -56,9 +56,7 @@ namespace WoW.Client
                     Send(new ClientAuth_Logon() { AccountName = AccountName });
 
                 if (NetState == GameNetworkState.Realm)
-                {
                     Send(new ClientRealm_TransferLogon() { SessionId = SessionId });
-                }
             };
 
             _netProcessor = new NetPacketProcessor();
