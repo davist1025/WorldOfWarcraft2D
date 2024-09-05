@@ -29,4 +29,13 @@
     <Folder Include="Content\Data\Tiled\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Content\Data\Tiled\Tileset\basic_grass_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Data\Tiled\world1.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
