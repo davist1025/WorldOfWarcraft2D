@@ -34,8 +34,8 @@ Below is a general overall roadmap for the current goals of the project:
 	Having to migrate, update, delete and backtrack database updates is time consuming.
 - [ ] Client plugin/addon support
 - [ ] General content management across the client and realmserver
-	- The client will need a way of keeping track of different types of files such as display id's, textures, etc.
-	- The realmserver will have a need to load and use all kinds of data.
+	- [ ] The client will need a way of keeping track of different types of files such as display id's, textures, etc.
+	- [x] The realmserver will have a need to load and use all kinds of data.
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
