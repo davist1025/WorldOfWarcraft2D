@@ -14,25 +14,31 @@ namespace WoW.Realmserver.Content
     {
         private const string _rootDirectory = "Content\\Data";
 
+        private List<TmxMap> _maps;
+
         public WorldContentManager()
         {
-            LoadTiled();
+            _maps = new List<TmxMap>();
             // todo: verify integrity.
             // the realmserver should come equipped with the files it will need upon startup. Most of these, such as Tiled maps, cannot be generated.
         }
 
-        // todo: adapt TiledMapLoader to load files in a headless state.
-        private void LoadTiled()
+        public void LoadTiled()
         {
+            Console.WriteLine("Loading Tiled maps...");
+
             var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
             for (int i = 0; i < tiledMaps.Length; i++)
                 LoadTiledMap(tiledMaps[i]);
         }
 
-        private TmxMap LoadTiledMap(string name)
+        private void LoadTiledMap(string name)
         {
-            Console.WriteLine($"Loading tiled map {name}");
-            return null;
+            TmxMap map = new TmxMap().LoadTmxMapHeadless(name);
+            _maps.Add(map);
         }
+
+        public TmxMap GetMap(string name)
+            => _maps.Find(m => m.Properties["name"].Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 }

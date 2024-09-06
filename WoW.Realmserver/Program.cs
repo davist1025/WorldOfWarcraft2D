@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Nez;
 using Nez.ECS.Headless;
 using Nez.Systems;
+using Nez.Tiled;
 using System.Diagnostics;
 using System.Net;
 using WoW.Client.Shared;
@@ -35,11 +36,16 @@ namespace WoW.Realmserver
         public Program()
         {
             Console.Title = "Realmserver";
+            TiledMapLoader.IsHeadless = true;
+
             IsFixedTimeStep = true;
 
             Content = new WorldContentManager();
             _world = new World();
             _netProcessor = new NetPacketProcessor();
+
+            // load content.
+            Content.LoadTiled();
 
             _netEventListener = new EventBasedNetListener();
                 _netEventListener.ConnectionRequestEvent += (req) => req.Accept();

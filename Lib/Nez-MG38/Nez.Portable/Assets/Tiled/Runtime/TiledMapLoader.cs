@@ -11,6 +11,12 @@ namespace Nez.Tiled
 {
 	public static class TiledMapLoader
 	{
+		/// <summary>
+		/// Determines if Image loading is necessary.
+		/// Default is 'false.'
+		/// </summary>
+		public static bool IsHeadless = false;
+
 		#region TmxMap Loader
 
 		public static TmxMap LoadTmxMap(this TmxMap map, string filepath)
@@ -532,7 +538,7 @@ namespace Nez.Tiled
 			layer.ParallaxFactorY = (float?)xImageLayer.Attribute("parallaxy") ?? 1.0f;
 
 			var xImage = xImageLayer.Element("image");
-			if (xImage != null)
+			if (xImage != null && !IsHeadless)
 				layer.Image = new TmxImage().LoadTmxImage(xImage, tmxDir);
 
 			layer.Properties = ParsePropertyDict(xImageLayer.Element("properties"));
@@ -579,7 +585,7 @@ namespace Nez.Tiled
 			tileset.TileOffset = ParseTmxTileOffset(xTileset.Element("tileoffset"));
 
 			var xImage = xTileset.Element("image");
-			if (xImage != null)
+			if (xImage != null && !IsHeadless)
 				tileset.Image = new TmxImage().LoadTmxImage(xImage, tsxDir);
 
 			var xTerrainType = xTileset.Element("terraintypes");
