@@ -42,6 +42,7 @@ namespace WoW.Realmserver
 
                 _mover.CalculateMovement(ref _moveDirection, out var res);
 
+                // todo: this is debug code for collision; check for collision ONLY on the map the player is on.
                 if (res.Collider != null)
                     Console.WriteLine($"{Character.Name} collided with {res.Collider.Bounds.ToString()}!");
 
