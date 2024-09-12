@@ -27,12 +27,14 @@ namespace WoW.Client.Scenes
 
             var playerEntity = CreateEntity("player").AddComponent(_theController);
             CreateEntity("gui").AddComponent(new ImGuiController());
-
             Camera.Entity.AddComponent(new FollowCamera(playerEntity.Entity, Camera));
         }
 
         public override void Initialize()
         {
+            var map = Content.LoadTiledMap("world1.tmx");
+
+            CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
         public void CreateEntity(RealmClient_EntityCreate create)

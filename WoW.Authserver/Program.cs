@@ -71,14 +71,12 @@ namespace WoW.Authserver
                     }
                     else if (account == null)
                     {
-                        // todo: send invalid login.
                         loginCode.Code = LogonCode.NoRecord;
                         return;
                     }
                     else
                     {
                         loginCode.Code = LogonCode.AlreadyOnline;
-                        // todo: send failed logon due to active session.
                         return;
                     }
 

@@ -1,4 +1,6 @@
-﻿using Nez.Tiled;
+﻿using Nez;
+using Nez.ECS.Headless;
+using Nez.Tiled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +16,11 @@ namespace WoW.Realmserver.Content
     {
         private const string _rootDirectory = "Content\\Data";
 
-        private List<TmxMap> _maps;
+        private Dictionary<string, TiledMapProcessor> _mapProcessors;
 
         public WorldContentManager()
         {
-            _maps = new List<TmxMap>();
+            _mapProcessors = new Dictionary<string, TiledMapProcessor>();
             // todo: verify integrity.
             // the realmserver should come equipped with the files it will need upon startup. Most of these, such as Tiled maps, cannot be generated.
         }
@@ -35,10 +37,19 @@ namespace WoW.Realmserver.Content
         private void LoadTiledMap(string name)
         {
             TmxMap map = new TmxMap().LoadTmxMapHeadless(name);
-            _maps.Add(map);
+            string mapName = map.Properties["name"];
+            Entity mapEntity = CoreHeadless.Scene.CreateEntity(mapName);
+            TiledMapProcessor processor = new TiledMapProcessor(map, "collision_layer");
+            mapEntity.AddComponent(processor);
+
+            _mapProcessors.Add(mapName, new TiledMapProcessor(map, "collision_layer"));
         }
 
-        public TmxMap GetMap(string name)
-            => _maps.Find(m => m.Properties["name"].Equals(name, StringComparison.OrdinalIgnoreCase));
+        public TiledMapProcessor GetMap(string name)
+        {
+            if (_mapProcessors.ContainsKey(name))
+                return _mapProcessors[name];
+            return null;
+        }
     }
 }

@@ -41,6 +41,10 @@ namespace WoW.Realmserver
                 _moveDirection = MovementSpeed * Program.DeltaTime * input;
 
                 _mover.CalculateMovement(ref _moveDirection, out var res);
+
+                if (res.Collider != null)
+                    Console.WriteLine($"{Character.Name} collided with {res.Collider.Bounds.ToString()}!");
+
                 _mover.ApplyMovement(_moveDirection);
 
                 Program.SendToExcept(Entity.Name,
