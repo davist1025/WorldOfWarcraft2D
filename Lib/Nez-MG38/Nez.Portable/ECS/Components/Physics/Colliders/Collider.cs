@@ -152,34 +152,49 @@ namespace Nez
 				Insist.IsTrue(this is BoxCollider || this is CircleCollider,
 					"Only box and circle colliders can be created automatically");
 
-				var renderable = Entity.GetComponent<RenderableComponent>();
-				Debug.WarnIf(renderable == null,
-					"Collider has no shape and no RenderableComponent. Can't figure out how to size it.");
-				if (renderable != null)
+				if (!Scene.IsHeadless)
 				{
-					var renderableBounds = renderable.Bounds;
+					var renderable = Entity.GetComponent<RenderableComponent>();
+					Debug.WarnIf(renderable == null,
+						"Collider has no shape and no RenderableComponent. Can't figure out how to size it.");
+					if (renderable != null)
+					{
+						var renderableBounds = renderable.Bounds;
 
-					// we need the size * inverse scale here because when we autosize the Collider it needs to be without a scaled Renderable
-					var width = renderableBounds.Width / Entity.Transform.Scale.X;
-					var height = renderableBounds.Height / Entity.Transform.Scale.Y;
+						// we need the size * inverse scale here because when we autosize the Collider it needs to be without a scaled Renderable
+						var width = renderableBounds.Width / Entity.Transform.Scale.X;
+						var height = renderableBounds.Height / Entity.Transform.Scale.Y;
 
-					// circle colliders need special care with the origin
+						// circle colliders need special care with the origin
+						if (this is CircleCollider)
+						{
+							var circleCollider = this as CircleCollider;
+							circleCollider.Radius = Math.Max(width, height) * 0.5f;
+
+							// fetch the Renderable's center, transfer it to local coordinates and use that as the localOffset of our collider
+							LocalOffset = renderableBounds.Center - Entity.Transform.Position;
+						}
+						else
+						{
+							var boxCollider = this as BoxCollider;
+							boxCollider.Width = width;
+							boxCollider.Height = height;
+
+							// fetch the Renderable's center, transfer it to local coordinates and use that as the localOffset of our collider
+							LocalOffset = renderableBounds.Center - Entity.Transform.Position;
+						}
+					}
+				}
+				else
+				{
+					// todo: base the "!6f" off of something else; not sure if sprites will consistently be this size.
+					var width = 16f / Entity.Transform.Scale.X;
+					var height = 16f / Entity.Transform.Scale.Y;
+
 					if (this is CircleCollider)
 					{
 						var circleCollider = this as CircleCollider;
 						circleCollider.Radius = Math.Max(width, height) * 0.5f;
-
-						// fetch the Renderable's center, transfer it to local coordinates and use that as the localOffset of our collider
-						LocalOffset = renderableBounds.Center - Entity.Transform.Position;
-					}
-					else
-					{
-						var boxCollider = this as BoxCollider;
-						boxCollider.Width = width;
-						boxCollider.Height = height;
-
-						// fetch the Renderable's center, transfer it to local coordinates and use that as the localOffset of our collider
-						LocalOffset = renderableBounds.Center - Entity.Transform.Position;
 					}
 				}
 			}

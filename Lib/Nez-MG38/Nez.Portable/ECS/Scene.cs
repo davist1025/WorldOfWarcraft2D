@@ -159,6 +159,8 @@ namespace Nez
 
 		IFinalRenderDelegate _finalRenderDelegate;
 
+		public static bool IsHeadless = false;
+
 
 		#region SceneResolutionPolicy private fields
 
@@ -297,16 +299,20 @@ namespace Nez
 		public Scene()
 		{
 			Entities = new EntityList(this);
-			RenderableComponents = new RenderableComponentList();
-			Content = new NezContentManager();
 
-			var cameraEntity = CreateEntity("camera");
-			Camera = cameraEntity.AddComponent(new Camera());
+			if (!IsHeadless)
+			{
+				RenderableComponents = new RenderableComponentList();
+				Content = new NezContentManager();
 
-			// setup our resolution policy. we'll commit it in begin
-			_resolutionPolicy = _defaultSceneResolutionPolicy;
-			_designResolutionSize = _defaultDesignResolutionSize;
-			_designBleedSize = _defaultDesignBleedSize;
+				var cameraEntity = CreateEntity("camera");
+				Camera = cameraEntity.AddComponent(new Camera());
+
+				// setup our resolution policy. we'll commit it in begin
+				_resolutionPolicy = _defaultSceneResolutionPolicy;
+				_designResolutionSize = _defaultDesignResolutionSize;
+				_designBleedSize = _defaultDesignBleedSize;
+			}
 
 			Initialize();
 		}
@@ -335,21 +341,25 @@ namespace Nez
 
 		public virtual void Begin()
 		{
-			if (_renderers.Length == 0)
-			{
-				AddRenderer(new DefaultRenderer());
-				Debug.Warn("Scene has begun with no renderer. A DefaultRenderer was added automatically so that something is visible.");
-			}
-
 			Physics.Reset();
 
-			// prep our render textures
-			UpdateResolutionScaler();
-			Core.GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
-			Core.Emitter.AddObserver(CoreEvents.GraphicsDeviceReset, OnGraphicsDeviceReset);
-			Core.Emitter.AddObserver(CoreEvents.OrientationChanged, OnOrientationChanged);
+			if (!IsHeadless)
+			{
+				if (_renderers.Length == 0)
+				{
+					AddRenderer(new DefaultRenderer());
+					Debug.Warn("Scene has begun with no renderer. A DefaultRenderer was added automatically so that something is visible.");
+				}
 
+				// prep our render textures
+				UpdateResolutionScaler();
+				Core.GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
+				Core.Emitter.AddObserver(CoreEvents.GraphicsDeviceReset, OnGraphicsDeviceReset);
+				Core.Emitter.AddObserver(CoreEvents.OrientationChanged, OnOrientationChanged);
+
+			}
 			_didSceneBegin = true;
+
 			OnStart();
 		}
 
@@ -357,36 +367,44 @@ namespace Nez
 		{
 			_didSceneBegin = false;
 
-			// we kill Renderers and PostProcessors first since they rely on Entities
-			for (var i = 0; i < _renderers.Length; i++)
-				_renderers.Buffer[i].Unload();
+			if (!IsHeadless)
+			{
+				// we kill Renderers and PostProcessors first since they rely on Entities
+				for (var i = 0; i < _renderers.Length; i++)
+					_renderers.Buffer[i].Unload();
 
-			for (var i = 0; i < _postProcessors.Length; i++)
-				_postProcessors.Buffer[i].Unload();
+				for (var i = 0; i < _postProcessors.Length; i++)
+					_postProcessors.Buffer[i].Unload();
 
-			// now we can remove the Entities and finally the SceneComponents
-			Core.Emitter.RemoveObserver(CoreEvents.GraphicsDeviceReset, OnGraphicsDeviceReset);
+				// now we can remove the Entities and finally the SceneComponents
+				Core.Emitter.RemoveObserver(CoreEvents.GraphicsDeviceReset, OnGraphicsDeviceReset);
+
+				Camera = null;
+				Content.Dispose();
+				_sceneRenderTarget.Dispose();
+
+				if (_destinationRenderTarget != null)
+					_destinationRenderTarget.Dispose();
+			}
+
 			Entities.RemoveAllEntities();
 
 			for (var i = 0; i < _sceneComponents.Length; i++)
 				_sceneComponents.Buffer[i].OnRemovedFromScene();
 			_sceneComponents.Clear();
 
-			Camera = null;
-			Content.Dispose();
-			_sceneRenderTarget.Dispose();
 			Physics.Clear();
-
-			if (_destinationRenderTarget != null)
-				_destinationRenderTarget.Dispose();
 
 			Unload();
 		}
 
 		public virtual void Update()
 		{
-			// we set the RenderTarget here so that the Viewport will match the RenderTarget properly
-			Core.GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
+			if (!IsHeadless)
+			{
+				// we set the RenderTarget here so that the Viewport will match the RenderTarget properly
+				Core.GraphicsDevice.SetRenderTarget(_sceneRenderTarget);
+			}
 
 			// update our lists in case they have any changes
 			Entities.UpdateLists();
@@ -401,8 +419,11 @@ namespace Nez
 			// update our Entities
 			Entities.Update();
 
-			// we update our renderables after entity.update in case any new Renderables were added
-			RenderableComponents.UpdateLists();
+			if (!IsHeadless)
+			{
+				// we update our renderables after entity.update in case any new Renderables were added
+				RenderableComponents.UpdateLists();
+			}
 		}
 
 		internal void Render()

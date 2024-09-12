@@ -123,13 +123,7 @@ namespace WoW.Client.Components
                                 {
                                     var netScene = new NetworkTestScene(character);
 
-                                    /** todo: world transfer.
-                                     * 
-                                     * tell the server what character we want to use, server will send gear, friends list, etc
-                                     * we will join the world as that character.
-                                     * 
-                                     */
-
+                                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
                                     Core.StartSceneTransition(new FadeTransition(() => netScene));
 
                                     Game1.NetState = GameNetworkState.World;

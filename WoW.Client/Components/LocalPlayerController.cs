@@ -24,6 +24,7 @@ namespace WoW.Client.Components
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
         private Mover _mover;
+        private CircleCollider _circleCollder;
 
         private int _tickCount = 0;
 
@@ -42,6 +43,8 @@ namespace WoW.Client.Components
 
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
+            _circleCollder = Entity.AddComponent<CircleCollider>();
+            _circleCollder.SetRadius(16f);
         }
 
         public void Update()

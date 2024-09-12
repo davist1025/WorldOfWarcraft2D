@@ -27,7 +27,6 @@ namespace WoW.Realmserver
         private static NetPacketProcessor _netProcessor;
 
         public static WorldContentManager Content;
-        private World _world;
 
         public static float DeltaTime = 0f;
 
@@ -37,11 +36,13 @@ namespace WoW.Realmserver
         {
             Console.Title = "Realmserver";
             TiledMapLoader.IsHeadless = true;
+            Scene.IsHeadless = true;
 
             IsFixedTimeStep = true;
 
+            CoreHeadless.Scene = new WorldScene();
+
             Content = new WorldContentManager();
-            _world = new World();
             _netProcessor = new NetPacketProcessor();
 
             // load content.
@@ -53,7 +54,7 @@ namespace WoW.Realmserver
 
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) =>
             {
-                var entity = peer.Tag as EntityHeadless;
+                var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSession>();
 
                 session.InputUpdates.Enqueue(new Vector2(movement.X, movement.Y));
@@ -62,7 +63,7 @@ namespace WoW.Realmserver
             _netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((message, peer) =>
             {
                 // verify the message; check for invalid characters; check for command usage.
-                var entity = peer.Tag as EntityHeadless;
+                var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSession>();
 
                 // todo: command processing!
@@ -103,7 +104,7 @@ namespace WoW.Realmserver
                     _transferSessions.Remove(session.User.SessionId);
 
                     WorldSession newSession = new WorldSession(session.User);
-                    EntityHeadless newEntity = _world.CreateEntity(newSession.Account.SessionId);
+                    Entity newEntity = Scene.CreateEntity(newSession.Account.SessionId);
                     newEntity.AddComponent(newSession);
                     sessionPeer.Tag = newEntity;
 
@@ -130,7 +131,7 @@ namespace WoW.Realmserver
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) =>
             {
-                EntityHeadless entity = peer.Tag as EntityHeadless;
+                Entity entity = peer.Tag as Entity;
                 WorldSession session = entity.GetComponent<WorldSession>();
 
                 using (var ctx = new RealmContext())
@@ -139,9 +140,12 @@ namespace WoW.Realmserver
                         .Where(c => c.AccountId == session.Account.Id)
                         .FirstOrDefault(c => c.CharacterId == transfer.LocalCharacterId);
 
+                    var chars = ctx.Characters.Where(c => c.AccountId == session.Account.Id);
+
                     if (playingCharacter != null)
                     {
                         session.Character = playingCharacter;
+                        session.InitializeGameComponents();
 
                         SerializableCharacter serializedCharacter = new SerializableCharacter(
                                 playingCharacter.CharacterId,
@@ -153,37 +157,40 @@ namespace WoW.Realmserver
                         for (int i = 0; i < _netManager.ConnectedPeersCount; i++)
                         {
                             var onlinePeer = _netManager.ConnectedPeerList[i];
-                            var peerEntity = onlinePeer.Tag as EntityHeadless;
+                            var peerEntity = onlinePeer.Tag as Entity;
                             var otherSession = peerEntity.GetComponent<WorldSession>();
                             var otherCharacter = otherSession.Character;
 
-                            // send all players to the new player.
-                            _netProcessor.Send(peer, new RealmClient_EntityCreate()
+                            if (onlinePeer.Id != peer.Id)
                             {
-                                EntityType = WorldEntityType.Player,
-                                Id = otherSession.Account.SessionId,
-                                X = otherSession.WorldPosition.X,
-                                Y = otherSession.WorldPosition.Y
-                            }, DeliveryMethod.ReliableOrdered);
+                                // send all players to the new player.
+                                _netProcessor.Send(peer, new RealmClient_EntityCreate()
+                                {
+                                    EntityType = WorldEntityType.Player,
+                                    Id = otherSession.Account.SessionId,
+                                    X = otherSession.Entity.Position.X,
+                                    Y = otherSession.Entity.Position.Y
+                                }, DeliveryMethod.ReliableOrdered);
 
-                            SerializableCharacter serializedOtherCharacter = new SerializableCharacter(
-                                otherCharacter.CharacterId, 
-                                otherCharacter.GuildId,
-                                otherCharacter.Name, 
-                                otherCharacter.Level, 
-                                otherCharacter.Class);
-                            SendSerializable(peer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedOtherCharacter });
+                                SerializableCharacter serializedOtherCharacter = new SerializableCharacter(
+                                    otherCharacter.CharacterId,
+                                    otherCharacter.GuildId,
+                                    otherCharacter.Name,
+                                    otherCharacter.Level,
+                                    otherCharacter.Class);
+                                SendSerializable(peer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedOtherCharacter });
 
-                            // send the new client to all other players.
-                            _netProcessor.Send(onlinePeer, new RealmClient_EntityCreate()
-                            {
-                                EntityType = WorldEntityType.Player,
-                                Id = session.Account.SessionId,
-                                X = session.WorldPosition.X,
-                                Y = session.WorldPosition.Y
-                            }, DeliveryMethod.ReliableOrdered);
+                                // send the new client to all other players.
+                                _netProcessor.Send(onlinePeer, new RealmClient_EntityCreate()
+                                {
+                                    EntityType = WorldEntityType.Player,
+                                    Id = session.Account.SessionId,
+                                    X = session.Entity.Position.X,
+                                    Y = session.Entity.Position.Y
+                                }, DeliveryMethod.ReliableOrdered);
 
-                            SendSerializable(onlinePeer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedCharacter });
+                                SendSerializable(onlinePeer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedCharacter });
+                            }
                         }
                     }
                 }
@@ -192,7 +199,7 @@ namespace WoW.Realmserver
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
             _netEventListener.PeerDisconnectedEvent += (peer, reason) =>
             {
-                var entity = peer.Tag as EntityHeadless;
+                var entity = peer.Tag as Entity;
 
                 SendToExcept(entity.Name, new RealmClient_Disconnect() { Id = entity.Name, Code = DisconnectCode.Timeout }, DeliveryMethod.ReliableOrdered);
             };
@@ -227,7 +234,7 @@ namespace WoW.Realmserver
         {
             DeltaTime = deltaTime;
 
-            _world.Update();
+            CoreHeadless.Scene.Update();
         }
 
         private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
@@ -245,7 +252,7 @@ namespace WoW.Realmserver
 
         public static void SendToExcept<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
-            var peersExcept = _netManager.ConnectedPeerList.Where(p => !(p.Tag as EntityHeadless).Name.Equals(gObjectId)).ToArray();
+            var peersExcept = _netManager.ConnectedPeerList.Where(p => !(p.Tag as Entity).Name.Equals(gObjectId)).ToArray();
 
             for (int i = 0; i < peersExcept.Length; i++)
                 Send(peersExcept[i], packet, delivery);

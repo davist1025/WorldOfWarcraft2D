@@ -12,6 +12,32 @@ namespace Nez.ECS.Headless
 
 		public static GameServiceContainer Services;
 
+		/// <summary>
+		/// The currently active Scene. Note that if set, the Scene will not actually change until the end of the Update
+		/// </summary>
+		public static Scene Scene
+		{
+			get => _instance._scene;
+			set
+			{
+				Insist.IsNotNull(value, "Scene cannot be null!");
+
+				// handle our initial Scene. If we have no Scene and one is assigned directly wire it up
+				if (_instance._scene == null)
+				{
+					_instance._scene = value;
+					_instance.OnSceneChanged();
+					_instance._scene.Begin();
+				}
+				else
+				{
+					_instance._nextScene = value;
+				}
+			}
+		}
+		Scene _scene;
+		Scene _nextScene;
+
 		public static CoreHeadless Instance => _instance;
 		internal static CoreHeadless _instance;
 
@@ -253,5 +279,15 @@ namespace Nez.ECS.Headless
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Called after a Scene ends, before the next Scene begins
+		/// </summary>
+		void OnSceneChanged()
+		{
+			//Emitter.Emit(CoreEvents.SceneChanged);
+			//Time.SceneChanged();
+			//GC.Collect();
+		}
 	}
 }

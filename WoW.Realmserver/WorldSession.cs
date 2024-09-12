@@ -14,17 +14,16 @@ using WoW.Server.Shared.Serializable;
 
 namespace WoW.Realmserver
 {
-    internal class WorldSession : ComponentHeadless, IUpdatable
+    internal class WorldSession : Component, IUpdatable
     {
-        public PlayerAccount Account { get; init; }
+        public PlayerAccount Account;
         public PlayerCharacter Character;
 
-        /// <summary>
-        /// The global position of this player.
-        /// </summary>
-        public Vector2 WorldPosition = new Vector2();
-        private Vector2 _moveDirection;
+        private SubpixelVector2 _subPixelMovement;
+        private CircleCollider _collider;
+        private Mover _mover;
 
+        private Vector2 _moveDirection = Vector2.Zero;
         public float MovementSpeed = 100f;
         // todo: local position within a zone.
 
@@ -40,16 +39,26 @@ namespace WoW.Realmserver
                 // todo: figure some way to do collision/invalid movement.
                 // probably best to just imitate Nez' 'Mover' class, and then use Tiled on the server.
                 _moveDirection = MovementSpeed * Program.DeltaTime * input;
-                WorldPosition += _moveDirection;
+
+                _mover.CalculateMovement(ref _moveDirection, out var res);
+                _mover.ApplyMovement(_moveDirection);
 
                 Program.SendToExcept(Entity.Name,
                     new RealmClient_NetPositionInputUpdate()
                     {
                         Id = Entity.Name,
-                        X = WorldPosition.X,
-                        Y = WorldPosition.Y,
+                        X = Entity.Position.X,
+                        Y = Entity.Position.Y,
                     }, DeliveryMethod.Unreliable);
             }
+
+        }
+
+        public void InitializeGameComponents()
+        {
+            _collider = Entity.AddComponent<CircleCollider>();
+            _collider.SetRadius(16f);
+            _mover = Entity.AddComponent<Mover>();
         }
     }
 }
