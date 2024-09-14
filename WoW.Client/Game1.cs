@@ -84,10 +84,9 @@ namespace WoW.Client
                 if (entityToCreateWithId != null)
                 {
                     Entity entity = new Entity(newLogin.Id);
-                    //Debug.LogIf(newLogin.PlayerCharacter == null, "Networked player is null!");
 
-                    if (newLogin.PlayerCharacter != null)
-                        Debug.Log($"{newLogin.Id} is playing w/ character: {newLogin.PlayerCharacter.Name}");
+                    Debug.WarnIf(newLogin.PlayerCharacter == null, "The new client's PlayerCharacter is null in the packet!"); // this shouldn't be possible but we'll keep the check for now.
+                    Debug.LogIf(newLogin.PlayerCharacter != null, $"{newLogin.Id} is playing character: {newLogin.PlayerCharacter.Name}");
 
                     entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
                     entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
