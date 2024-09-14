@@ -69,6 +69,7 @@ namespace WoW.Client.Components
 
         /// <summary>
         /// Returns the character name for the player.
+        /// todo: temporary function to quickly grab that character name for our player.
         /// </summary>
         /// <returns></returns>
         public string GetName()

@@ -74,24 +74,25 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_EntityCreate>((newCreate) =>
             {
-                Debug.Log(newCreate.Id);
                 if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
                     _entityQueue.Add(newCreate);
-                //var netTestScene = Scene as NetworkTestScene;
-                //netTestScene.CreateEntity(newCreate);
             });
 
-            _netProcessor.SubscribeReusable<RealmClient_Connect>((newLogin) =>
+            _netProcessor.SubscribeNetSerializable<RealmClient_Connect>((newLogin) =>
             {
                 var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
                 if (entityToCreateWithId != null)
                 {
                     Entity entity = new Entity(newLogin.Id);
+                    //Debug.LogIf(newLogin.PlayerCharacter == null, "Networked player is null!");
+
+                    if (newLogin.PlayerCharacter != null)
+                        Debug.Log($"{newLogin.Id} is playing w/ character: {newLogin.PlayerCharacter.Name}");
+
                     entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
+                    entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
                     EntityQueue.Enqueue(entity);
                 }
-                //var netTestScene = Scene as NetworkTestScene;
-                //netTestScene.CreatePlayer(newLogin);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((positionUpdate) =>

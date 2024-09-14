@@ -14,11 +14,12 @@ namespace WoW.Client.Shared.Realm
     /// </summary>
     public class RealmClient_Connect : INetSerializable
     {
-        public string Id { get; set; }
+        public string Id;
         public SerializableCharacter PlayerCharacter;
 
         public void Deserialize(NetDataReader reader)
         {
+            Id = reader.GetString();
             PlayerCharacter = new
                 (reader.GetInt(),
                 reader.GetInt(),
@@ -30,6 +31,7 @@ namespace WoW.Client.Shared.Realm
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(Id);
             writer.Put(PlayerCharacter.CharacterId);
             writer.Put(PlayerCharacter.RaceId);
             writer.Put(PlayerCharacter.GuildId);
