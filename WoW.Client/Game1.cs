@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.ImGuiTools;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using WoW.Client.Components;
 using WoW.Client.Scenes;
 using WoW.Client.Shared;
@@ -22,6 +24,7 @@ namespace WoW.Client
         Auth_Realmlist,
         Realm,
         Realm_Characters,
+        LoadingWorld,
         World
     }
 
@@ -34,7 +37,11 @@ namespace WoW.Client
 
         public static string AccountName;
         public static string SessionId;
-        public static Realmserver LastRealm;
+        public static Realmserver LastRealm; // todo: save to disk.
+
+        private static List<RealmClient_EntityCreate> _entityQueue;
+        private static List<RealmClient_Connect> _entityToPlayerQueue;
+        public static Queue<Entity> EntityQueue;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
         {
@@ -44,6 +51,10 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
+            _entityQueue = new List<RealmClient_EntityCreate>();
+            _entityToPlayerQueue = new List<RealmClient_Connect>();
+            EntityQueue = new Queue<Entity>();
+
             // todo: network stuff init'd here.
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
@@ -63,14 +74,24 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_EntityCreate>((newCreate) =>
             {
-                var netTestScene = Scene as NetworkTestScene;
-                netTestScene.CreateEntity(newCreate);
+                Debug.Log(newCreate.Id);
+                if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
+                    _entityQueue.Add(newCreate);
+                //var netTestScene = Scene as NetworkTestScene;
+                //netTestScene.CreateEntity(newCreate);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_Connect>((newLogin) =>
             {
-                var netTestScene = Scene as NetworkTestScene;
-                netTestScene.CreatePlayer(newLogin);
+                var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
+                if (entityToCreateWithId != null)
+                {
+                    Entity entity = new Entity(newLogin.Id);
+                    entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
+                    EntityQueue.Enqueue(entity);
+                }
+                //var netTestScene = Scene as NetworkTestScene;
+                //netTestScene.CreatePlayer(newLogin);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((positionUpdate) =>
@@ -104,7 +125,7 @@ namespace WoW.Client
                     }
 
                     var netPlayerController = playerById.GetComponent<NetPlayerController>();
-                    chatFormat = $"[{netPlayerController.Username}] {newChat.Message}";
+                    chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
                 }
                 else
                 {

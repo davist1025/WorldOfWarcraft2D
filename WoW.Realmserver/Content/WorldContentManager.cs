@@ -38,6 +38,12 @@ namespace WoW.Realmserver.Content
         {
             TmxMap map = new TmxMap().LoadTmxMapHeadless(name);
             string mapName = map.Properties["name"];
+
+            // todo: check for an empty name prop.
+
+            // todo: each map can be loaded and placed at 0,0; collision checks occur for each player independently and only within the map their on.
+            // need to add support for this later, so players don't collider with every map.
+            // random note: the server could hypothetically only load maps that contains at least one player, and unload them when there are none?
             Entity mapEntity = CoreHeadless.Scene.CreateEntity(mapName);
             TiledMapProcessor processor = new TiledMapProcessor(map, "collision_layer");
             mapEntity.AddComponent(processor);

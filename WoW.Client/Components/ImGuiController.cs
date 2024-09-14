@@ -143,6 +143,11 @@ namespace WoW.Client.Components
 
                     ImGui.End();
                     break;
+                case GameNetworkState.LoadingWorld:
+                    // at this point, the client is just waiting on all of the data from the realmserver (our equipment, inventory, all other players, etc)
+                    // the server will tell the client when to transition scenes.
+                    // todo: unused net state.
+                    break;
                 case GameNetworkState.World:
                     ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
 

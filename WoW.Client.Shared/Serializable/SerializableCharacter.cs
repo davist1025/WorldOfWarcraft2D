@@ -15,7 +15,7 @@ namespace WoW.Client.Shared.Serializable
 
         public string Name { get; set; }
 
-        public bool RaceId { get; set; }
+        public int RaceId { get; set; }
 
         public int GuildId { get; set; }
 
@@ -28,9 +28,10 @@ namespace WoW.Client.Shared.Serializable
         // need to keep in mind the servers will be transitioning to MySQL for data storage at some point.
         // id like the data migration to be as seamless as possible.
 
-        public SerializableCharacter(int localId, int guildId, string name, int level, CharacterClassType @class)
+        public SerializableCharacter(int localId, int raceId, int guildId, string name, int level, CharacterClassType @class)
         {
             CharacterId = localId;
+            RaceId = raceId;
             GuildId = guildId;
             Name = name;
             Level = level;

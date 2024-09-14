@@ -6,17 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
+using WoW.Client.Shared.Serializable;
 
 namespace WoW.Client.Components
 {
     internal class NetPlayerController : Component, IUpdatable
     {
-        public string Username = "";
+        public SerializableCharacter Character;
 
         private Mover _mover;
         private SubpixelVector2 _subPixel;
 
         public Queue<Vector2> Inputs;
+
+        public NetPlayerController(SerializableCharacter character)
+            => Character = character;
 
         public override void OnAddedToEntity()
         {

@@ -20,7 +20,8 @@ namespace WoW.Client.Shared.Realm
         public void Deserialize(NetDataReader reader)
         {
             PlayerCharacter = new
-                (reader.GetInt(), 
+                (reader.GetInt(),
+                reader.GetInt(),
                 reader.GetInt(),
                 reader.GetString(), 
                 reader.GetInt(), 
@@ -30,6 +31,7 @@ namespace WoW.Client.Shared.Realm
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(PlayerCharacter.CharacterId);
+            writer.Put(PlayerCharacter.RaceId);
             writer.Put(PlayerCharacter.GuildId);
             writer.Put(PlayerCharacter.Name);
             writer.Put(PlayerCharacter.Level);

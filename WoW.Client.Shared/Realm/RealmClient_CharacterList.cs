@@ -26,11 +26,12 @@ namespace WoW.Client.Shared.Realm
             for (int i = 0; i < characterCount; i++)
             {
                 int localId = reader.GetInt();
+                int raceId = reader.GetInt();
                 int guildId = reader.GetInt();
                 string name = reader.GetString();
                 int level = reader.GetInt();
                 CharacterClassType @class = (CharacterClassType)reader.GetInt();
-                Characters.Add(new SerializableCharacter(localId, guildId, name, level, @class));
+                Characters.Add(new SerializableCharacter(localId, raceId, guildId, name, level, @class));
             }
         }
 
@@ -41,6 +42,7 @@ namespace WoW.Client.Shared.Realm
             {
                 SerializableCharacter character = Characters[i];
                 writer.Put(character.CharacterId);
+                writer.Put(character.RaceId);
                 writer.Put(character.GuildId);
                 writer.Put(character.Name);
                 writer.Put(character.Level);

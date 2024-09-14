@@ -32,6 +32,7 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
+            // todo: more debug tiled code.
             var map = Content.LoadTiledMap("world1.tmx");
 
             CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
@@ -49,14 +50,11 @@ namespace WoW.Client.Scenes
 
             if (existingEntity != null)
             {
-                var newController = new NetPlayerController()
-                {
-                    Username = newLogin.PlayerCharacter.Name
-                };
+                var newController = new NetPlayerController(newLogin.PlayerCharacter);
 
                 existingEntity.AddComponent(newController);
 
-                Debug.Log($"New player: {newController.Username} has connected!");
+                Debug.Log($"New player: {newController.Character.Name} has connected!");
             }
         }
 
@@ -69,6 +67,17 @@ namespace WoW.Client.Scenes
             var player = FindEntity(posUpdate.Id);
             if (player != null)
                 player.GetComponent<NetPlayerController>().Inputs.Enqueue(new Vector2(posUpdate.X, posUpdate.Y));
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (Game1.EntityQueue.Count > 0)
+            {
+                var entity = Game1.EntityQueue.Dequeue();
+                AddEntity(entity);
+            }
         }
 
         public Entity GetPlayer()

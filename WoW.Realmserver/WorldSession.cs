@@ -25,7 +25,6 @@ namespace WoW.Realmserver
 
         private Vector2 _moveDirection = Vector2.Zero;
         public float MovementSpeed = 100f;
-        // todo: local position within a zone.
 
         public Queue<Vector2> InputUpdates = new Queue<Vector2>();
 
@@ -36,8 +35,6 @@ namespace WoW.Realmserver
         {
             if (InputUpdates.TryDequeue(out var input))
             {
-                // todo: figure some way to do collision/invalid movement.
-                // probably best to just imitate Nez' 'Mover' class, and then use Tiled on the server.
                 _moveDirection = MovementSpeed * Program.DeltaTime * input;
 
                 _mover.CalculateMovement(ref _moveDirection, out var res);
@@ -46,14 +43,15 @@ namespace WoW.Realmserver
                 if (res.Collider != null)
                     Console.WriteLine($"{Character.Name} collided with {res.Collider.Bounds.ToString()}!");
 
+                _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
 
                 Program.SendToExcept(Entity.Name,
                     new RealmClient_NetPositionInputUpdate()
                     {
                         Id = Entity.Name,
-                        X = Entity.Position.X,
-                        Y = Entity.Position.Y,
+                        X = Entity.Transform.Position.X,
+                        Y = Entity.Transform.Position.Y,
                     }, DeliveryMethod.Unreliable);
             }
 

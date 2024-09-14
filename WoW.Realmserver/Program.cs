@@ -121,7 +121,7 @@ namespace WoW.Realmserver
                         for (int i = 0; i < characters.Length; i++)
                         {
                             var character = characters[i];
-                            serializableCharacters.Add(new SerializableCharacter(character.CharacterId,character.GuildId, character.Name, character.Level, character.Class));
+                            serializableCharacters.Add(new SerializableCharacter(character.CharacterId, character.RaceId, character.GuildId, character.Name, character.Level, character.Class));
                         }
 
                         SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = serializableCharacters });
@@ -129,6 +129,7 @@ namespace WoW.Realmserver
                 }
             });
 
+            // this is where we will send the connecting client everything they need to play.
             _netProcessor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) =>
             {
                 Entity entity = peer.Tag as Entity;
@@ -140,57 +141,60 @@ namespace WoW.Realmserver
                         .Where(c => c.AccountId == session.Account.Id)
                         .FirstOrDefault(c => c.CharacterId == transfer.LocalCharacterId);
 
-                    var chars = ctx.Characters.Where(c => c.AccountId == session.Account.Id);
-
                     if (playingCharacter != null)
                     {
                         session.Character = playingCharacter;
                         session.InitializeGameComponents();
 
+                        // send the client their chosen character.
                         SerializableCharacter serializedCharacter = new SerializableCharacter(
                                 playingCharacter.CharacterId,
+                                playingCharacter.RaceId,
                                 playingCharacter.GuildId,
                                 playingCharacter.Name,
                                 playingCharacter.Level,
                                 playingCharacter.Class);
 
-                        for (int i = 0; i < _netManager.ConnectedPeersCount; i++)
+                        var allPeersExceptSender = _netManager.ConnectedPeerList.Where(p => p.Id != peer.Id).ToArray();
+                        for (int i = 0; i < allPeersExceptSender.Length; i++)
                         {
-                            var onlinePeer = _netManager.ConnectedPeerList[i];
-                            var peerEntity = onlinePeer.Tag as Entity;
-                            var otherSession = peerEntity.GetComponent<WorldSession>();
-                            var otherCharacter = otherSession.Character;
+                            NetPeer onlinePeer = allPeersExceptSender[i];
+                            Entity entityForPeer = onlinePeer.Tag as Entity;
+                            WorldSession sessionForEntity = entityForPeer.GetComponent<WorldSession>();
 
-                            if (onlinePeer.Id != peer.Id)
+                            SerializableCharacter serializedOnlineCharacter = new SerializableCharacter(
+                                sessionForEntity.Character.CharacterId,
+                                sessionForEntity.Character.RaceId,
+                                sessionForEntity.Character.GuildId,
+                                sessionForEntity.Character.Name,
+                                sessionForEntity.Character.Level,
+                                sessionForEntity.Character.Class);
+
+                            Send(peer, new RealmClient_EntityCreate()
                             {
-                                // send all players to the new player.
-                                _netProcessor.Send(peer, new RealmClient_EntityCreate()
-                                {
-                                    EntityType = WorldEntityType.Player,
-                                    Id = otherSession.Account.SessionId,
-                                    X = otherSession.Entity.Position.X,
-                                    Y = otherSession.Entity.Position.Y
-                                }, DeliveryMethod.ReliableOrdered);
+                                EntityType = WorldEntityType.Player,
+                                Id = sessionForEntity.Account.SessionId,
+                                X = sessionForEntity.Entity.Transform.Position.X,
+                                Y = sessionForEntity.Entity.Transform.Position.Y
+                            });
+                            Send(peer, new RealmClient_Connect()
+                            {
+                                Id = sessionForEntity.Account.SessionId,
+                                PlayerCharacter = serializedOnlineCharacter
+                            });
 
-                                SerializableCharacter serializedOtherCharacter = new SerializableCharacter(
-                                    otherCharacter.CharacterId,
-                                    otherCharacter.GuildId,
-                                    otherCharacter.Name,
-                                    otherCharacter.Level,
-                                    otherCharacter.Class);
-                                SendSerializable(peer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedOtherCharacter });
-
-                                // send the new client to all other players.
-                                _netProcessor.Send(onlinePeer, new RealmClient_EntityCreate()
-                                {
-                                    EntityType = WorldEntityType.Player,
-                                    Id = session.Account.SessionId,
-                                    X = session.Entity.Position.X,
-                                    Y = session.Entity.Position.Y
-                                }, DeliveryMethod.ReliableOrdered);
-
-                                SendSerializable(onlinePeer, new RealmClient_Connect() { Id = otherSession.Account.SessionId, PlayerCharacter = serializedCharacter });
-                            }
+                            Send(onlinePeer, new RealmClient_EntityCreate()
+                            {
+                                EntityType = WorldEntityType.Player,
+                                Id = session.Account.SessionId,
+                                X = session.Entity.Transform.Position.X,
+                                Y = session.Entity.Transform.Position.Y
+                            });
+                            Send(onlinePeer, new RealmClient_Connect()
+                            {
+                                Id = session.Account.SessionId,
+                                PlayerCharacter = serializedCharacter
+                            });
                         }
                     }
                 }
