@@ -21,7 +21,6 @@ namespace WoW.Authserver
         private static NetPacketProcessor _netProcessor;
 
         public static List<Realmserver> Realmlist = new List<Realmserver>();
-        public static AuthContext AuthDB = new AuthContext();
 
         public Program()
         {
