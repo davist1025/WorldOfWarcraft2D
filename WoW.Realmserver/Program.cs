@@ -172,9 +172,9 @@ namespace WoW.Realmserver
                                 sessionForEntity.Character.Level,
                                 sessionForEntity.Character.Class);
 
-                            Send(peer, new RealmClient_EntityCreate()
+                            Send(peer, new RealmClient_CreateGameObject()
                             {
-                                EntityType = WorldEntityType.Player,
+                                EntityType = GameObjectType.Player,
                                 Id = sessionForEntity.Account.SessionId,
                                 X = sessionForEntity.Entity.Transform.Position.X,
                                 Y = sessionForEntity.Entity.Transform.Position.Y
@@ -185,9 +185,9 @@ namespace WoW.Realmserver
                                 PlayerCharacter = serializedOnlineCharacter
                             });
 
-                            Send(onlinePeer, new RealmClient_EntityCreate()
+                            Send(onlinePeer, new RealmClient_CreateGameObject()
                             {
-                                EntityType = WorldEntityType.Player,
+                                EntityType = GameObjectType.Player,
                                 Id = session.Account.SessionId,
                                 X = session.Entity.Transform.Position.X,
                                 Y = session.Entity.Transform.Position.Y

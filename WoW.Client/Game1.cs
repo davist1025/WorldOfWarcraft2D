@@ -39,7 +39,7 @@ namespace WoW.Client
         public static string SessionId;
         public static Realmserver LastRealm; // todo: save to disk.
 
-        private static List<RealmClient_EntityCreate> _entityQueue;
+        private static List<RealmClient_CreateGameObject> _entityQueue;
         private static List<RealmClient_Connect> _entityToPlayerQueue;
         public static Queue<Entity> EntityQueue;
 
@@ -51,7 +51,7 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
-            _entityQueue = new List<RealmClient_EntityCreate>();
+            _entityQueue = new List<RealmClient_CreateGameObject>();
             _entityToPlayerQueue = new List<RealmClient_Connect>();
             EntityQueue = new Queue<Entity>();
 
@@ -72,7 +72,7 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
-            _netProcessor.SubscribeReusable<RealmClient_EntityCreate>((newCreate) =>
+            _netProcessor.SubscribeReusable<RealmClient_CreateGameObject>((newCreate) =>
             {
                 if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
                     _entityQueue.Add(newCreate);

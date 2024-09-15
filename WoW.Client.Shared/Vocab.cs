@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Shared
 {
-    public enum WorldEntityType : int
+    public enum GameObjectType : int
     {
         Player,
-        Creature
+        Creature,
+        Interactable
     }
 
+    // todo: re-implement flags at a later date.
+    [Obsolete("Requires reimplementation.")]
     public enum ObjectFlags
     {
         None = 0,

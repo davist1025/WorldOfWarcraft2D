@@ -12,9 +12,9 @@ namespace WoW.Client.Shared.Realm
     /// 
     /// This packet is the only one to signify that the client should create a new Scene entity.
     /// </summary>
-    public class RealmClient_EntityCreate
+    public class RealmClient_CreateGameObject
     {
-        public WorldEntityType EntityType { get; set; }
+        public GameObjectType EntityType { get; set; }
 
         /// <summary>
         /// The unique id of the entity.

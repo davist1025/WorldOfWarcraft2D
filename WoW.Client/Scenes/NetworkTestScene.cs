@@ -38,7 +38,7 @@ namespace WoW.Client.Scenes
             CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
-        public void CreateEntity(RealmClient_EntityCreate create)
+        public void CreateEntity(RealmClient_CreateGameObject create)
         {
             var newEntity = CreateEntity(create.Id, new Vector2(create.X, create.Y));
             newEntity.Tag = (int)create.EntityType;
