@@ -124,6 +124,8 @@ namespace WoW.Realmserver
                             serializableCharacters.Add(new SerializableCharacter(character.CharacterId, character.RaceId, character.GuildId, character.Name, character.Level, character.Class));
                         }
 
+                        // todo: should we still send this packet if the list is empty?
+                        // suppose the client could just check the list count and if it's <1, just diaply no characters :p+
                         SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = serializableCharacters });
                     }
                 }

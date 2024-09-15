@@ -160,8 +160,6 @@ namespace WoW.Client
             {
                 SessionId = logon.SessionId;
                 // server sends the realmlist automatically.
-
-                // do we need to send a realmlist req. packet here or should we just have the server send it?
             });
 
             _netProcessor.SubscribeReusable<AuthClient_Realmserver>((realmlist) =>
