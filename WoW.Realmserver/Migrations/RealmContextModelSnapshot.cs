@@ -51,7 +51,7 @@ namespace WoW.Realmserver.Migrations
 
                     b.HasKey("AccountId");
 
-                    b.ToTable("characters");
+                    b.ToTable("characters", (string)null);
                 });
 #pragma warning restore 612, 618
         }

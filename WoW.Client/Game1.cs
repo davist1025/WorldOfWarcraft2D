@@ -40,7 +40,7 @@ namespace WoW.Client
         public static Realmserver LastRealm; // todo: save to disk.
 
         private static List<RealmClient_CreateGameObject> _entityQueue;
-        private static List<RealmClient_Connect> _entityToPlayerQueue;
+        private static List<RealmClient_CreateNetPlayer> _entityToPlayerQueue;
         public static Queue<Entity> EntityQueue;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
@@ -52,7 +52,7 @@ namespace WoW.Client
         protected override void Initialize()
         {
             _entityQueue = new List<RealmClient_CreateGameObject>();
-            _entityToPlayerQueue = new List<RealmClient_Connect>();
+            _entityToPlayerQueue = new List<RealmClient_CreateNetPlayer>();
             EntityQueue = new Queue<Entity>();
 
             // todo: network stuff init'd here.
@@ -78,7 +78,7 @@ namespace WoW.Client
                     _entityQueue.Add(newCreate);
             });
 
-            _netProcessor.SubscribeNetSerializable<RealmClient_Connect>((newLogin) =>
+            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNetPlayer>((newLogin) =>
             {
                 var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
                 if (entityToCreateWithId != null)

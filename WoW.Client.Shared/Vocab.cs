@@ -13,13 +13,13 @@ namespace WoW.Client.Shared
         Interactable
     }
 
-    // todo: re-implement flags at a later date.
-    [Obsolete("Requires reimplementation.")]
-    public enum ObjectFlags
+    [Flags]
+    public enum GameObjectFlags : int
     {
-        None = 0,
-        Ambient = 1,
-        QuestGiver = 2,
+        None = 0, // should never contain this flag. used to init the object.
+        IsTargetable = 1,
+        IsContainer = 1 << 1,
+        
     }
 
     public enum LogonCode

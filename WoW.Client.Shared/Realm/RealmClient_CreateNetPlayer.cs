@@ -12,7 +12,7 @@ namespace WoW.Client.Shared.Realm
     /// Realm -> Client
     /// Sent to all clients and describes a new character login.
     /// </summary>
-    public class RealmClient_Connect : INetSerializable
+    public class RealmClient_CreateNetPlayer : INetSerializable
     {
         public string Id;
         public SerializableCharacter PlayerCharacter;

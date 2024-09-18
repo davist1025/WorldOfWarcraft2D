@@ -179,7 +179,7 @@ namespace WoW.Realmserver
                                 X = sessionForEntity.Entity.Transform.Position.X,
                                 Y = sessionForEntity.Entity.Transform.Position.Y
                             });
-                            SendSerializable(peer, new RealmClient_Connect()
+                            SendSerializable(peer, new RealmClient_CreateNetPlayer()
                             {
                                 Id = sessionForEntity.Account.SessionId,
                                 PlayerCharacter = serializedOnlineCharacter
@@ -192,7 +192,7 @@ namespace WoW.Realmserver
                                 X = session.Entity.Transform.Position.X,
                                 Y = session.Entity.Transform.Position.Y
                             });
-                            SendSerializable(onlinePeer, new RealmClient_Connect()
+                            SendSerializable(onlinePeer, new RealmClient_CreateNetPlayer()
                             {
                                 Id = session.Account.SessionId,
                                 PlayerCharacter = serializedCharacter

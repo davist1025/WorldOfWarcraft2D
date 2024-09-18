@@ -28,6 +28,7 @@ namespace WoW.Client.Scenes
             var playerEntity = CreateEntity("player").AddComponent(_theController);
             CreateEntity("gui").AddComponent(new ImGuiController());
             Camera.Entity.AddComponent(new FollowCamera(playerEntity.Entity, Camera));
+            Camera.Zoom = 0.5f;
         }
 
         public override void Initialize()
@@ -44,7 +45,7 @@ namespace WoW.Client.Scenes
             newEntity.Tag = (int)create.EntityType;
         }
 
-        public void CreatePlayer(RealmClient_Connect newLogin)
+        public void CreatePlayer(RealmClient_CreateNetPlayer newLogin)
         {
             var existingEntity = FindEntity(newLogin.Id);
 
