@@ -19,7 +19,7 @@ namespace WoW.Client.Shared
         None = 0, // should never contain this flag. used to init the object.
         IsTargetable = 1,
         IsContainer = 1 << 1,
-        
+        IsMailbox = 1 << 2,
     }
 
     public enum LogonCode
