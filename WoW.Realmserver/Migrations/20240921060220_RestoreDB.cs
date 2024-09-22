@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WoW.Realmserver.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateDB : Migration
+    public partial class RestoreDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace WoW.Realmserver.Migrations
                     AccountId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     CharacterId = table.Column<int>(type: "int", nullable: false),
-                    GuildId = table.Column<int>(type: "int", nullable: true),
+                    GuildId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RaceId = table.Column<int>(type: "int", nullable: false),
@@ -34,7 +34,25 @@ namespace WoW.Realmserver.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.Sql("INSERT INTO characters(CharacterId, GuildId, Name, RaceId, ClassId, Level) VALUES ('1', '-1', 'Gourdroe', '1', '1', '1')");
+            migrationBuilder.CreateTable(
+                name: "creatures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SubName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DisplayId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Flags = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_creatures", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
         }
 
         /// <inheritdoc />
@@ -42,6 +60,9 @@ namespace WoW.Realmserver.Migrations
         {
             migrationBuilder.DropTable(
                 name: "characters");
+
+            migrationBuilder.DropTable(
+                name: "creatures");
         }
     }
 }

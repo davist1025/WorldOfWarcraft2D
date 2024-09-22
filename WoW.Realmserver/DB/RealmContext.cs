@@ -17,7 +17,9 @@ namespace WoW.Realmserver.DB
         private const string _connectionString = "server=127.0.0.1;uid=root;pwd=1111;database=wpp_realm";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
+        {
+            optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

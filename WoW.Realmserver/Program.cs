@@ -11,6 +11,7 @@ using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Realm;
 using WoW.Client.Shared.Serializable;
+using WoW.Realmserver.Components;
 using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
@@ -39,8 +40,7 @@ namespace WoW.Realmserver
             Scene.IsHeadless = true;
 
             IsFixedTimeStep = true;
-
-            CoreHeadless.Scene = new WorldScene();
+            Scene = new WorldScene();
 
             Content = new WorldContentManager();
             _netProcessor = new NetPacketProcessor();
@@ -55,7 +55,7 @@ namespace WoW.Realmserver
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) =>
             {
                 var entity = peer.Tag as Entity;
-                var session = entity.GetComponent<WorldSession>();
+                var session = entity.GetComponent<WorldSessionComponent>();
 
                 session.InputUpdates.Enqueue(new Vector2(movement.X, movement.Y));
             });
@@ -64,7 +64,7 @@ namespace WoW.Realmserver
             {
                 // verify the message; check for invalid characters; check for command usage.
                 var entity = peer.Tag as Entity;
-                var session = entity.GetComponent<WorldSession>();
+                var session = entity.GetComponent<WorldSessionComponent>();
 
                 // todo: command processing!
                 //if (message.Message.StartsWith('.'))
@@ -103,7 +103,7 @@ namespace WoW.Realmserver
                     NetPeer sessionPeer = _transferSessions[session.User.SessionId];
                     _transferSessions.Remove(session.User.SessionId);
 
-                    WorldSession newSession = new WorldSession(session.User);
+                    WorldSessionComponent newSession = new WorldSessionComponent(session.User);
                     Entity newEntity = Scene.CreateEntity(newSession.Account.SessionId);
                     newEntity.AddComponent(newSession);
                     sessionPeer.Tag = newEntity;
@@ -125,7 +125,7 @@ namespace WoW.Realmserver
                         }
 
                         // todo: should we still send this packet if the list is empty?
-                        // suppose the client could just check the list count and if it's <1, just diaply no characters :p+
+                        // suppose the client could just check the list count and if it's <1, just diaply no characters :p
                         SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = serializableCharacters });
                     }
                 }
@@ -135,7 +135,8 @@ namespace WoW.Realmserver
             _netProcessor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) =>
             {
                 Entity entity = peer.Tag as Entity;
-                WorldSession session = entity.GetComponent<WorldSession>();
+                entity.Tag = (int)GameObjectType.Player;
+                WorldSessionComponent session = entity.GetComponent<WorldSessionComponent>();
 
                 using (var ctx = new RealmContext())
                 {
@@ -162,7 +163,7 @@ namespace WoW.Realmserver
                         {
                             NetPeer onlinePeer = allPeersExceptSender[i];
                             Entity entityForPeer = onlinePeer.Tag as Entity;
-                            WorldSession sessionForEntity = entityForPeer.GetComponent<WorldSession>();
+                            WorldSessionComponent sessionForEntity = entityForPeer.GetComponent<WorldSessionComponent>();
 
                             SerializableCharacter serializedOnlineCharacter = new SerializableCharacter(
                                 sessionForEntity.Character.CharacterId,
@@ -228,6 +229,11 @@ namespace WoW.Realmserver
             // authentication server will register each realmserver and give them to a connecting client.
             // client will select a realmserver, tell the authentication server which one.
 
+            // todo: try to add a behavior plugin system for ai routines so they can be "scripted"?
+            // will attempt to use CSScript and use Nez' BehaviorTree system.
+
+            CreateCreature("debug_world_1", Vector2.Zero, rawId: "mailbox_basic");
+
             while (true)
             {
                 _netManager.PollEvents();
@@ -239,8 +245,7 @@ namespace WoW.Realmserver
         public override void Update(float deltaTime)
         {
             DeltaTime = deltaTime;
-
-            CoreHeadless.Scene.Update();
+            Scene.Update();
         }
 
         private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
@@ -272,6 +277,48 @@ namespace WoW.Realmserver
 
         public static void SendToAuthserver<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(_authNetManager, packet, delivery);
+
+        /// <summary>
+        /// Adds a Creature to the world.
+        /// </summary>
+        /// <param name="creatureId"></param>
+        /// <param name="mapId"></param>
+        /// <param name="position"></param>
+        public static void CreateCreature(string mapId, Vector2 position, int creatureId = -1, string rawId = "")
+        {
+            // todo: make use of "raw id" in the creature object.
+            // this will be a universally unique string id that is more recognizable.
+            if (!Scene.GetType().Equals(typeof(WorldScene)))
+            {
+                Console.WriteLine("Scene is not a WorldScene object.");
+                return;
+            }
+
+            // todo: check for existing map id.
+            using (var ctx = new RealmContext())
+            {
+                Creature creature = null;
+
+                if (creatureId != -1)
+                    creature = ctx.Creatures.Where(c => c.Id == creatureId).FirstOrDefault();
+                else if (rawId != "")
+                    creature = ctx.Creatures.Where(c => c.RawId == rawId).FirstOrDefault();
+
+
+                if (creature == null)
+                {
+                    Console.WriteLine($"Unable to create an instance of this Creature; invalid name or id given!");
+                    return;
+                }
+
+                // todo: meh, find a better way to name creature entities.
+                Entity newCreature = Scene.CreateEntity($"{creature.Name}_{Nez.Random.NextInt(1000)}");
+                newCreature.Tag = (int)GameObjectType.Creature;
+                newCreature.AddComponent(new GameObjectComponent(mapId, creature));
+            }
+            // create and add the entity to the scene so they receive tick updates.
+            // place the mapId somewhere on the entity so we can reference them when the player joins a map.
+        }
 
         static void Main(string[] args)
             => new Program();

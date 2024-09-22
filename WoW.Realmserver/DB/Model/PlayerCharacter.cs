@@ -14,6 +14,7 @@ namespace WoW.Realmserver.DB.Model
     [Table("characters")]
     public class PlayerCharacter
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int AccountId { get; set; }
         public int CharacterId { get; set; }
         public int GuildId { get; set; }
@@ -30,5 +31,7 @@ namespace WoW.Realmserver.DB.Model
         public int ClassId { get; set; }
 
         public int Level { get; set; }
+
+        // todo: add a function to create serializable versions of model objects.
     }
 }

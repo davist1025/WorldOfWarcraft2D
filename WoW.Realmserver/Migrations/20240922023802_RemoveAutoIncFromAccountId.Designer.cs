@@ -11,8 +11,8 @@ using WoW.Realmserver.DB;
 namespace WoW.Realmserver.Migrations
 {
     [DbContext(typeof(RealmContext))]
-    [Migration("20240919053839_AddCreatureTable")]
-    partial class AddCreatureTable
+    [Migration("20240922023802_RemoveAutoIncFromAccountId")]
+    partial class RemoveAutoIncFromAccountId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace WoW.Realmserver.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("RawId")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("SubName")
                         .HasColumnType("longtext");
 
@@ -55,10 +58,7 @@ namespace WoW.Realmserver.Migrations
             modelBuilder.Entity("WoW.Realmserver.DB.Model.PlayerCharacter", b =>
                 {
                     b.Property<int>("AccountId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AccountId"));
 
                     b.Property<int>("CharacterId")
                         .HasColumnType("int");

@@ -12,9 +12,9 @@ using WoW.Client.Shared.Realm;
 using WoW.Realmserver.DB.Model;
 using WoW.Server.Shared.Serializable;
 
-namespace WoW.Realmserver
+namespace WoW.Realmserver.Components
 {
-    internal class WorldSession : Component, IUpdatable
+    internal class WorldSessionComponent : Component, IUpdatable
     {
         public PlayerAccount Account;
         public PlayerCharacter Character;
@@ -28,7 +28,7 @@ namespace WoW.Realmserver
 
         public Queue<Vector2> InputUpdates = new Queue<Vector2>();
 
-        public WorldSession(PlayerAccount user)
+        public WorldSessionComponent(PlayerAccount user)
             => Account = user;
 
         public void Update()
@@ -36,7 +36,6 @@ namespace WoW.Realmserver
             if (InputUpdates.TryDequeue(out var input))
             {
                 _moveDirection = MovementSpeed * Program.DeltaTime * input;
-
                 _mover.CalculateMovement(ref _moveDirection, out var res);
 
                 // todo: this is debug code for collision; check for collision ONLY on the map the player is on.
@@ -45,6 +44,8 @@ namespace WoW.Realmserver
 
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
+
+                // todo: only send to players on the same map as the player.
 
                 Program.SendToExcept(Entity.Name,
                     new RealmClient_NetPositionInputUpdate()

@@ -12,6 +12,7 @@ namespace WoW.Realmserver.DB.Model
     public class Creature
     {
         public int Id { get; set; }
+        public string? RawId { get; set; }
         public string Name { get; set; }
         public string? SubName { get; set; }
         public string DisplayId { get; set; }

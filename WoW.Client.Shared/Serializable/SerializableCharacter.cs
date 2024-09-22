@@ -25,9 +25,6 @@ namespace WoW.Client.Shared.Serializable
 
         // todo: should we load everything else into this object such as equipment, buffs, etc?
 
-        // need to keep in mind the servers will be transitioning to MySQL for data storage at some point.
-        // id like the data migration to be as seamless as possible.
-
         public SerializableCharacter(int localId, int raceId, int guildId, string name, int level, CharacterClassType @class)
         {
             CharacterId = localId;
