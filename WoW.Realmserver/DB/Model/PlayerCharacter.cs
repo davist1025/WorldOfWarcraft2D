@@ -19,6 +19,9 @@ namespace WoW.Realmserver.DB.Model
         public int CharacterId { get; set; }
         public int GuildId { get; set; }
         public string Name { get; set; }
+        public string MapId { get; set; }
+        public float XPosition { get; set; }
+        public float YPosition { get; set; }
 
         [NotMapped]
         public RaceType Race => (RaceType)RaceId;

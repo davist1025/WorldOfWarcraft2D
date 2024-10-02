@@ -1,9 +1,11 @@
-﻿using System;
+﻿using LiteNetLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
+using WoW.Client.Shared.Serializable;
 
 namespace WoW.Client.Shared.Realm
 {
@@ -11,17 +13,30 @@ namespace WoW.Client.Shared.Realm
     /// Realm -> Client.
     /// Tells the player to create a new GameObject that can have flags, which tell the player how to handle them.
     /// </summary>
-    public class RealmClient_CreateNetObject
+    public class RealmClient_CreateNetObject : INetSerializable
     {
-        public string Id { get; set; }
+        public string Id;
+        public SerializableCreature Creature;
 
-        /// <summary>
-        /// The image or animation used to render this object.
-        /// </summary>
-        public string DisplayId { get; set; }
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(Id);
+            writer.Put(Creature.Name);
+            writer.Put(Creature.SubName);
+            writer.Put(Creature.DisplayId);
+            writer.Put((int)Creature.Flags);
+        }
 
-        public GameObjectFlags Flags => (GameObjectFlags)FlagsLiteral;
-
-        public int FlagsLiteral = 0;
+        public void Deserialize(NetDataReader reader)
+        {
+            Id = reader.GetString();
+            Creature = new SerializableCreature()
+            {
+                Name = reader.GetString(),
+                SubName = reader.GetString(),
+                DisplayId = reader.GetString(),
+                Flags = (GameObjectFlags)reader.GetInt(),
+            };
+        }
     }
 }

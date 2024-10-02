@@ -29,6 +29,10 @@ namespace WoW.Realmserver.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BehaviorId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("DisplayId")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -42,6 +46,10 @@ namespace WoW.Realmserver.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("RawId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ScriptId")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("SubName")
@@ -69,12 +77,22 @@ namespace WoW.Realmserver.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("int");
 
+                    b.Property<string>("MapId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("RaceId")
                         .HasColumnType("int");
+
+                    b.Property<float>("XPosition")
+                        .HasColumnType("float");
+
+                    b.Property<float>("YPosition")
+                        .HasColumnType("float");
 
                     b.HasKey("AccountId");
 

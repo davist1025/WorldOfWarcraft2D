@@ -11,8 +11,8 @@ using WoW.Realmserver.DB;
 namespace WoW.Realmserver.Migrations
 {
     [DbContext(typeof(RealmContext))]
-    [Migration("20240922023802_RemoveAutoIncFromAccountId")]
-    partial class RemoveAutoIncFromAccountId
+    [Migration("20241001061511_CreateDatabase")]
+    partial class CreateDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace WoW.Realmserver.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BehaviorId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("DisplayId")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -45,6 +49,10 @@ namespace WoW.Realmserver.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("RawId")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ScriptId")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("SubName")
@@ -72,12 +80,22 @@ namespace WoW.Realmserver.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("int");
 
+                    b.Property<string>("MapId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("RaceId")
                         .HasColumnType("int");
+
+                    b.Property<float>("XPosition")
+                        .HasColumnType("float");
+
+                    b.Property<float>("YPosition")
+                        .HasColumnType("float");
 
                     b.HasKey("AccountId");
 

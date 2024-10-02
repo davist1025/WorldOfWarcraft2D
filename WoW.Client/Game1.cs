@@ -78,6 +78,20 @@ namespace WoW.Client
                     _entityQueue.Add(newCreate);
             });
 
+            _netProcessor.SubscribeReusable<RealmClient_CreateNetObject>((newCreate) =>
+            {
+                var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newCreate.Id, StringComparison.OrdinalIgnoreCase));
+                if (entityToCreateWithId != null)
+                {
+                    Entity entity = new Entity(newCreate.Id);
+
+                    // todo: what type of component is needed for a network creature?
+                    //entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
+                    entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
+                    EntityQueue.Enqueue(entity);
+                }
+            });
+
             _netProcessor.SubscribeNetSerializable<RealmClient_CreateNetPlayer>((newLogin) =>
             {
                 var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));

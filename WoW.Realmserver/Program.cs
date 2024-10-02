@@ -12,6 +12,7 @@ using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Realm;
 using WoW.Client.Shared.Serializable;
 using WoW.Realmserver.Components;
+using WoW.Realmserver.Components.Scripts;
 using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
@@ -41,6 +42,9 @@ namespace WoW.Realmserver
 
             IsFixedTimeStep = true;
             Scene = new WorldScene();
+
+            // hack: debug script loading code.
+            var script = ScriptLoader.GetScriptFromAssembly("targeted_script");
 
             Content = new WorldContentManager();
             _netProcessor = new NetPacketProcessor();
@@ -165,7 +169,9 @@ namespace WoW.Realmserver
                             Entity entityForPeer = onlinePeer.Tag as Entity;
                             WorldSessionComponent sessionForEntity = entityForPeer.GetComponent<WorldSessionComponent>();
 
-                            SerializableCharacter serializedOnlineCharacter = new SerializableCharacter(
+                            if (sessionForEntity.Character.MapId.Equals(session.Character.MapId, StringComparison.OrdinalIgnoreCase))
+                            {
+                                SerializableCharacter serializedOnlineCharacter = new SerializableCharacter(
                                 sessionForEntity.Character.CharacterId,
                                 sessionForEntity.Character.RaceId,
                                 sessionForEntity.Character.GuildId,
@@ -173,31 +179,62 @@ namespace WoW.Realmserver
                                 sessionForEntity.Character.Level,
                                 sessionForEntity.Character.Class);
 
-                            Send(peer, new RealmClient_CreateGameObject()
-                            {
-                                EntityType = GameObjectType.Player,
-                                Id = sessionForEntity.Account.SessionId,
-                                X = sessionForEntity.Entity.Transform.Position.X,
-                                Y = sessionForEntity.Entity.Transform.Position.Y
-                            });
-                            SendSerializable(peer, new RealmClient_CreateNetPlayer()
-                            {
-                                Id = sessionForEntity.Account.SessionId,
-                                PlayerCharacter = serializedOnlineCharacter
-                            });
+                                Send(peer, new RealmClient_CreateGameObject()
+                                {
+                                    EntityType = GameObjectType.Player,
+                                    Id = sessionForEntity.Account.SessionId,
+                                    X = sessionForEntity.Entity.Transform.Position.X,
+                                    Y = sessionForEntity.Entity.Transform.Position.Y
+                                });
+                                SendSerializable(peer, new RealmClient_CreateNetPlayer()
+                                {
+                                    Id = sessionForEntity.Account.SessionId,
+                                    PlayerCharacter = serializedOnlineCharacter
+                                });
 
-                            Send(onlinePeer, new RealmClient_CreateGameObject()
+                                Send(onlinePeer, new RealmClient_CreateGameObject()
+                                {
+                                    EntityType = GameObjectType.Player,
+                                    Id = session.Account.SessionId,
+                                    X = session.Entity.Transform.Position.X,
+                                    Y = session.Entity.Transform.Position.Y
+                                });
+                                SendSerializable(onlinePeer, new RealmClient_CreateNetPlayer()
+                                {
+                                    Id = session.Account.SessionId,
+                                    PlayerCharacter = serializedCharacter
+                                });
+                            }
+                        }
+
+                        var nonPlayerCreatures = Scene.FindEntitiesWithTag((int)GameObjectType.Creature);
+                        for (int i = 0; i < nonPlayerCreatures.Count; i++)
+                        {
+                            var creature = nonPlayerCreatures[i];
+                            var gObjectComponent = creature.GetComponent<GameObjectComponent>();
+
+                            if (gObjectComponent.MapId.Equals(session.Character.MapId, StringComparison.OrdinalIgnoreCase))
                             {
-                                EntityType = GameObjectType.Player,
-                                Id = session.Account.SessionId,
-                                X = session.Entity.Transform.Position.X,
-                                Y = session.Entity.Transform.Position.Y
-                            });
-                            SendSerializable(onlinePeer, new RealmClient_CreateNetPlayer()
-                            {
-                                Id = session.Account.SessionId,
-                                PlayerCharacter = serializedCharacter
-                            });
+                                Send(peer, new RealmClient_CreateGameObject()
+                                {
+                                    EntityType = GameObjectType.Creature,
+                                    Id = gObjectComponent.Id,
+                                    X = creature.Transform.Position.X,
+                                    Y = creature.Transform.Position.Y,
+                                });
+
+                                Send(peer, new RealmClient_CreateNetObject()
+                                {
+                                    Id = gObjectComponent.Id,
+                                    Creature = new SerializableCreature()
+                                    {
+                                        Name = gObjectComponent.Creature.Name,
+                                        SubName = gObjectComponent.Creature.SubName,
+                                        DisplayId = gObjectComponent.Creature.DisplayId,
+                                        Flags = gObjectComponent.Creature.Flags,
+                                    }
+                                });
+                            }
                         }
                     }
                 }
@@ -304,10 +341,9 @@ namespace WoW.Realmserver
                 else if (rawId != "")
                     creature = ctx.Creatures.Where(c => c.RawId == rawId).FirstOrDefault();
 
-
                 if (creature == null)
                 {
-                    Console.WriteLine($"Unable to create an instance of this Creature; invalid name or id given!");
+                    Console.WriteLine($"Unable to create an instance of this Creature; invalid id given!");
                     return;
                 }
 

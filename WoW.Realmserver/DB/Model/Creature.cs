@@ -16,6 +16,10 @@ namespace WoW.Realmserver.DB.Model
         public string Name { get; set; }
         public string? SubName { get; set; }
         public string DisplayId { get; set; }
+        public string ScriptId { get; set; }
+
+        // todo: temporarily remove this from code and the db, or just mark unused/obsolete.
+        public string BehaviorId { get; set; }
 
         [NotMapped]
         public GameObjectFlags Flags => (GameObjectFlags)FlagsLiteral;

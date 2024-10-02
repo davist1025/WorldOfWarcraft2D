@@ -14,7 +14,7 @@ using WoW.Server.Shared.Serializable;
 
 namespace WoW.Realmserver.Components
 {
-    internal class WorldSessionComponent : Component, IUpdatable
+    public class WorldSessionComponent : Component, IUpdatable
     {
         public PlayerAccount Account;
         public PlayerCharacter Character;
