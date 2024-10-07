@@ -17,5 +17,8 @@ namespace WoW.Server.Shared.Serializable
         public int Id;
         public string SessionId;
         public SecurityLevel Security;
+
+        public override string ToString()
+            => $"{Id}:{SessionId}";
     }
 }

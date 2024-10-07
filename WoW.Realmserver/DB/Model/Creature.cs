@@ -18,8 +18,19 @@ namespace WoW.Realmserver.DB.Model
         public string DisplayId { get; set; }
         public string ScriptId { get; set; }
 
-        // todo: temporarily remove this from code and the db, or just mark unused/obsolete.
+        [Obsolete("Not implemented.")]
         public string BehaviorId { get; set; }
+
+        /// <summary>
+        /// Describes a target in which the player can "tab" to.
+        /// Mailboxes, quest objects, etc are excluded from this.
+        /// </summary>
+        public bool IsTargetable { get; set; }
+        
+        /// <summary>
+        /// Will this Creature automatically target and attack any player in "sight?"
+        /// </summary>
+        public bool IsAggressive { get; set; }
 
         [NotMapped]
         public GameObjectFlags Flags => (GameObjectFlags)FlagsLiteral;

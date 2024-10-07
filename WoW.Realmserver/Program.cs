@@ -119,7 +119,7 @@ namespace WoW.Realmserver
                     using (var ctx = new RealmContext())
                     {
                         PlayerCharacter[] characters = ctx.Characters.Where(c => c.AccountId == session.User.Id).ToArray();
-                        Console.WriteLine($"Sending {characters.Length} to {session.User.SessionId}...");
+                        Console.WriteLine($"Sending {characters.Length} to {session.User}...");
 
                         List<SerializableCharacter> serializableCharacters = new List<SerializableCharacter>();
                         for (int i = 0; i < characters.Length; i++)

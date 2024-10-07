@@ -14,6 +14,8 @@ namespace WoW.Client.Shared.Serializable
         public string Name { get; set; }
         public string SubName { get; set; }
         public string DisplayId { get; set; }
+        public bool IsTargetable { get; set; }
+        public bool IsAggressive { get; set; }
         public GameObjectFlags Flags { get; set; }
     }
 }

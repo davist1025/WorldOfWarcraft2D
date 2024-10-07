@@ -31,6 +31,8 @@ namespace WoW.Realmserver.Components.Scripts
         /// <returns></returns>
         public static ActionEventScript GetScriptFromAssembly(string id)
         {
+            // hack: script loading from assm is probably _really_ slow but it's fine since it's only used once when loading a creature for the first time.
+
             ActionEventScript scriptToReturn = null;
             Type[] childTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsAssignableTo(typeof(ActionEventScript))).ToArray();
 

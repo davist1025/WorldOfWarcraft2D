@@ -24,6 +24,8 @@ namespace WoW.Client.Shared.Realm
             writer.Put(Creature.Name);
             writer.Put(Creature.SubName);
             writer.Put(Creature.DisplayId);
+            writer.Put(Creature.IsTargetable);
+            writer.Put(Creature.IsAggressive);
             writer.Put((int)Creature.Flags);
         }
 
@@ -35,6 +37,8 @@ namespace WoW.Client.Shared.Realm
                 Name = reader.GetString(),
                 SubName = reader.GetString(),
                 DisplayId = reader.GetString(),
+                IsTargetable = reader.GetBool(),
+                IsAggressive = reader.GetBool(),
                 Flags = (GameObjectFlags)reader.GetInt(),
             };
         }
