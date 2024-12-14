@@ -16,6 +16,7 @@ namespace WoW.Authserver.DB
     /// </summary>
     public class AuthContext : DbContext
     {
+        public DbSet<Realmserver> Realmlist { get; set; }
         public DbSet<Account> Accounts { get; set; }
 
         // todo: we might be able to allow a host to set this in a production context, since the database is automatically migrated upon launch.
@@ -23,19 +24,5 @@ namespace WoW.Authserver.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Account>()
-                .HasKey(p => new { p.Id });
-
-            modelBuilder.Entity<Account>()
-                .Property(p => p.Id)
-                .UseMySqlIdentityColumn();
-
-            modelBuilder.Entity<Account>()
-                .Property(p => p.Username)
-                .IsRequired();
-        }
     }
 }

@@ -27,6 +27,7 @@ namespace WoW.Realmserver.Components
         public float MovementSpeed = 100f;
 
         public Queue<Vector2> InputUpdates = new Queue<Vector2>();
+        public Queue<InputChangeTick> InputChanges = new Queue<InputChangeTick>();
 
         public WorldSessionComponent(PlayerAccount user)
             => Account = user;
@@ -55,7 +56,6 @@ namespace WoW.Realmserver.Components
                         Y = Entity.Transform.Position.Y,
                     }, DeliveryMethod.Unreliable);
             }
-
         }
 
         public void InitializeGameComponents()

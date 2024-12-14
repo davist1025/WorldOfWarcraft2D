@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -14,27 +15,21 @@ namespace WoW.Realmserver.DB.Model
     [Table("characters")]
     public class PlayerCharacter
     {
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Column("account_id")]
         public int AccountId { get; set; }
+
+        [Column("character_id")]
         public int CharacterId { get; set; }
-        public int GuildId { get; set; }
+
+        [Column("character_name", TypeName = "varchar(16)")]
         public string Name { get; set; }
-        public string MapId { get; set; }
+
+        [Column("zone_x_position")]
         public float XPosition { get; set; }
+
+        [Column("zome_y_position")]
         public float YPosition { get; set; }
-
-        [NotMapped]
-        public RaceType Race => (RaceType)RaceId;
-
-        public int RaceId { get; set; }
-
-        [NotMapped]
-        public CharacterClassType Class => (CharacterClassType)ClassId;
-
-        public int ClassId { get; set; }
-
-        public int Level { get; set; }
-
-        // todo: add a function to create serializable versions of model objects.
     }
 }

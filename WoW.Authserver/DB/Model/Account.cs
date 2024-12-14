@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,15 +14,28 @@ namespace WoW.Authserver.DB.Model
     [Table("accounts")]
     public class Account
     {
+        [Key]
+        [Column("user_id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Stored in all capital letters.
+        /// </summary>
+        [Column("account_name", TypeName = "varchar(64)")]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Username { get; set; }
-        
+
+        [Column("password_hash", TypeName = "varchar(128)")]
+        public string HashedPassword { get; set; }
+
+        [Column("session_id", TypeName = "varchar(32)")]
         public string? SessionId { get; set; }
 
-        [NotMapped]
-        public SecurityLevel Security => (SecurityLevel)SecurityId;
+        [Column("user_security")]
+        public int SecurityLevel { get; set; }
 
-        public int SecurityId { get; set; }
+        [NotMapped]
+        public SecurityLevel Security => (SecurityLevel)SecurityLevel;
     }
 }

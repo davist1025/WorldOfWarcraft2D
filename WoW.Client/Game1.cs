@@ -38,9 +38,6 @@ namespace WoW.Client
         public static string AccountName;
         public static string SessionId;
         public static Realmserver LastRealm; // todo: save to disk.
-
-        private static List<RealmClient_CreateGameObject> _entityQueue;
-        private static List<RealmClient_CreateNetPlayer> _entityToPlayerQueue;
         public static Queue<Entity> EntityQueue;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
@@ -51,10 +48,6 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
-            _entityQueue = new List<RealmClient_CreateGameObject>();
-            _entityToPlayerQueue = new List<RealmClient_CreateNetPlayer>();
-            EntityQueue = new Queue<Entity>();
-
             // todo: network stuff init'd here.
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
@@ -72,98 +65,98 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
-            _netProcessor.SubscribeReusable<RealmClient_CreateGameObject>((newCreate) =>
-            {
-                if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
-                    _entityQueue.Add(newCreate);
-            });
+            //_netProcessor.SubscribeReusable<RealmClient_CreateGameObject>((newCreate) =>
+            //{
+            //    if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
+            //        _entityQueue.Add(newCreate);
+            //});
 
-            _netProcessor.SubscribeReusable<RealmClient_CreateNetObject>((newCreate) =>
-            {
-                var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newCreate.Id, StringComparison.OrdinalIgnoreCase));
-                if (entityToCreateWithId != null)
-                {
-                    Entity entity = new Entity(newCreate.Id);
+            //_netProcessor.SubscribeReusable<RealmClient_CreateNetObject>((newCreate) =>
+            //{
+            //    var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newCreate.Id, StringComparison.OrdinalIgnoreCase));
+            //    if (entityToCreateWithId != null)
+            //    {
+            //        Entity entity = new Entity(newCreate.Id);
 
-                    // todo: what type of component is needed for a network creature?
-                    //entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
-                    entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
-                    EntityQueue.Enqueue(entity);
-                }
-            });
+            //        // todo: what type of component is needed for a network creature?
+            //        //entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
+            //        entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
+            //        EntityQueue.Enqueue(entity);
+            //    }
+            //});
 
-            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNetPlayer>((newLogin) =>
-            {
-                var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
-                if (entityToCreateWithId != null)
-                {
-                    Entity entity = new Entity(newLogin.Id);
+            //_netProcessor.SubscribeNetSerializable<RealmClient_CreateNetPlayer>((newLogin) =>
+            //{
+            //    var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
+            //    if (entityToCreateWithId != null)
+            //    {
+            //        Entity entity = new Entity(newLogin.Id);
 
-                    Debug.WarnIf(newLogin.PlayerCharacter == null, "The new client's PlayerCharacter is null in the packet!"); // this shouldn't be possible but we'll keep the check for now.
-                    Debug.LogIf(newLogin.PlayerCharacter != null, $"{newLogin.Id} is playing character: {newLogin.PlayerCharacter.Name}");
+            //        Debug.WarnIf(newLogin.PlayerCharacter == null, "The new client's PlayerCharacter is null in the packet!"); // this shouldn't be possible but we'll keep the check for now.
+            //        Debug.LogIf(newLogin.PlayerCharacter != null, $"{newLogin.Id} is playing character: {newLogin.PlayerCharacter.Name}");
 
-                    entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
-                    entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
-                    EntityQueue.Enqueue(entity);
-                }
-            });
+            //        entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
+            //        entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
+            //        EntityQueue.Enqueue(entity);
+            //    }
+            //});
 
-            _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((positionUpdate) =>
-            {
-                var netTestScene = Scene as NetworkTestScene;
-                netTestScene.UpdatePlayerPosition(positionUpdate);
-            });
+            //_netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((positionUpdate) =>
+            //{
+            //    var netTestScene = Scene as NetworkTestScene;
+            //    netTestScene.UpdatePlayerPosition(positionUpdate);
+            //});
 
-            _netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
-            {
-                var netTestScene = Scene as NetworkTestScene;
+            //_netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
+            //{
+            //    var netTestScene = Scene as NetworkTestScene;
 
-                var guiEntity = netTestScene.FindEntity("gui");
-                if (guiEntity == null)
-                {
-                    Debug.Error("Client GUI entity is null!");
-                    return;
-                }
+            //    var guiEntity = netTestScene.FindEntity("gui");
+            //    if (guiEntity == null)
+            //    {
+            //        Debug.Error("Client GUI entity is null!");
+            //        return;
+            //    }
 
-                var guiController = guiEntity.GetComponent<ImGuiController>();
-                Entity playerById;
-                string chatFormat = "";
+            //    var guiController = guiEntity.GetComponent<ImGuiController>();
+            //    Entity playerById;
+            //    string chatFormat = "";
 
-                if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
-                {
-                    playerById = netTestScene.FindEntity(newChat.Id);
-                    if (playerById == null)
-                    {
-                        Debug.Error($"No player exists with the given id: {newChat.Id}.");
-                        return;
-                    }
+            //    if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        playerById = netTestScene.FindEntity(newChat.Id);
+            //        if (playerById == null)
+            //        {
+            //            Debug.Error($"No player exists with the given id: {newChat.Id}.");
+            //            return;
+            //        }
 
-                    var netPlayerController = playerById.GetComponent<NetPlayerController>();
-                    chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
-                }
-                else
-                {
-                    playerById = netTestScene.FindEntity("player");
-                    chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
-                }
+            //        var netPlayerController = playerById.GetComponent<NetPlayerController>();
+            //        chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
+            //    }
+            //    else
+            //    {
+            //        playerById = netTestScene.FindEntity("player");
+            //        chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
+            //    }
 
-                guiController.Chat.Add(chatFormat);
-            });
+            //    guiController.Chat.Add(chatFormat);
+            //});
 
-            _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
-            {
-                var netTestScene = Scene as NetworkTestScene;
+            //_netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
+            //{
+            //    var netTestScene = Scene as NetworkTestScene;
 
-                if (newDisconenct.Code == DisconnectCode.Timeout)
-                {
-                    var entity = netTestScene.FindEntity(newDisconenct.Id);
-                    var netController = entity.GetComponent<NetPlayerController>();
+            //    if (newDisconenct.Code == DisconnectCode.Timeout)
+            //    {
+            //        var entity = netTestScene.FindEntity(newDisconenct.Id);
+            //        var netController = entity.GetComponent<NetPlayerController>();
 
-                    Debug.Log($"{entity.Name} has disconnected; deleting entity...");
+            //        Debug.Log($"{entity.Name} has disconnected; deleting entity...");
 
-                    entity.Destroy();
-                }
-            });
+            //        entity.Destroy();
+            //    }
+            //});
 
             _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) =>
             {
@@ -176,25 +169,25 @@ namespace WoW.Client
                 // server sends the realmlist automatically.
             });
 
-            _netProcessor.SubscribeReusable<AuthClient_Realmserver>((realmlist) =>
+            _netProcessor.SubscribeReusable<AuthClient_Realm>((realmlist) =>
             {
-                Debug.Log($"Received realmlist: {realmlist.Name} - {realmlist.Ip}:{realmlist.Port}");
+                Debug.Log($"Received realmlist: {realmlist.Name} - {realmlist.Host}:{realmlist.Port}");
 
                 LogonScene scene = Core.Scene as LogonScene;
                 var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
 
-                gui.Realmlist.Add(new Realmserver(realmlist.Name, realmlist.Ip, realmlist.Port));
+                gui.Realmlist.Add(new Realmserver(realmlist.Name, realmlist.Host, realmlist.Port));
                 NetState = GameNetworkState.Auth_Realmlist;
             });
 
-            _netProcessor.SubscribeNetSerializable<RealmClient_CharacterList>((characterList) =>
-            {
-                Debug.Log($"Received {characterList.Characters.Count} characters.");
+            //_netProcessor.SubscribeNetSerializable<RealmClient_CharacterList>((characterList) =>
+            //{
+            //    Debug.Log($"Received {characterList.Characters.Count} characters.");
 
-                var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
-                gui.Characters.AddRange(characterList.Characters);
-                NetState = GameNetworkState.Realm_Characters;
-            });
+            //    var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
+            //    gui.Characters.AddRange(characterList.Characters);
+            //    NetState = GameNetworkState.Realm_Characters;
+            //});
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();

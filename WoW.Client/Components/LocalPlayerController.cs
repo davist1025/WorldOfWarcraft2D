@@ -9,13 +9,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Serializable;
 
 namespace WoW.Client.Components
 {
+
     internal class LocalPlayerController : Component, IUpdatable
     {
-        private SerializableCharacter _character;
         private PrototypeSpriteRenderer _renderer;
 
         // todo: create a renderer based on the character race.
@@ -27,9 +26,7 @@ namespace WoW.Client.Components
         private CircleCollider _circleCollder;
 
         private int _tickCount = 0;
-
-        public LocalPlayerController(SerializableCharacter character)
-            => _character = character;
+        //private List<InputChangeTick> _inputRecord;
 
         public override void OnAddedToEntity()
         {
@@ -45,6 +42,8 @@ namespace WoW.Client.Components
             _mover = Entity.AddComponent<Mover>();
             _circleCollder = Entity.AddComponent<CircleCollider>();
             _circleCollder.SetRadius(16f);
+
+            //_inputRecord = new List<InputChangeTick>();
         }
 
         public void Update()
@@ -56,9 +55,11 @@ namespace WoW.Client.Components
                 ++_tickCount; // todo: unused client tick.
                 // todo: are more generalized state updates needed (i.e sending all inputs that matter; movement, attack, etc)?
                 // for instance: we could send new input changes such as "started moving left" once, and then once more when we release the button.
-                Game1.Send(new ClientRealm_Movement() { X = _movementInput.X, Y = _movementInput.Y }, LiteNetLib.DeliveryMethod.Unreliable);
+                //_inputRecord.Add(new InputChangeTick(_tickCount, _movementInput));
+                Game1.Send(new ClientRealm_Movement() { X = _movementInput.X, Y = _movementInput.Y, Tick = _tickCount }, LiteNetLib.DeliveryMethod.Unreliable);
 
                 // todo: '100f' should come from the server; this is our movement speed.
+                
                 var moveDirection = 100f * Time.DeltaTime * _movementInput;
 
                 _mover.CalculateMovement(ref moveDirection, out var _);
@@ -66,13 +67,5 @@ namespace WoW.Client.Components
                 _mover.ApplyMovement(moveDirection);
             }
         }
-
-        /// <summary>
-        /// Returns the character name for the player.
-        /// todo: temporary function to quickly grab that character name for our player.
-        /// </summary>
-        /// <returns></returns>
-        public string GetName()
-            => _character.Name;
     }
 }

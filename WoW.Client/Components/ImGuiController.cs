@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using WoW.Client.Scenes;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Serializable;
 
 namespace WoW.Client.Components
 {
@@ -21,7 +20,6 @@ namespace WoW.Client.Components
 
         public List<string> Chat = new List<string>();
         public List<Realmserver> Realmlist = new List<Realmserver>();
-        public List<SerializableCharacter> Characters = new List<SerializableCharacter>();
 
         public override void OnAddedToEntity()
         {
@@ -101,78 +99,78 @@ namespace WoW.Client.Components
                     ImGui.Text("Retrieving characters..."); // todo: fix this not being long enough.
                     ImGui.End();
                     break;
-                case GameNetworkState.Realm_Characters:
-                    ImGui.Begin("Characters");
-                    if (Characters.Count > 0)
-                    {
-                        ImGui.Columns(3);
-                        ImGui.Text("Name");
-                        ImGui.NextColumn();
-                        ImGui.Text("Level");
-                        ImGui.NextColumn();
-                        ImGui.Text("Class");
-                        ImGui.NextColumn();
+                //case GameNetworkState.Realm_Characters:
+                //    ImGui.Begin("Characters");
+                //    if (Characters.Count > 0)
+                //    {
+                //        ImGui.Columns(3);
+                //        ImGui.Text("Name");
+                //        ImGui.NextColumn();
+                //        ImGui.Text("Level");
+                //        ImGui.NextColumn();
+                //        ImGui.Text("Class");
+                //        ImGui.NextColumn();
 
-                        for (int i = 0; i < Characters.Count; i++)
-                        {
-                            SerializableCharacter character = Characters[i];
+                //        for (int i = 0; i < Characters.Count; i++)
+                //        {
+                //            SerializableCharacter character = Characters[i];
 
-                            if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
-                            {
-                                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                                {
-                                    var netScene = new NetworkTestScene(character);
+                //            if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
+                //            {
+                //                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                //                {
+                //                    var netScene = new NetworkTestScene(character);
 
-                                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
-                                    Core.StartSceneTransition(new FadeTransition(() => netScene));
+                //                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
+                //                    Core.StartSceneTransition(new FadeTransition(() => netScene));
 
-                                    Game1.NetState = GameNetworkState.World;
-                                }
-                            }
+                //                    Game1.NetState = GameNetworkState.World;
+                //                }
+                //            }
 
-                            ImGui.SameLine();
-                            ImGui.Text($"{character.Name}");
-                            ImGui.NextColumn();
-                            ImGui.Text(character.Level.ToString());
-                            ImGui.NextColumn();
-                            ImGui.Text(character.Class.ToString());
-                        }
-                        ImGui.Columns(0);
-                    }
-                    ImGui.Button("Create Character");
+                //            ImGui.SameLine();
+                //            ImGui.Text($"{character.Name}");
+                //            ImGui.NextColumn();
+                //            ImGui.Text(character.Level.ToString());
+                //            ImGui.NextColumn();
+                //            ImGui.Text(character.Class.ToString());
+                //        }
+                //        ImGui.Columns(0);
+                //    }
+                //    ImGui.Button("Create Character");
 
-                    ImGui.End();
-                    break;
-                case GameNetworkState.LoadingWorld:
-                    // at this point, the client is just waiting on all of the data from the realmserver (our equipment, inventory, all other players, etc)
-                    // the server will tell the client when to transition scenes.
-                    // todo: unused net state.
-                    break;
-                case GameNetworkState.World:
-                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
+                //    ImGui.End();
+                //    break;
+                //case GameNetworkState.LoadingWorld:
+                //    // at this point, the client is just waiting on all of the data from the realmserver (our equipment, inventory, all other players, etc)
+                //    // the server will tell the client when to transition scenes.
+                //    // todo: unused net state.
+                //    break;
+                //case GameNetworkState.World:
+                //    ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
 
-                    ImGui.Begin("Chat");
+                //    ImGui.Begin("Chat");
 
-                    if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
-                    {
-                        for (int i = 0; i < Chat.Count; i++)
-                            ImGui.TextUnformatted(Chat[i]);
+                //    if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
+                //    {
+                //        for (int i = 0; i < Chat.Count; i++)
+                //            ImGui.TextUnformatted(Chat[i]);
 
-                        ImGui.EndChild();
-                    }
+                //        ImGui.EndChild();
+                //    }
 
-                    ImGui.Separator();
+                //    ImGui.Separator();
 
-                    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
-                    {
-                        // todo: print our own chat.
-                        // should we just have the server send us back our own message?
-                        Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
-                        _chatInput = "";
-                    }
+                //    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
+                //    {
+                //        // todo: print our own chat.
+                //        // should we just have the server send us back our own message?
+                //        Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                //        _chatInput = "";
+                //    }
 
-                    ImGui.End();
-                    break;
+                //    ImGui.End();
+                //    break;
             };
         }
 

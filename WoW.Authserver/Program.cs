@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using System.Net;
 using WoW.Authserver.DB;
 using WoW.Authserver.DB.Model;
 using WoW.Client.Shared;
@@ -11,6 +12,7 @@ using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
 using WoW.Server.Shared;
 using WoW.Server.Shared.Serializable;
+using static WoW.Server.Shared.Vocab;
 
 namespace WoW.Authserver
 {
@@ -20,22 +22,76 @@ namespace WoW.Authserver
         private EventBasedNetListener _netEventListener;
         private static NetPacketProcessor _netProcessor;
 
-        public static List<Realmserver> Realmlist = new List<Realmserver>();
-
         public Program()
         {
             Console.Title = "Authserver";
 
-            using (var ctx = new AuthContext())
-                // creates the database with/applies migrations.
-                // todo: doesn't seem to ensure the tables are created if they get deleted, or that they have data in them.
-                ctx.Database.Migrate();
+            //Console.WriteLine("Checking the integrity of the database...");
+            //using (var ctx = new AuthContext())
+            //    // creates the database with/applies migrations.
+            //    // todo: doesn't seem to ensure the tables are created if they get deleted, or that they have data in them.
+            //    ctx.Database.Migrate();
 
             Console.WriteLine("Deleting all sessions...");
             using (var ctx = new AuthContext())
                 ctx.Accounts.Where(a => a.SessionId != string.Empty)
-                    .ExecuteUpdate(setters => setters
+                    .ExecuteUpdate(setters => setters // todo: see if we can make use of more shorthands like this so we don't need to type out raw SQL code.
                         .SetProperty(p => p.SessionId, default(string)));
+
+            Console.WriteLine("Verifying default account integrity...");
+            using (var ctx = new AuthContext())
+            {
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("ADMIN")))
+                {
+                    ctx.Accounts.Add(new Account()
+                    {
+                        Username = "admin".ToUpper(),
+                        HashedPassword = "123",
+                        SecurityLevel = (int)SecurityLevel.Administrator
+                    });
+                }
+
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("GAMEMASTER")))
+                {
+                    ctx.Accounts.Add(new Account()
+                    {
+                        Username = "gamemaster".ToUpper(),
+                        HashedPassword = "123",
+                        SecurityLevel = (int)SecurityLevel.Gamemaster
+                    });
+                }
+
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("PLAYER")))
+                {
+                    ctx.Accounts.Add(new Account()
+                    {
+                        Username = "player".ToUpper(),
+                        HashedPassword = "123",
+                        SecurityLevel = (int)SecurityLevel.Player
+                    });
+                }
+
+                ctx.SaveChanges();
+            }
+
+            // todo: set a configuration setting for using default realms.
+            Console.WriteLine("Verifying default realmlist integrity...");
+            using (var ctx = new AuthContext())
+            {
+                if (ctx.Realmlist.Count() == 0)
+                {
+                    ctx.Add(new WoW.Authserver.DB.Model.Realmserver()
+                    {
+                        Name = "Test PTR",
+                        Hostname = "127.0.0.1",
+                        Port = 3733,
+                        Flag = (int)RealmFlags.IsPTR | (int)RealmFlags.IsRestricted
+                    });
+                    ctx.SaveChanges();
+                }
+
+                Console.WriteLine($"Registered {ctx.Realmlist.Count()} realm(s).");
+            }
 
             _netProcessor = new NetPacketProcessor();
 
@@ -45,10 +101,21 @@ namespace WoW.Authserver
 
             _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) =>
             {
-                var newRealm = new Realmserver(newAuthRegistration.Name, newAuthRegistration.Ip, newAuthRegistration.Port);
-                Realmlist.Add(newRealm);
+                using (var ctx = new AuthContext())
+                {
+                    var realms = ctx.Realmlist.ToList();
+                    var storedRealm = realms.FirstOrDefault(r => r.StoredEndPoint.Equals(new IPEndPoint(IPAddress.Parse(newAuthRegistration.Ip), newAuthRegistration.Port)));
 
-                Console.WriteLine($"'{newRealm.Name}' has registered with realmlist ({newRealm.Ip}:{newRealm.Port})");
+                    if (storedRealm != null)
+                    {
+                        Console.WriteLine($"Realmserver ({storedRealm.StoredEndPoint}) has come online.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("An unregistered realm is attempting to connect to this authentication server.");
+                        peer.Disconnect(); // what happens to the realmserver at this point?
+                    }
+                }
             });
 
             _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) =>
@@ -86,12 +153,12 @@ namespace WoW.Authserver
                         Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
 
                         // todo: send all realms in one packet.
-                        foreach (Realmserver realm in Realmlist)
+                        foreach (var realm in ctx.Realmlist)
                         {
-                            AuthClient_Realmserver realmserver = new AuthClient_Realmserver()
+                            AuthClient_Realm realmserver = new AuthClient_Realm()
                             {
                                 Name = realm.Name,
-                                Ip = realm.Ip,
+                                Host = realm.Hostname,
                                 Port = realm.Port,
                             };
                             Send(peer, realmserver);

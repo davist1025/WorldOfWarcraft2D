@@ -10,10 +10,10 @@ namespace WoW.Client.Shared.Auth
     /// <summary>
     /// Auth -> Client.
     /// </summary>
-    public class AuthClient_Realmserver
+    public class AuthClient_Realm
     {
         public string Name { get; set; }
-        public string Ip { get; set; }
+        public string Host { get; set; }
         public int Port { get; set; }
 
         // array and list cant be used here for some reason, serializer doesnt recognize it.

@@ -29,9 +29,9 @@ namespace WoW.Realmserver.Content
         {
             Console.WriteLine("Loading Tiled maps...");
 
-            var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
-            for (int i = 0; i < tiledMaps.Length; i++)
-                LoadTiledMap(tiledMaps[i]);
+            //var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
+            //for (int i = 0; i < tiledMaps.Length; i++)
+            //    LoadTiledMap(tiledMaps[i]);
         }
 
         private void LoadTiledMap(string name)
