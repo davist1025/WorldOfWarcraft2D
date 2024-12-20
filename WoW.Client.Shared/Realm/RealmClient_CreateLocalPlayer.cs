@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WoW.Client.Shared.Realm
+{
+    /// <summary>
+    /// Realm -> Client.
+    /// </summary>
+    public class RealmClient_CreateLocalPlayer
+    {
+        public float ZoneX { get; set; }
+        public float ZoneY { get; set; }
+
+        /// <summary>
+        /// Used client-side to load the given TiledMap.
+        /// </summary>
+        public string MapId { get; set; }
+
+        // todo: statistics and attributes.
+    }
+}

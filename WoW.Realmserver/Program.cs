@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Xna.Framework;
 using Nez;
 using Nez.ECS.Headless;
@@ -9,6 +10,7 @@ using System.Diagnostics;
 using System.Net;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Content;
@@ -53,6 +55,14 @@ namespace WoW.Realmserver
             _netEventListener = new EventBasedNetListener();
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.PeerConnectedEvent += (peer) => { };
+            _netEventListener.PeerDisconnectedEvent += (peer, reason) =>
+            {
+                if (peer.Tag is Entity)
+                {
+                    var session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+                    SendToAuthserver(new RealmAuth_Disconnection() { AccountId = session.Account.Id });
+                }
+            };
 
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) =>
             {
@@ -62,33 +72,33 @@ namespace WoW.Realmserver
                 session.InputUpdates.Enqueue(new Vector2(movement.X, movement.Y));
             });
 
-            _netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((message, peer) =>
-            {
-                // verify the message; check for invalid characters; check for command usage.
-                var entity = peer.Tag as Entity;
-                var session = entity.GetComponent<WorldSessionComponent>();
+            //_netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((message, peer) =>
+            //{
+            //    // verify the message; check for invalid characters; check for command usage.
+            //    var entity = peer.Tag as Entity;
+            //    var session = entity.GetComponent<WorldSessionComponent>();
 
-                // todo: command processing!
-                //if (message.Message.StartsWith('.'))
-                //{
-                //    // parse the string out to get the command and arguments.
-                //    // there could be multiple arguments depending on command.
+            //    // todo: command processing!
+            //    //if (message.Message.StartsWith('.'))
+            //    //{
+            //    //    // parse the string out to get the command and arguments.
+            //    //    // there could be multiple arguments depending on command.
 
-                //    // exmaple: .gm on/off
-                //    // .gobject create [id] [x] [y] [z]
-                //    // .additem [id]
-                //    // .server (general server information)
-                //    // .kick [username]
-                //    // .ban [username] [reason] [duration]
-                //    // .ticket
-                //    //      create
-                //    //      delete
-                //    //      view
-                //    //      assign [username]
-                //}
-                //else
-                    SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message }, DeliveryMethod.ReliableOrdered);
-            });
+            //    //    // exmaple: .gm on/off
+            //    //    // .gobject create [id] [x] [y] [z]
+            //    //    // .additem [id]
+            //    //    // .server (general server information)
+            //    //    // .kick [username]
+            //    //    // .ban [username] [reason] [duration]
+            //    //    // .ticket
+            //    //    //      create
+            //    //    //      delete
+            //    //    //      view
+            //    //    //      assign [username]
+            //    //}
+            //    //else
+            //        SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message }, DeliveryMethod.ReliableOrdered);
+            //});
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) =>
             {
@@ -116,98 +126,136 @@ namespace WoW.Realmserver
 
                     using (var ctx = new RealmContext())
                     {
-                        PlayerCharacter[] characters = ctx.Characters.Where(c => c.AccountId == session.User.Id).ToArray();
-                        Console.WriteLine($"Sending {characters.Length} to {session.User}...");
+                        //PlayerCharacter[] characters = ctx.Characters.Where(c => c.AccountId == session.User.Id).ToArray();
+                        //Console.WriteLine($"Sending {characters.Length} to {session.User}...");
 
-                        // todo: send characters to user.
+                        List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
-                        //List<SerializableCharacter> serializableCharacters = new List<SerializableCharacter>();
-                        //for (int i = 0; i < characters.Length; i++)
-                        //{
-                        //    var character = characters[i];
-                        //    serializableCharacters.Add(new SerializableCharacter(character.CharacterId, character.RaceId, character.GuildId, character.Name, character.Level, character.Class));
-                        //}
+                        // todo: get db charactes based on account id.
 
-                        //// todo: should we still send this packet if the list is empty?
-                        //// suppose the client could just check the list count and if it's <1, just diaply no characters :p
-                        //SendSerializable(sessionPeer, new RealmClient_CharacterList() { Characters = serializableCharacters });
+                        foreach (var character in ctx.Characters.Where(a => a.AccountId == newSession.Account.Id))
+                            characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+
+                        Console.WriteLine($"Sending {characters.Count} to client...");
+
+                        SendSerializable(sessionPeer, new RealmClient_PlayerCharacters() { Characters = characters });
                     }
+                }
+            });
+
+            _netProcessor.SubscribeReusable<ClientRealm_CreateCharacter, NetPeer>((request, peer) =>
+            {
+                using (var ctx = new RealmContext())
+                {
+                    bool characterExists = ctx.Characters.Any(c => c.Name.Equals(request.Name.ToUpper()));
+
+                    RealmClient_CreateCharacter.Result creationResult = RealmClient_CreateCharacter.Result.NameInUse;
+                    WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+
+                    if (!characterExists)
+                    {
+                        creationResult = RealmClient_CreateCharacter.Result.Success;
+                        var dbCharacters = ctx.Characters.ToList();
+                        int lastCharacterId = 0;
+
+                        if (dbCharacters.Count > 0)
+                        {
+                            // todo: check character count per account id.
+                            // this throws a "Sequence contains no elements" exception.
+                            lastCharacterId = dbCharacters
+                                .Where(c => c.AccountId == session.Account.Id)
+                                .Select(c => c.CharacterId)
+                                .Max();
+                        }
+
+                        var newCharacter = new PlayerCharacter()
+                        {
+                            AccountId = session.Account.Id,
+                            CharacterId = (lastCharacterId + 1),
+                            Name = request.Name.ToUpper(),
+                            XPosition = 0f,
+                            YPosition = 0f
+                        };
+                        ctx.Add(newCharacter);
+                        ctx.SaveChanges();
+
+                        Console.WriteLine($"Account ID: {session.Account.Id} has created a new character: {newCharacter.Name}");
+                    }
+
+                    Send(peer, new RealmClient_CreateCharacter() { CreationResult = creationResult });
+
+                    List<RemoteCharacter> characters = new List<RemoteCharacter>();
+
+                    foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
+                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+
+                    Console.WriteLine($"Sending {characters.Count} to client...");
+
+                    SendSerializable(peer, new RealmClient_PlayerCharacters() { Characters = characters });
                 }
             });
 
             // this is where we will send the connecting client everything they need to play.
             _netProcessor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) =>
             {
-                //Entity entity = peer.Tag as Entity;
-                //entity.Tag = (int)GameObjectType.Player;
-                //WorldSessionComponent session = entity.GetComponent<WorldSessionComponent>();
+                Entity thisEntity = peer.Tag as Entity;
+                WorldSessionComponent thisSession = thisEntity.GetComponent<WorldSessionComponent>();
 
-                //using (var ctx = new RealmContext())
-                //{
-                //    var playingCharacter = ctx.Characters
-                //        .Where(c => c.AccountId == session.Account.Id)
-                //        .FirstOrDefault(c => c.CharacterId == transfer.LocalCharacterId);
+                using (var ctx = new RealmContext())
+                {
+                    var activeCharacter = ctx.Characters
+                        .Where(a => a.AccountId == thisSession.Account.Id)
+                        .FirstOrDefault(c => c.CharacterId == transfer.LocalCharacterId);
 
-                //    if (playingCharacter != null)
-                //    {
-                //        session.Character = playingCharacter;
-                //        session.InitializeGameComponents();
+                    thisSession.Character = activeCharacter;
+                }
+                thisSession.InitializeGameComponents();
 
-                //        // send the client their chosen character.
-                //        SerializableCharacter serializedCharacter = new SerializableCharacter(
-                //                playingCharacter.CharacterId,
-                //                playingCharacter.RaceId,
-                //                playingCharacter.GuildId,
-                //                playingCharacter.Name,
-                //                playingCharacter.Level,
-                //                playingCharacter.Class);
+                // let the client create their local player object.
+                Send(peer, new RealmClient_CreateLocalPlayer()
+                {
+                    MapId = "world1",
+                    ZoneX = 50f,
+                    ZoneY = 50f
+                });
+            });
 
-                //        var allPeersExceptSender = _netManager.ConnectedPeerList.Where(p => p.Id != peer.Id).ToArray();
-                //        for (int i = 0; i < allPeersExceptSender.Length; i++)
-                //        {
-                //            NetPeer onlinePeer = allPeersExceptSender[i];
-                //            Entity entityForPeer = onlinePeer.Tag as Entity;
-                //            WorldSessionComponent sessionForEntity = entityForPeer.GetComponent<WorldSessionComponent>();
+            _netProcessor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) =>
+            {
+                var entity = peer.Tag as Entity;
+                var session = entity?.GetComponent<WorldSessionComponent>();
 
-                //            if (sessionForEntity.Character.MapId.Equals(session.Character.MapId, StringComparison.OrdinalIgnoreCase))
-                //            {
-                //                SerializableCharacter serializedOnlineCharacter = new SerializableCharacter(
-                //                sessionForEntity.Character.CharacterId,
-                //                sessionForEntity.Character.RaceId,
-                //                sessionForEntity.Character.GuildId,
-                //                sessionForEntity.Character.Name,
-                //                sessionForEntity.Character.Level,
-                //                sessionForEntity.Character.Class);
+                if (session != null)
+                {
+                    bool isSuccess = false;
 
-                //                Send(peer, new RealmClient_CreateGameObject()
-                //                {
-                //                    EntityType = GameObjectType.Player,
-                //                    Id = sessionForEntity.Account.SessionId,
-                //                    X = sessionForEntity.Entity.Transform.Position.X,
-                //                    Y = sessionForEntity.Entity.Transform.Position.Y
-                //                });
-                //                SendSerializable(peer, new RealmClient_CreateNetPlayer()
-                //                {
-                //                    Id = sessionForEntity.Account.SessionId,
-                //                    PlayerCharacter = serializedOnlineCharacter
-                //                });
+                    using (var ctx = new RealmContext())
+                    {
+                        isSuccess = (ctx.Characters
+                            .Where(a => a.AccountId == session.Account.Id)
+                            .Where(c => c.CharacterId == deletion.CharacterId)
+                            .ExecuteDelete()) > 0;
+                    }
 
-                //                Send(onlinePeer, new RealmClient_CreateGameObject()
-                //                {
-                //                    EntityType = GameObjectType.Player,
-                //                    Id = session.Account.SessionId,
-                //                    X = session.Entity.Transform.Position.X,
-                //                    Y = session.Entity.Transform.Position.Y
-                //                });
-                //                SendSerializable(onlinePeer, new RealmClient_CreateNetPlayer()
-                //                {
-                //                    Id = session.Account.SessionId,
-                //                    PlayerCharacter = serializedCharacter
-                //                });
-                //            }
-                //        }
-                //    }
-                //}
+                    if (isSuccess)
+                    {
+                        Console.WriteLine($"Account ID: {session.Account.Id} is deleting character id: {deletion.CharacterId}");
+                        using (var ctx = new RealmContext())
+                        {
+                            List<RemoteCharacter> characters = new List<RemoteCharacter>();
+
+                            // todo: get db charactes based on account id.
+
+                            foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
+                                characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+
+                            Console.WriteLine($"Sending {characters.Count} to client...");
+
+                            SendSerializable(peer, new RealmClient_PlayerCharacters() { Characters = characters });
+                        }
+                        // todo: send character list to peer.
+                    }
+                }
             });
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
@@ -279,47 +327,6 @@ namespace WoW.Realmserver
 
         public static void SendToAuthserver<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(_authNetManager, packet, delivery);
-
-        /// <summary>
-        /// Adds a Creature to the world.
-        /// </summary>
-        /// <param name="creatureId"></param>
-        /// <param name="mapId"></param>
-        /// <param name="position"></param>
-        //public static void CreateCreature(string mapId, Vector2 position, int creatureId = -1, string rawId = "")
-        //{
-        //    // todo: make use of "raw id" in the creature object.
-        //    // this will be a universally unique string id that is more recognizable.
-        //    if (!Scene.GetType().Equals(typeof(WorldScene)))
-        //    {
-        //        Console.WriteLine("Scene is not a WorldScene object.");
-        //        return;
-        //    }
-
-        //    // todo: check for existing map id.
-        //    using (var ctx = new RealmContext())
-        //    {
-        //        Creature creature = null;
-
-        //        if (creatureId != -1)
-        //            creature = ctx.Creatures.Where(c => c.Id == creatureId).FirstOrDefault();
-        //        else if (rawId != "")
-        //            creature = ctx.Creatures.Where(c => c.RawId == rawId).FirstOrDefault();
-
-        //        if (creature == null)
-        //        {
-        //            Console.WriteLine($"Unable to create an instance of this Creature; invalid id given!");
-        //            return;
-        //        }
-
-        //        // todo: meh, find a better way to name creature entities.
-        //        Entity newCreature = Scene.CreateEntity($"{creature.Name}_{Nez.Random.NextInt(1000)}");
-        //        newCreature.Tag = (int)GameObjectType.Creature;
-        //        newCreature.AddComponent(new GameObjectComponent(mapId, creature));
-        //    }
-        //    // create and add the entity to the scene so they receive tick updates.
-        //    // place the mapId somewhere on the entity so we can reference them when the player joins a map.
-        //}
 
         static void Main(string[] args)
             => new Program();

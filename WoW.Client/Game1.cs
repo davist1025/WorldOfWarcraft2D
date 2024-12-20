@@ -13,6 +13,7 @@ using WoW.Client.Scenes;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 
 namespace WoW.Client
@@ -24,6 +25,7 @@ namespace WoW.Client
         Auth_Realmlist,
         Realm,
         Realm_Characters,
+        Realm_CreateCharacter,
         LoadingWorld,
         World
     }
@@ -37,8 +39,7 @@ namespace WoW.Client
 
         public static string AccountName;
         public static string SessionId;
-        public static Realmserver LastRealm; // todo: save to disk.
-        public static Queue<Entity> EntityQueue;
+        public static RemoteRealmserver LastRealm; // todo: save to disk.
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
         {
@@ -62,6 +63,17 @@ namespace WoW.Client
                 if (NetState == GameNetworkState.Realm)
                     Send(new ClientRealm_TransferLogon() { SessionId = SessionId });
             };
+
+            /*
+             * NetState can be changed to display whichever UI is necessary, per ImGUI.
+             * We need to set ClientNetwork's connection state at the same time we set this so the packet flow doesn't crash the client or server.
+             */
+
+
+            //ClientListener.PeerDisconnectedEvent += (peer, reason) =>
+            //{
+            //    NetState = GameNetworkState.Offline;
+            //};
 
             _netProcessor = new NetPacketProcessor();
 
@@ -169,24 +181,48 @@ namespace WoW.Client
                 // server sends the realmlist automatically.
             });
 
-            _netProcessor.SubscribeReusable<AuthClient_Realm>((realmlist) =>
+            _netProcessor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) =>
             {
-                Debug.Log($"Received realmlist: {realmlist.Name} - {realmlist.Host}:{realmlist.Port}");
+                Debug.Log($"Received realms: {realmlist.Realmlist.Count}");
 
                 LogonScene scene = Core.Scene as LogonScene;
                 var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
 
-                gui.Realmlist.Add(new Realmserver(realmlist.Name, realmlist.Host, realmlist.Port));
+                gui.Realmlist.AddRange(realmlist.Realmlist);
                 NetState = GameNetworkState.Auth_Realmlist;
+            });
+
+            _netProcessor.SubscribeReusable<RealmClient_CreateCharacter>((response) =>
+            {
+                Debug.Log(response.CreationResult);
+                // todo: return to character select, ask for character list.
+            });
+
+            _netProcessor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) =>
+            {
+                Debug.Log($"Received {characters.Characters.Count} characters.");
+
+                var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
+
+                gui.Characters.Clear();
+
+                gui.Characters.AddRange(characters.Characters);
+                NetState = GameNetworkState.Realm_Characters;
+            });
+
+            _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) =>
+            {
+                var netScene = new NetworkTestScene();
+                netScene.CreateLocalPlayer(thePlayer);
             });
 
             //_netProcessor.SubscribeNetSerializable<RealmClient_CharacterList>((characterList) =>
             //{
             //    Debug.Log($"Received {characterList.Characters.Count} characters.");
 
-            //    var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
-            //    gui.Characters.AddRange(characterList.Characters);
-            //    NetState = GameNetworkState.Realm_Characters;
+            //var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
+            //gui.Characters.AddRange(characterList.Characters);
+            //NetState = GameNetworkState.Realm_Characters;
             //});
 
             ClientNetwork = new NetManager(ClientListener);
@@ -217,5 +253,18 @@ namespace WoW.Client
 
         public static void Send<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(ClientNetwork, packet, delivery);
+
+        /// <summary>
+        /// Cleanly disconnects from the realmserver.
+        /// </summary>
+        public static void Disconnect()
+        {
+            var gui = Core.Scene.FindEntity("gui");
+            var component = gui.GetComponent<ImGuiController>();
+            component.Characters.Clear();
+            component.Realmlist.Clear();
+            ClientNetwork.DisconnectAll();
+            NetState = GameNetworkState.Offline;
+        }
     }
 }

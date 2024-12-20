@@ -10,6 +10,7 @@ using WoW.Authserver.DB.Model;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
 using WoW.Server.Shared;
 using WoW.Server.Shared.Serializable;
 using static WoW.Server.Shared.Vocab;
@@ -26,11 +27,7 @@ namespace WoW.Authserver
         {
             Console.Title = "Authserver";
 
-            //Console.WriteLine("Checking the integrity of the database...");
-            //using (var ctx = new AuthContext())
-            //    // creates the database with/applies migrations.
-            //    // todo: doesn't seem to ensure the tables are created if they get deleted, or that they have data in them.
-            //    ctx.Database.Migrate();
+
 
             Console.WriteLine("Deleting all sessions...");
             using (var ctx = new AuthContext())
@@ -80,7 +77,7 @@ namespace WoW.Authserver
             {
                 if (ctx.Realmlist.Count() == 0)
                 {
-                    ctx.Add(new WoW.Authserver.DB.Model.Realmserver()
+                    ctx.Add(new Realmserver()
                     {
                         Name = "Test PTR",
                         Hostname = "127.0.0.1",
@@ -98,6 +95,15 @@ namespace WoW.Authserver
             _netEventListener = new EventBasedNetListener();
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.NetworkReceiveEvent += (peer, reader, delivery) => _netProcessor.ReadAllPackets(reader, peer);
+
+            _netProcessor.SubscribeReusable<RealmAuth_Disconnection, NetPeer>((disconnect, peer) =>
+            {
+                using (var ctx = new AuthContext())
+                {
+                    ctx.Accounts.Where(a => a.Id == disconnect.AccountId).ExecuteUpdate(setters => setters.SetProperty(p => p.SessionId, default(string)));
+                    Console.WriteLine($"Account ID: {disconnect.AccountId} has disconnected.");
+                }
+            });
 
             _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) =>
             {
@@ -152,17 +158,11 @@ namespace WoW.Authserver
                     {
                         Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
 
-                        // todo: send all realms in one packet.
+                        var realms = new List<RemoteRealmserver>();
+
                         foreach (var realm in ctx.Realmlist)
-                        {
-                            AuthClient_Realm realmserver = new AuthClient_Realm()
-                            {
-                                Name = realm.Name,
-                                Host = realm.Hostname,
-                                Port = realm.Port,
-                            };
-                            Send(peer, realmserver);
-                        }
+                            realms.Add(new RemoteRealmserver(realm.Name, realm.Hostname, realm.Port));
+                        SendSerializable(peer, new AuthClient_Realm() { Realmlist = realms });
                     }
 
                     ctx.SaveChanges();

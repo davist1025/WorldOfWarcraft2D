@@ -19,9 +19,9 @@ namespace WoW.Client.Scenes
         {
             base.OnStart();
 
-            var playerEntity = CreateEntity("player").AddComponent(_theController);
+            //var playerEntity = CreateEntity("player").AddComponent(_theController);
             CreateEntity("gui").AddComponent(new ImGuiController());
-            Camera.Entity.AddComponent(new FollowCamera(playerEntity.Entity, Camera));
+            Camera.Entity.AddComponent(new FollowCamera(_thePlayer, Camera));
             Camera.Zoom = 0.5f;
         }
 
@@ -64,15 +64,19 @@ namespace WoW.Client.Scenes
         //        player.GetComponent<NetPlayerController>().Inputs.Enqueue(new Vector2(posUpdate.X, posUpdate.Y));
         //}
 
+        public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
+        {
+            _theController = new LocalPlayerController();
+            _thePlayer = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            _thePlayer.AddComponent(_theController);
+
+            Game1.NetState = GameNetworkState.World;
+            Core.StartSceneTransition(new FadeTransition(() => this));
+        }
+
         public override void Update()
         {
             base.Update();
-
-            if (Game1.EntityQueue.Count > 0)
-            {
-                var entity = Game1.EntityQueue.Dequeue();
-                AddEntity(entity);
-            }
         }
 
         public Entity GetPlayer()

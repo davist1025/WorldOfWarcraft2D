@@ -15,21 +15,21 @@ namespace WoW.Realmserver.DB.Model
     [Table("characters")]
     public class PlayerCharacter
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("account_id")]
         public int AccountId { get; set; }
 
         [Column("character_id")]
         public int CharacterId { get; set; }
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("character_name", TypeName = "varchar(16)")]
         public string Name { get; set; }
 
         [Column("zone_x_position")]
         public float XPosition { get; set; }
 
-        [Column("zome_y_position")]
+        [Column("zone_y_position")]
         public float YPosition { get; set; }
     }
 }

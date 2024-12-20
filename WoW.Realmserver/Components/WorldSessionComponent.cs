@@ -36,7 +36,7 @@ namespace WoW.Realmserver.Components
         {
             if (InputUpdates.TryDequeue(out var input))
             {
-                _moveDirection = MovementSpeed * Program.DeltaTime * input;
+                _moveDirection = MovementSpeed * Time.DeltaTime * input;
                 _mover.CalculateMovement(ref _moveDirection, out var res);
 
                 // todo: this is debug code for collision; check for collision ONLY on the map the player is on.
@@ -63,6 +63,8 @@ namespace WoW.Realmserver.Components
             _collider = Entity.AddComponent<CircleCollider>();
             _collider.SetRadius(16f);
             _mover = Entity.AddComponent<Mover>();
+
+            Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
         }
     }
 }
