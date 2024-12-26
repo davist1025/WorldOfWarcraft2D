@@ -37,6 +37,7 @@ namespace WoW.Client
         public static EventBasedNetListener ClientListener;
         private static NetPacketProcessor _netProcessor;
 
+        // todo: store these globally.
         public static string AccountName;
         public static string SessionId;
         public static RemoteRealmserver LastRealm; // todo: save to disk.
@@ -70,55 +71,7 @@ namespace WoW.Client
              * We need to set ClientNetwork's connection state at the same time we set this so the packet flow doesn't crash the client or server.
              */
 
-
-            //ClientListener.PeerDisconnectedEvent += (peer, reason) =>
-            //{
-            //    NetState = GameNetworkState.Offline;
-            //};
-
             _netProcessor = new NetPacketProcessor();
-
-            //_netProcessor.SubscribeReusable<RealmClient_CreateGameObject>((newCreate) =>
-            //{
-            //    if (_entityQueue.Find(e => e.Id == newCreate.Id) == null)
-            //        _entityQueue.Add(newCreate);
-            //});
-
-            //_netProcessor.SubscribeReusable<RealmClient_CreateNetObject>((newCreate) =>
-            //{
-            //    var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newCreate.Id, StringComparison.OrdinalIgnoreCase));
-            //    if (entityToCreateWithId != null)
-            //    {
-            //        Entity entity = new Entity(newCreate.Id);
-
-            //        // todo: what type of component is needed for a network creature?
-            //        //entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
-            //        entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
-            //        EntityQueue.Enqueue(entity);
-            //    }
-            //});
-
-            //_netProcessor.SubscribeNetSerializable<RealmClient_CreateNetPlayer>((newLogin) =>
-            //{
-            //    var entityToCreateWithId = _entityQueue.Find(e => e.Id.Equals(newLogin.Id, StringComparison.OrdinalIgnoreCase));
-            //    if (entityToCreateWithId != null)
-            //    {
-            //        Entity entity = new Entity(newLogin.Id);
-
-            //        Debug.WarnIf(newLogin.PlayerCharacter == null, "The new client's PlayerCharacter is null in the packet!"); // this shouldn't be possible but we'll keep the check for now.
-            //        Debug.LogIf(newLogin.PlayerCharacter != null, $"{newLogin.Id} is playing character: {newLogin.PlayerCharacter.Name}");
-
-            //        entity.AddComponent(new NetPlayerController(newLogin.PlayerCharacter));
-            //        entity.SetPosition(new Vector2(entityToCreateWithId.X, entityToCreateWithId.Y));
-            //        EntityQueue.Enqueue(entity);
-            //    }
-            //});
-
-            //_netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((positionUpdate) =>
-            //{
-            //    var netTestScene = Scene as NetworkTestScene;
-            //    netTestScene.UpdatePlayerPosition(positionUpdate);
-            //});
 
             //_netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
             //{
@@ -156,20 +109,18 @@ namespace WoW.Client
             //    guiController.Chat.Add(chatFormat);
             //});
 
-            //_netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
-            //{
-            //    var netTestScene = Scene as NetworkTestScene;
+            _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
+            {
+                if (newDisconenct.Code == DisconnectCode.Timeout)
+                {
+                    var entity = NetworkScene.FindEntity(newDisconenct.Id);
+                    var netController = entity.GetComponent<NetPlayerController>();
 
-            //    if (newDisconenct.Code == DisconnectCode.Timeout)
-            //    {
-            //        var entity = netTestScene.FindEntity(newDisconenct.Id);
-            //        var netController = entity.GetComponent<NetPlayerController>();
+                    Debug.Log($"{entity.Name} has disconnected; deleting entity...");
 
-            //        Debug.Log($"{entity.Name} has disconnected; deleting entity...");
-
-            //        entity.Destroy();
-            //    }
-            //});
+                    entity.Destroy();
+                }
+            });
 
             _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) =>
             {

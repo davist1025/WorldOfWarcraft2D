@@ -82,6 +82,7 @@ namespace WoW.Realmserver
                         }
                     }
 
+                    // todo: only send to players within the game world; not at character select, etc.
                     SendToExcept(entity.Name, new RealmClient_Disconnect() { Id = entity.Name, Code = DisconnectCode.Timeout }, DeliveryMethod.ReliableOrdered);
                 }
             };

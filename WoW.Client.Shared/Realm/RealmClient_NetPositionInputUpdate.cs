@@ -10,14 +10,14 @@ namespace WoW.Client.Shared.Realm
     {
         public string Id { get; set; }
 
+        [Obsolete("Unused server position update result X.")]
         public float ResultX { get; set; }
+
+        [Obsolete("Unused server position update result Y.")]
         public float ResultY { get; set; }
 
-        // todo: movementx/y will be necessary to determine animations, etc.
-        [Obsolete("Unused as of 12/25/24. Currecntly using ResultX/ResultY.")]
         public float MovementX { get; set; }
 
-        [Obsolete("Unused as of 12/25/24. Currecntly using ResultX/ResultY.")]
         public float MovementY { get; set; }
     }
 }
