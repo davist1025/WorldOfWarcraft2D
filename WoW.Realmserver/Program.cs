@@ -73,6 +73,9 @@ namespace WoW.Realmserver
                     {
                         using (var ctx = new RealmContext())
                         {
+                            // todo: test if session.Character is tracked after setting the reference.
+                            // Could just do SaveChanges() here?
+
                             ctx.Characters
                             .Where(c => c.CharacterId == session.Character.CharacterId && c.AccountId == session.Account.Id)
                             .ExecuteUpdate(setters => setters
@@ -95,33 +98,34 @@ namespace WoW.Realmserver
                 session.InputUpdates.Enqueue(new Vector2(movement.X, movement.Y));
             });
 
-            //_netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((message, peer) =>
-            //{
-            //    // verify the message; check for invalid characters; check for command usage.
-            //    var entity = peer.Tag as Entity;
-            //    var session = entity.GetComponent<WorldSessionComponent>();
+            _netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((message, peer) =>
+            {
+                // verify the message; check for invalid characters; check for command usage.
+                var entity = peer.Tag as Entity;
+                var session = entity.GetComponent<WorldSessionComponent>();
 
-            //    // todo: command processing!
-            //    //if (message.Message.StartsWith('.'))
-            //    //{
-            //    //    // parse the string out to get the command and arguments.
-            //    //    // there could be multiple arguments depending on command.
+                // todo: command processing!
+                //if (message.Message.StartsWith('.'))
+                //{
+                //    // parse the string out to get the command and arguments.
+                //    // there could be multiple arguments depending on command.
 
-            //    //    // exmaple: .gm on/off
-            //    //    // .gobject create [id] [x] [y] [z]
-            //    //    // .additem [id]
-            //    //    // .server (general server information)
-            //    //    // .kick [username]
-            //    //    // .ban [username] [reason] [duration]
-            //    //    // .ticket
-            //    //    //      create
-            //    //    //      delete
-            //    //    //      view
-            //    //    //      assign [username]
-            //    //}
-            //    //else
-            //        SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message }, DeliveryMethod.ReliableOrdered);
-            //});
+                //    // exmaple: .gm on/off
+                //    // .gobject create [id] [x] [y] [z]
+                //    // .additem [id]
+                //    // .server (general server information)
+                //    // .kick [username]
+                //    // .ban [username] [reason] [duration]
+                //    // .ticket
+                //    //      create
+                //    //      delete
+                //    //      view
+                //    //      assign [username]
+                //}
+                //else
+                SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message });
+                // todo: send to sending player, as well.
+            });
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) =>
             {
@@ -239,6 +243,7 @@ namespace WoW.Realmserver
                 // let the client create their local player object.
                 Send(peer, new RealmClient_CreateLocalPlayer()
                 {
+                    Name = thisSession.Character.Name,
                     MapId = "world1",
                     ZoneX = thisSession.Character.XPosition,
                     ZoneY = thisSession.Character.YPosition

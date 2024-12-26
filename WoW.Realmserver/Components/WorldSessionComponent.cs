@@ -45,7 +45,6 @@ namespace WoW.Realmserver.Components
 
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
-
                 // todo: only send to players on the same map as the player.
 
                 Program.SendToExcept(Entity.Name,
@@ -58,6 +57,7 @@ namespace WoW.Realmserver.Components
                         MovementY = input.Y,
                     }, DeliveryMethod.Unreliable);
 
+                // show the player the server's resulting calculation.
                 Program.SendTo(Entity.Name, new RealmClient_Debug_ServerPosition() { X = Entity.Transform.Position.X, Y = Entity.Transform.Position.Y });
             }
         }

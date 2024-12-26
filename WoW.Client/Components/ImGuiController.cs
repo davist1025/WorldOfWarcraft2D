@@ -197,7 +197,7 @@ namespace WoW.Client.Components
                     ImGui.SetNextWindowBgAlpha(0.5f);
                     ImGui.SetNextWindowPos(new System.Numerics.Vector2(x: 10f, y: 10f));
 
-                    var localPlayer = Entity.Scene.FindEntity("thePlayer");
+                    var localPlayer = Entity.Scene.FindComponentOfType<LocalPlayerController>();
 
                     if (localPlayer != null)
                     {
@@ -211,29 +211,59 @@ namespace WoW.Client.Components
                             ImGui.End();
                         }
                     }
+
+                    var chatSize = new System.Numerics.Vector2(425f, 190f);
+
+                    ImGui.SetNextWindowPos(new System.Numerics.Vector2(10f, Core.GraphicsDevice.Viewport.Height - chatSize.Y - 10f));
+                    ImGui.SetNextWindowSize(chatSize);
+                    ImGui.SetNextWindowBgAlpha(0.5f);
+
+                    ImGui.Begin("Chat");
+
+                    if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
+                    {
+                        for (int i = 0; i < Chat.Count; i++)
+                            ImGui.TextUnformatted(Chat[i]);
+                        ImGui.SetScrollHereY(1f);
+
+                        ImGui.EndChild();
+                    }
+
+                    ImGui.Separator();
+
+                    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
+                    {
+                        // todo: print our own chat.
+                        // should we just have the server send us back our own message?
+                        Game1.Send(new ClientRealm_Chat() { Message = _chatInput });
+                        _chatInput = "";
+                    }
+
+                    ImGui.End();
+
                     break;
                     //case GameNetworkState.World:
                     //    ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
 
                     //    ImGui.Begin("Chat");
 
-                    //    if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
-                    //    {
-                    //        for (int i = 0; i < Chat.Count; i++)
-                    //            ImGui.TextUnformatted(Chat[i]);
+                    //if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
+                    //{
+                    //    for (int i = 0; i < Chat.Count; i++)
+                    //        ImGui.TextUnformatted(Chat[i]);
 
-                    //        ImGui.EndChild();
-                    //    }
+                    //    ImGui.EndChild();
+                    //}
 
-                    //    ImGui.Separator();
+                    //ImGui.Separator();
 
-                    //    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
-                    //    {
-                    //        // todo: print our own chat.
-                    //        // should we just have the server send us back our own message?
-                    //        Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
-                    //        _chatInput = "";
-                    //    }
+                    //if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
+                    //{
+                    //    // todo: print our own chat.
+                    //    // should we just have the server send us back our own message?
+                    //    Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
+                    //    _chatInput = "";
+                    //}
 
                     //    ImGui.End();
                     //    break;

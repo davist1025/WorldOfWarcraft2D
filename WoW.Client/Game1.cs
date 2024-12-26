@@ -73,41 +73,47 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
-            //_netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
-            //{
-            //    var netTestScene = Scene as NetworkTestScene;
+            _netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
+            {
+                var guiEntity = NetworkScene.FindEntity("gui");
+                if (guiEntity == null)
+                {
+                    Debug.Error("Client GUI entity is null!");
+                    return;
+                }
 
-            //    var guiEntity = netTestScene.FindEntity("gui");
-            //    if (guiEntity == null)
-            //    {
-            //        Debug.Error("Client GUI entity is null!");
-            //        return;
-            //    }
+                var guiController = guiEntity.GetComponent<ImGuiController>();
+                Entity playerById = NetworkScene.FindEntity(newChat.Id);
+                string chatFormat = "";
 
-            //    var guiController = guiEntity.GetComponent<ImGuiController>();
-            //    Entity playerById;
-            //    string chatFormat = "";
+                if (playerById != null)
+                {
+                    chatFormat = $"{playerById.Name} says: {newChat.Message}";
+                    guiController.Chat.Add(chatFormat);
+                }
+                else
+                    guiController.Chat.Add($"{newChat.Id} cannot be found.");
 
-            //    if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        playerById = netTestScene.FindEntity(newChat.Id);
-            //        if (playerById == null)
-            //        {
-            //            Debug.Error($"No player exists with the given id: {newChat.Id}.");
-            //            return;
-            //        }
+                //if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
+                //{
+                //    playerById = netTestScene.FindEntity(newChat.Id);
+                //    if (playerById == null)
+                //    {
+                //        Debug.Error($"No player exists with the given id: {newChat.Id}.");
+                //        return;
+                //    }
 
-            //        var netPlayerController = playerById.GetComponent<NetPlayerController>();
-            //        chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
-            //    }
-            //    else
-            //    {
-            //        playerById = netTestScene.FindEntity("player");
-            //        chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
-            //    }
+                //    var netPlayerController = playerById.GetComponent<NetPlayerController>();
+                //    chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
+                //}
+                //else
+                //{
+                //    playerById = netTestScene.FindEntity("player");
+                //    chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
+                //}
 
-            //    guiController.Chat.Add(chatFormat);
-            //});
+                //guiController.Chat.Add(chatFormat);
+            });
 
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
             {
@@ -175,7 +181,7 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_Debug_ServerPosition>((result) =>
             {
-                var controller = Scene.FindEntity("thePlayer").GetComponent<LocalPlayerController>();
+                var controller = Scene.FindComponentOfType<LocalPlayerController>();
                 controller.LastServerPosition = new Vector2(result.X, result.Y);
             });
 

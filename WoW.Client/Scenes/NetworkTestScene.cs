@@ -67,7 +67,7 @@ namespace WoW.Client.Scenes
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
             _theController = new LocalPlayerController();
-            _thePlayer = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            _thePlayer = CreateEntity(thePlayer.Name, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
             _thePlayer.AddComponent(_theController);
         }
 

@@ -29,9 +29,11 @@ namespace WoW.Realmserver.Content
         {
             Console.WriteLine("Loading Tiled maps...");
 
-            //var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
-            //for (int i = 0; i < tiledMaps.Length; i++)
-            //    LoadTiledMap(tiledMaps[i]);
+            var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
+
+            // todo: this creates a processor for every tiled map found. is that effecient?
+            for (int i = 0; i < tiledMaps.Length; i++)
+                LoadTiledMap(tiledMaps[i]);
         }
 
         private void LoadTiledMap(string name)
@@ -49,6 +51,8 @@ namespace WoW.Realmserver.Content
             mapEntity.AddComponent(processor);
 
             _mapProcessors.Add(mapName, new TiledMapProcessor(map, "collision_layer"));
+
+            Console.WriteLine($"Created a Tiled processor for: '{mapName}'");
         }
 
         public TiledMapProcessor GetMap(string name)
