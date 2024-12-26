@@ -59,6 +59,23 @@ namespace WoW.Client.Components
                     ImGui.Text("Logging in...");
                     ImGui.End();
                     break;
+                case GameNetworkState.Auth_Invalid:
+                    var dialogSize = new System.Numerics.Vector2(450, 50);
+
+                    ImGui.SetNextWindowPos(new System.Numerics.Vector2(Core.GraphicsDevice.Viewport.Width / 2 - (dialogSize.X / 2), Core.GraphicsDevice.Viewport.Height / 2 - (dialogSize.Y / 2)));
+                    ImGui.SetNextWindowSize(dialogSize);
+
+                    ImGui.Begin("dialog", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
+
+                    ImGui.Text($"Your account name or password are incorrect. Please try again.");
+
+                    if (ImGui.Button("Ok"))
+                    {
+                        Game1.Disconnect();
+                    }
+
+                    ImGui.End();
+                    break;
                 case GameNetworkState.Auth_Realmlist:
                     if (Realmlist.Count > 0)
                     {
@@ -233,8 +250,6 @@ namespace WoW.Client.Components
 
                     if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
                     {
-                        // todo: print our own chat.
-                        // should we just have the server send us back our own message?
                         Game1.Send(new ClientRealm_Chat() { Message = _chatInput });
                         _chatInput = "";
                     }
@@ -242,31 +257,6 @@ namespace WoW.Client.Components
                     ImGui.End();
 
                     break;
-                    //case GameNetworkState.World:
-                    //    ImGui.SetNextWindowSize(new System.Numerics.Vector2(425, 190));
-
-                    //    ImGui.Begin("Chat");
-
-                    //if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
-                    //{
-                    //    for (int i = 0; i < Chat.Count; i++)
-                    //        ImGui.TextUnformatted(Chat[i]);
-
-                    //    ImGui.EndChild();
-                    //}
-
-                    //ImGui.Separator();
-
-                    //if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
-                    //{
-                    //    // todo: print our own chat.
-                    //    // should we just have the server send us back our own message?
-                    //    Game1.Send(new ClientRealm_Chat() { Message = _chatInput }, LiteNetLib.DeliveryMethod.ReliableOrdered);
-                    //    _chatInput = "";
-                    //}
-
-                    //    ImGui.End();
-                    //    break;
             };
         }
 

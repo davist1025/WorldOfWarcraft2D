@@ -124,7 +124,6 @@ namespace WoW.Realmserver
                 //}
                 //else
                 SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message });
-                // todo: send to sending player, as well.
             });
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) =>
@@ -187,8 +186,6 @@ namespace WoW.Realmserver
 
                         if (dbCharacters.Count > 0)
                         {
-                            // todo: check character count per account id.
-                            // this throws a "Sequence contains no elements" exception.
                             lastCharacterId = dbCharacters
                                 .Where(c => c.AccountId == session.Account.Id)
                                 .Select(c => c.CharacterId)
@@ -288,8 +285,6 @@ namespace WoW.Realmserver
                         {
                             List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
-                            // todo: get db charactes based on account id.
-
                             foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
                                 characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
 
@@ -325,9 +320,6 @@ namespace WoW.Realmserver
             _authNetManager = new NetManager(_authListener);
             _authNetManager.Start();
             _authNetManager.Connect("127.0.0.1", 8070, "");
-
-            // authentication server will register each realmserver and give them to a connecting client.
-            // client will select a realmserver, tell the authentication server which one.
 
             while (true)
             {

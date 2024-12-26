@@ -144,12 +144,11 @@ namespace WoW.Authserver
                     else if (account == null)
                     {
                         loginCode.Code = LogonCode.NoRecord;
-                        return;
+                        Console.WriteLine("Invalid login.");
                     }
                     else
                     {
                         loginCode.Code = LogonCode.AlreadyOnline;
-                        return;
                     }
 
                     Send(peer, loginCode);

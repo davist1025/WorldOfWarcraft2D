@@ -22,6 +22,9 @@ namespace WoW.Client
     {
         Offline,
         Auth_LoggingIn,
+        Auth_Banned,
+        Auth_Invalid,
+        Auth_IsOnline,
         Auth_Realmlist,
         Realm,
         Realm_Characters,
@@ -93,26 +96,6 @@ namespace WoW.Client
                 }
                 else
                     guiController.Chat.Add($"{newChat.Id} cannot be found.");
-
-                //if (!string.Equals(SessionId, newChat.Id, StringComparison.OrdinalIgnoreCase))
-                //{
-                //    playerById = netTestScene.FindEntity(newChat.Id);
-                //    if (playerById == null)
-                //    {
-                //        Debug.Error($"No player exists with the given id: {newChat.Id}.");
-                //        return;
-                //    }
-
-                //    var netPlayerController = playerById.GetComponent<NetPlayerController>();
-                //    chatFormat = $"[{netPlayerController.Character.Name}] {newChat.Message}";
-                //}
-                //else
-                //{
-                //    playerById = netTestScene.FindEntity("player");
-                //    chatFormat = $"[{playerById.GetComponent<LocalPlayerController>().GetName()}] {newChat.Message}";
-                //}
-
-                //guiController.Chat.Add(chatFormat);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
@@ -132,7 +115,8 @@ namespace WoW.Client
             {
                 switch (logonCode.Code)
                 {
-                    case LogonCode.AlreadyOnline:
+                    case LogonCode.NoRecord:
+                        Game1.NetState = GameNetworkState.Auth_Invalid;
                         break;
                 }
                 // todo: handle logon code.
@@ -190,6 +174,7 @@ namespace WoW.Client
                 NetworkScene.CreateNetworkPlayer(newPlayer);
             });
 
+            // mostly an empty packet. open to suggestions or later implementation :P
             _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((s) =>
             {
                 Game1.NetState = GameNetworkState.World;
