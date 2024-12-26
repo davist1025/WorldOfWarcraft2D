@@ -69,9 +69,19 @@ namespace WoW.Client.Scenes
             _theController = new LocalPlayerController();
             _thePlayer = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
             _thePlayer.AddComponent(_theController);
+        }
 
-            Game1.NetState = GameNetworkState.World;
-            Core.StartSceneTransition(new FadeTransition(() => this));
+        /// <summary>
+        /// Creates a networked player for the client to display.
+        /// 
+        /// Functions similarly to the local player.
+        /// </summary>
+        /// <param name="theOtherPlayer"></param>
+        public void CreateNetworkPlayer(RealmClient_CreateNetPlayer theOtherPlayer)
+        {
+            var netController = new NetPlayerController();
+            var theOtherEntity = CreateEntity(theOtherPlayer.Name, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
+            theOtherEntity.AddComponent(netController);
         }
 
         public override void Update()

@@ -40,6 +40,7 @@ namespace WoW.Client
         public static string AccountName;
         public static string SessionId;
         public static RemoteRealmserver LastRealm; // todo: save to disk.
+        public static NetworkTestScene NetworkScene;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
         {
@@ -172,6 +173,11 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) =>
             {
+                switch (logonCode.Code)
+                {
+                    case LogonCode.AlreadyOnline:
+                        break;
+                }
                 // todo: handle logon code.
             });
 
@@ -212,23 +218,44 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) =>
             {
-                var netScene = new NetworkTestScene();
-                netScene.CreateLocalPlayer(thePlayer);
+                NetworkScene = new NetworkTestScene();
+                NetworkScene.CreateLocalPlayer(thePlayer);
             });
 
-            //_netProcessor.SubscribeNetSerializable<RealmClient_CharacterList>((characterList) =>
-            //{
-            //    Debug.Log($"Received {characterList.Characters.Count} characters.");
+            _netProcessor.SubscribeReusable<RealmClient_Debug_ServerPosition>((result) =>
+            {
+                var controller = Scene.FindEntity("thePlayer").GetComponent<LocalPlayerController>();
+                controller.LastServerPosition = new Vector2(result.X, result.Y);
+            });
 
-            //var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
-            //gui.Characters.AddRange(characterList.Characters);
-            //NetState = GameNetworkState.Realm_Characters;
-            //});
+            _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) =>
+            {
+                NetworkScene.CreateNetworkPlayer(newPlayer);
+            });
+
+            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((s) =>
+            {
+                Game1.NetState = GameNetworkState.World;
+                Core.StartSceneTransition(new FadeTransition(() => NetworkScene));
+            });
+
+            _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((serverNetUpdate) =>
+            {
+                var netPlayer = Core.Scene.FindEntity(serverNetUpdate.Id);
+
+                if (netPlayer != null)
+                {
+                    var controller = netPlayer.GetComponent<NetPlayerController>();
+                    controller.MovementDirectionQueue.Enqueue(new Vector2(serverNetUpdate.MovementX, serverNetUpdate.MovementY));
+                }
+            });
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
 
             base.Initialize();
+
+            IsFixedTimeStep = true;
 
             var guiManager = new ImGuiManager()
             {

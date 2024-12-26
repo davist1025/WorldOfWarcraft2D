@@ -52,6 +52,9 @@ namespace WoW.Realmserver
             // load content.
             Content.LoadTiled();
 
+            // todo: ensurecreated for testing.
+            // data doesn't need to persist across test runs, and can be initialized on startup.
+
             _netEventListener = new EventBasedNetListener();
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.PeerConnectedEvent += (peer) => { };
@@ -59,8 +62,27 @@ namespace WoW.Realmserver
             {
                 if (peer.Tag is Entity)
                 {
-                    var session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+                    var entity = peer.Tag as Entity;
+                    var session = entity.GetComponent<WorldSessionComponent>();
+                    Console.WriteLine($"Account ID: {session.Account.Id} is disconnecting...");
+
                     SendToAuthserver(new RealmAuth_Disconnection() { AccountId = session.Account.Id });
+
+                    // save world position.
+                    if (session.Character != null)
+                    {
+                        using (var ctx = new RealmContext())
+                        {
+                            ctx.Characters
+                            .Where(c => c.CharacterId == session.Character.CharacterId && c.AccountId == session.Account.Id)
+                            .ExecuteUpdate(setters => setters
+                                .SetProperty(c => c.XPosition, session.Entity.Position.X)
+                                .SetProperty(c => c.YPosition, session.Entity.Position.Y));
+                            // todo: set mapid.
+                        }
+                    }
+
+                    SendToExcept(entity.Name, new RealmClient_Disconnect() { Id = entity.Name, Code = DisconnectCode.Timeout }, DeliveryMethod.ReliableOrdered);
                 }
             };
 
@@ -155,7 +177,7 @@ namespace WoW.Realmserver
                     if (!characterExists)
                     {
                         creationResult = RealmClient_CreateCharacter.Result.Success;
-                        var dbCharacters = ctx.Characters.ToList();
+                        var dbCharacters = ctx.Characters.Where(x => x.AccountId == session.Account.Id).ToList();
                         int lastCharacterId = 0;
 
                         if (dbCharacters.Count > 0)
@@ -173,8 +195,8 @@ namespace WoW.Realmserver
                             AccountId = session.Account.Id,
                             CharacterId = (lastCharacterId + 1),
                             Name = request.Name.ToUpper(),
-                            XPosition = 0f,
-                            YPosition = 0f
+                            XPosition = 50f,
+                            YPosition = 50f
                         };
                         ctx.Add(newCharacter);
                         ctx.SaveChanges();
@@ -196,6 +218,7 @@ namespace WoW.Realmserver
             });
 
             // this is where we will send the connecting client everything they need to play.
+            // we will also update all players on the client's MapId that there is a new player.
             _netProcessor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) =>
             {
                 Entity thisEntity = peer.Tag as Entity;
@@ -210,14 +233,29 @@ namespace WoW.Realmserver
                     thisSession.Character = activeCharacter;
                 }
                 thisSession.InitializeGameComponents();
+                thisEntity.Name = thisSession.Character.Name;
 
                 // let the client create their local player object.
                 Send(peer, new RealmClient_CreateLocalPlayer()
                 {
                     MapId = "world1",
-                    ZoneX = 50f,
-                    ZoneY = 50f
+                    ZoneX = thisSession.Character.XPosition,
+                    ZoneY = thisSession.Character.YPosition
                 });
+                Console.WriteLine($"{thisEntity.Name} is entering the world!");
+
+                SendToExcept(thisEntity.Name, new RealmClient_CreateNetPlayer() { Name = thisEntity.Name, ZoneX = thisSession.Character.XPosition, ZoneY = thisSession.Character.YPosition });
+
+                var allSessionsExceptThis = Scene.FindComponentsOfType<WorldSessionComponent>().Where(session => session.Account.Id != thisSession.Account.Id).ToList();
+
+                for (int i = 0; i < allSessionsExceptThis.Count; i++)
+                {
+                    var otherSession = allSessionsExceptThis[i];
+                    SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer() { Name = otherSession.Entity.Name, ZoneX = otherSession.Entity.Position.X, ZoneY = otherSession.Entity.Position.Y });
+                }
+
+                // tells the client they can enter the world.
+                SendTo(thisEntity.Name, new RealmClient_EnterWorld());
             });
 
             _netProcessor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) =>
@@ -259,15 +297,16 @@ namespace WoW.Realmserver
             });
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
-            _netEventListener.PeerDisconnectedEvent += (peer, reason) =>
-            {
-                var entity = peer.Tag as Entity;
-
-                SendToExcept(entity.Name, new RealmClient_Disconnect() { Id = entity.Name, Code = DisconnectCode.Timeout }, DeliveryMethod.ReliableOrdered);
-            };
 
             _netManager = new NetManager(_netEventListener);
             _netManager.Start(_port);
+
+            // todo: implement prediction/reconciliation with packet loss and latency simulation.
+            //_netManager.SimulatePacketLoss = true;
+            //_netManager.SimulatePacketLoss = true;
+            ////_netManager.SimulationPacketLossChance = 20;
+            //_netManager.SimulationMinLatency = 100;
+            //_netManager.SimulationMaxLatency = 350;
 
             _authListener = new EventBasedNetListener();
             _authListener.PeerConnectedEvent += (peer) =>
@@ -317,6 +356,14 @@ namespace WoW.Realmserver
 
             for (int i = 0; i < peersExcept.Length; i++)
                 Send(peersExcept[i], packet, delivery);
+        }
+
+        public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        {
+            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.Equals(gObjectId)).FirstOrDefault();
+
+            if (peer != null)
+                Send(peer, packet, delivery);
         }
 
         public static void SendToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()

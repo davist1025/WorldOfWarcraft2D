@@ -28,6 +28,8 @@ namespace WoW.Client.Components
         private int _tickCount = 0;
         //private List<InputChangeTick> _inputRecord;
 
+        public Vector2 LastServerPosition = Vector2.Zero;
+
         public override void OnAddedToEntity()
         {
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
@@ -41,9 +43,8 @@ namespace WoW.Client.Components
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
             _circleCollder = Entity.AddComponent<CircleCollider>();
-            _circleCollder.SetRadius(16f);
-
-            //_inputRecord = new List<InputChangeTick>();
+            _circleCollder.SetRadius(8f);
+            // todo: should collider size be set by the server and transmitted?
         }
 
         public void Update()
@@ -66,6 +67,15 @@ namespace WoW.Client.Components
                 _subPixelMovement.Update(ref moveDirection);
                 _mover.ApplyMovement(moveDirection);
             }
+
+            if (_movementInput == Vector2.Zero && _tickCount > 0)
+                _tickCount = 0;
+        }
+
+        public override void DebugRender(Batcher batcher)
+        {
+            // todo: need to set an "Origin" value server-side so this is automatically calculated and the position matches what the client would expect.
+            batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
         }
     }
 }

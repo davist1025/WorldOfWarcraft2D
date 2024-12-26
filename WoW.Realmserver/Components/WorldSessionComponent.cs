@@ -52,16 +52,20 @@ namespace WoW.Realmserver.Components
                     new RealmClient_NetPositionInputUpdate()
                     {
                         Id = Entity.Name,
-                        X = Entity.Transform.Position.X,
-                        Y = Entity.Transform.Position.Y,
+                        ResultX = Entity.Transform.Position.X,
+                        ResultY = Entity.Transform.Position.Y,
+                        MovementX = input.X,
+                        MovementY = input.Y,
                     }, DeliveryMethod.Unreliable);
+
+                Program.SendTo(Entity.Name, new RealmClient_Debug_ServerPosition() { X = Entity.Transform.Position.X, Y = Entity.Transform.Position.Y });
             }
         }
 
         public void InitializeGameComponents()
         {
             _collider = Entity.AddComponent<CircleCollider>();
-            _collider.SetRadius(16f);
+            _collider.SetRadius(8f);
             _mover = Entity.AddComponent<Mover>();
 
             Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
