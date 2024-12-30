@@ -15,6 +15,7 @@ using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
+using WoW.Client.Util;
 
 namespace WoW.Client
 {
@@ -39,6 +40,8 @@ namespace WoW.Client
         public static NetManager ClientNetwork;
         public static EventBasedNetListener ClientListener;
         private static NetPacketProcessor _netProcessor;
+
+        public static GameConfiguration Configuration;
 
         // todo: store these globally.
         public static string AccountName;
@@ -118,8 +121,10 @@ namespace WoW.Client
                     case LogonCode.NoRecord:
                         Game1.NetState = GameNetworkState.Auth_Invalid;
                         break;
+                    case LogonCode.AlreadyOnline:
+                        Game1.NetState = GameNetworkState.Auth_IsOnline;
+                        break;
                 }
-                // todo: handle logon code.
             });
 
             _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) =>
@@ -195,6 +200,8 @@ namespace WoW.Client
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
 
+            Configuration = GameConfiguration.Load();
+
             base.Initialize();
 
             IsFixedTimeStep = true;
@@ -216,7 +223,6 @@ namespace WoW.Client
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
             ClientNetwork.PollEvents();
         }
 
@@ -234,6 +240,13 @@ namespace WoW.Client
             component.Realmlist.Clear();
             ClientNetwork.DisconnectAll();
             NetState = GameNetworkState.Offline;
+        }
+
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+
+            Configuration.Save();
         }
     }
 }

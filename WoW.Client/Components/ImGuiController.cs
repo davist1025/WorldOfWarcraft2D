@@ -70,9 +70,7 @@ namespace WoW.Client.Components
                     ImGui.Text($"Your account name or password are incorrect. Please try again.");
 
                     if (ImGui.Button("Ok"))
-                    {
                         Game1.Disconnect();
-                    }
 
                     ImGui.End();
                     break;
@@ -143,12 +141,6 @@ namespace WoW.Client.Components
                                 {
                                     Game1.NetState = GameNetworkState.LoadingWorld;
                                     Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
-                                    //var netScene = new NetworkTestScene();
-                                    //var netScene = new NetworkTestScene(character);
-
-                                    //Core.StartSceneTransition(new FadeTransition(() => netScene));
-
-                                    //Game1.NetState = GameNetworkState.World;
                                 }
                             }
 
@@ -173,8 +165,6 @@ namespace WoW.Client.Components
                         }
                     }
 
-                    // todo: finish disconnect button.
-                    // set the network state to offline, disconnect.
                     ImGui.SetCursorPosX((ImGui.GetWindowSize().X / 2f) / 2f);
                     if (ImGui.Button("Disconnect"))
                         Game1.Disconnect();
