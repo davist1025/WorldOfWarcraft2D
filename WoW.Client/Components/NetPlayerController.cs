@@ -35,7 +35,7 @@ namespace WoW.Client.Components
             if (MovementDirectionQueue.TryDequeue(out Vector2 serverOut))
             {
                 Vector2 movement = new Vector2(serverOut.X, serverOut.Y);
-                var direction = 100f * Time.DeltaTime * movement;
+                var direction = Game1.MovementSpeed * Time.DeltaTime * movement;
 
                 _mover.CalculateMovement(ref direction, out var _);
                 _subPixelMovement.Update(ref direction);

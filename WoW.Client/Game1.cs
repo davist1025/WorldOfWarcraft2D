@@ -9,13 +9,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using WoW.Client.Components;
+using WoW.Client.Content;
 using WoW.Client.Scenes;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
-using WoW.Client.Util;
 
 namespace WoW.Client
 {
@@ -48,6 +48,8 @@ namespace WoW.Client
         public static string SessionId;
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
+
+        public static float MovementSpeed = 1f;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
         {
@@ -180,8 +182,10 @@ namespace WoW.Client
             });
 
             // mostly an empty packet. open to suggestions or later implementation :P
-            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((s) =>
+            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) =>
             {
+                Game1.MovementSpeed = worldParams.MovementSpeed;
+
                 Game1.NetState = GameNetworkState.World;
                 Core.StartSceneTransition(new FadeTransition(() => NetworkScene));
             });

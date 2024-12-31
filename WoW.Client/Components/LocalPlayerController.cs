@@ -61,7 +61,7 @@ namespace WoW.Client.Components
 
                 // todo: '100f' should come from the server; this is our movement speed.
                 
-                var moveDirection = 100f * Time.DeltaTime * _movementInput;
+                var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
 
                 _mover.CalculateMovement(ref moveDirection, out var _);
                 _subPixelMovement.Update(ref moveDirection);

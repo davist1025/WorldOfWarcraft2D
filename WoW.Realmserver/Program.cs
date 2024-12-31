@@ -28,6 +28,7 @@ namespace WoW.Realmserver
         private EventBasedNetListener _authListener;
         private static NetPacketProcessor _netProcessor;
 
+        public static RealmConfiguration Configuration;
         public static WorldContentManager Content;
 
         public static float DeltaTime = 0f;
@@ -46,6 +47,7 @@ namespace WoW.Realmserver
             IsFixedTimeStep = true;
             Scene = new WorldScene();
 
+            Configuration = RealmConfiguration.Load();
             Content = new WorldContentManager();
             _netProcessor = new NetPacketProcessor();
 
@@ -258,7 +260,7 @@ namespace WoW.Realmserver
                 }
 
                 // tells the client they can enter the world.
-                SendTo(thisEntity.Name, new RealmClient_EnterWorld());
+                SendTo(thisEntity.Name, new RealmClient_EnterWorld() { MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"] });
             });
 
             _netProcessor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) =>

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Client.Util
+namespace WoW.Client.Content
 {
     public class GameConfiguration
     {
