@@ -27,17 +27,14 @@ namespace WoW.Authserver
         {
             Console.Title = "Authserver";
 
-
-
-            Console.WriteLine("Deleting all sessions...");
-            using (var ctx = new AuthContext())
-                ctx.Accounts.Where(a => a.SessionId != string.Empty)
-                    .ExecuteUpdate(setters => setters // todo: see if we can make use of more shorthands like this so we don't need to type out raw SQL code.
-                        .SetProperty(p => p.SessionId, default(string)));
-
-            Console.WriteLine("Verifying default account integrity...");
             using (var ctx = new AuthContext())
             {
+                Console.WriteLine("Deleting all sessions...");
+                ctx.Accounts.Where(a => a.SessionId != string.Empty)
+                    .ExecuteUpdate(setters => setters
+                        .SetProperty(p => p.SessionId, default(string)));
+
+                Console.WriteLine("Verifying default account integrity...");
                 if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("ADMIN")))
                 {
                     ctx.Accounts.Add(new Account()
@@ -69,12 +66,9 @@ namespace WoW.Authserver
                 }
 
                 ctx.SaveChanges();
-            }
 
-            // todo: set a configuration setting for using default realms.
-            Console.WriteLine("Verifying default realmlist integrity...");
-            using (var ctx = new AuthContext())
-            {
+                // todo: set a configuration setting for using default realms.
+                Console.WriteLine("Verifying default realmlist integrity...");
                 if (ctx.Realmlist.Count() == 0)
                 {
                     ctx.Add(new Realmserver()
@@ -89,7 +83,6 @@ namespace WoW.Authserver
 
                 Console.WriteLine($"Registered {ctx.Realmlist.Count()} realm(s).");
             }
-
             _netProcessor = new NetPacketProcessor();
 
             _netEventListener = new EventBasedNetListener();
