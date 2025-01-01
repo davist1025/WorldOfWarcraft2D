@@ -58,8 +58,6 @@ namespace WoW.Client.Components
                 // for instance: we could send new input changes such as "started moving left" once, and then once more when we release the button.
                 //_inputRecord.Add(new InputChangeTick(_tickCount, _movementInput));
                 Game1.Send(new ClientRealm_Movement() { X = _movementInput.X, Y = _movementInput.Y, Tick = _tickCount }, LiteNetLib.DeliveryMethod.Unreliable);
-
-                // todo: '100f' should come from the server; this is our movement speed.
                 
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
 

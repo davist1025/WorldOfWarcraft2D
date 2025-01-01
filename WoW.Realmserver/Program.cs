@@ -35,9 +35,6 @@ namespace WoW.Realmserver
 
         private Dictionary<string, NetPeer> _transferSessions = new Dictionary<string, NetPeer>();
 
-        private string _hostName = "127.0.0.1";
-        private int _port = 3733;
-
         public Program()
         {
             Console.Title = "Realmserver";
@@ -56,6 +53,19 @@ namespace WoW.Realmserver
 
             // todo: ensurecreated for testing.
             // data doesn't need to persist across test runs, and can be initialized on startup.
+
+            Console.WriteLine("Checking for script/NPC flag mismatch...");
+            using (var ctx = new RealmContext())
+            {
+                var flagsNeedingScript = ctx.NPCs.Where(npc => ((NpcTypeFlags)npc.FlagType).HasFlag(NpcTypeFlags.CanDialogue)).ToList();
+                foreach (var npc in flagsNeedingScript)
+                {
+                    bool isMissingScript = ctx.Behaviors.Any(b => b.NpcId == npc.Id && b.Script == null);
+
+                    if (isMissingScript)
+                        Console.WriteLine($"NPC: {npc.Name} has dialogue, but there is no script attached!");
+                }
+            }
 
             _netEventListener = new EventBasedNetListener();
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
@@ -106,6 +116,15 @@ namespace WoW.Realmserver
                 var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSessionComponent>();
 
+                if (message.Message.StartsWith("."))
+                {
+                    if (message.Message.Contains(" "))
+                    {
+                        string[] msgCopy = message.Message.Substring(1).Split(" ");
+                        string commandName = msgCopy[0];
+                    }
+                }
+
                 // todo: command processing!
                 //if (message.Message.StartsWith('.'))
                 //{
@@ -154,12 +173,7 @@ namespace WoW.Realmserver
 
                     using (var ctx = new RealmContext())
                     {
-                        //PlayerCharacter[] characters = ctx.Characters.Where(c => c.AccountId == session.User.Id).ToArray();
-                        //Console.WriteLine($"Sending {characters.Length} to {session.User}...");
-
                         List<RemoteCharacter> characters = new List<RemoteCharacter>();
-
-                        // todo: get db charactes based on account id.
 
                         foreach (var character in ctx.Characters.Where(a => a.AccountId == newSession.Account.Id))
                             characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
@@ -193,6 +207,7 @@ namespace WoW.Realmserver
                                 .Select(c => c.CharacterId)
                                 .Max();
                         }
+                        // todo: check for max character count.
 
                         var newCharacter = new PlayerCharacter()
                         {
@@ -260,7 +275,10 @@ namespace WoW.Realmserver
                 }
 
                 // tells the client they can enter the world.
-                SendTo(thisEntity.Name, new RealmClient_EnterWorld() { MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"] });
+                SendTo(thisEntity.Name, new RealmClient_EnterWorld() 
+                { 
+                    MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"] 
+                });
             });
 
             _netProcessor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) =>
@@ -302,7 +320,7 @@ namespace WoW.Realmserver
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
             _netManager = new NetManager(_netEventListener);
-            _netManager.Start(_port);
+            _netManager.Start(Configuration.Port);
 
             // todo: implement prediction/reconciliation with packet loss and latency simulation.
             //_netManager.SimulatePacketLoss = true;
@@ -315,7 +333,7 @@ namespace WoW.Realmserver
             _authListener.PeerConnectedEvent += (peer) =>
             {
                 // todo: grab from config.
-                SendToAuthserver(new RealmAuth_Registrar() { Name = "PTR", Ip = _hostName, Port = _port });
+                SendToAuthserver(new RealmAuth_Registrar() { Ip = Configuration.IpAddress, Port = Configuration.Port });
             };
 
             _authListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);

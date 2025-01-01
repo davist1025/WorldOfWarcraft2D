@@ -8,7 +8,6 @@
     /// </summary>
     public class RealmAuth_Registrar
     {
-        public string Name { get; set; }
         public string Ip { get; set; }
         public int Port { get; set; }
     }
