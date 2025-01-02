@@ -6,23 +6,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver.DB.Model
+namespace WoW.Realmserver.DB.Model.Chat
 {
-    [Table("npc")]
-    public class NonPlayerCharacter
+    [Table("chat_command")]
+    public class ChatCommand
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Column("id")]
+        [Column("command_id")]
         public int Id { get; set; }
 
         [Column("name")]
         public string Name { get; set; }
 
-        [Column("npc_flag")]
-        public int FlagType { get; set; }
+        [Column("help_text")]
+        public string? HelpText { get; set; }
 
-        [Column("level")]
-        public int Level { get; set; } = 1;
+        [Column("security_level")]
+        public int Security { get; set; }
+
+        [Column("handler_id")]
+        public string? HandlerId { get; set; }
     }
 }

@@ -122,29 +122,43 @@ namespace WoW.Realmserver
                     {
                         string[] msgCopy = message.Message.Substring(1).Split(" ");
                         string commandName = msgCopy[0];
+
+                        using (var ctx = new RealmContext())
+                        {
+                            if (ctx.Commands.Any(c => c.Name.Equals(commandName) && c.Security == (int)session.Account.Security))
+                            {
+                                var command = ctx.Commands.Single(c => c.Name.Equals(commandName));
+                                if (command.HandlerId == null)
+                                {
+                                    string childCommandName = msgCopy[1];
+
+                                    if (ctx.ChildCommands.Any(c => c.Name.Equals(childCommandName) && c.Security == (int)session.Account.Security))
+                                    {
+                                        var childCommand = ctx.ChildCommands.Single(c => c.Name.Equals(childCommandName));
+                                        var childCommandHandlerId = childCommand.HandlerId;
+
+                                        Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName} {childCommandName}'.");
+
+                                        var handlerFunc = typeof(CommandHandler)
+                                            .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
+                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.Equals(childCommandHandlerId))
+                                            .Single();
+
+                                        handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(2).ToArray(), session, peer });
+                                    }
+                                }
+                                else
+                                {
+                                    // todo: use parent handlerid w/ Reflection to process command.
+                                    // children will not be processed if a handler exists for the top-most command.
+                                }
+                            }
+                        }
                     }
                 }
-
-                // todo: command processing!
-                //if (message.Message.StartsWith('.'))
-                //{
-                //    // parse the string out to get the command and arguments.
-                //    // there could be multiple arguments depending on command.
-
-                //    // exmaple: .gm on/off
-                //    // .gobject create [id] [x] [y] [z]
-                //    // .additem [id]
-                //    // .server (general server information)
-                //    // .kick [username]
-                //    // .ban [username] [reason] [duration]
-                //    // .ticket
-                //    //      create
-                //    //      delete
-                //    //      view
-                //    //      assign [username]
-                //}
-                //else
-                SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message });
+                else
+                    SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = message.Message });
             });
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) =>
@@ -365,8 +379,12 @@ namespace WoW.Realmserver
         /// <param name="peer"></param>
         /// <param name="packet"></param>
         /// <param name="delivery"></param>
-        private static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+        public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(peer, packet, delivery);
+
+        private static void SendSerializableToAll<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+            => _netProcessor.SendNetSerializable(_netManager, packet, delivery);
+
 
         public static void SendToExcept<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {

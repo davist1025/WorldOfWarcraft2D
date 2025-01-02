@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WoW.Realmserver.DB;
 
@@ -10,9 +11,11 @@ using WoW.Realmserver.DB;
 namespace WoW.Realmserver.Migrations
 {
     [DbContext(typeof(RealmContext))]
-    partial class RealmContextModelSnapshot : ModelSnapshot
+    [Migration("20250102054845_FixCommandChildColumn")]
+    partial class FixCommandChildColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -201,6 +201,11 @@ namespace WoW.Client
                 }
             });
 
+            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) =>
+            {
+                // todo: create NPC controller
+            });
+
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
 
