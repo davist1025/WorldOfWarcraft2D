@@ -18,7 +18,9 @@ namespace WoW.Client.Shared.Realm
             {
                 Name = reader.GetString(),
                 Flags = reader.GetInt(),
-                Level = reader.GetInt()
+                Level = reader.GetInt(),
+                X = reader.GetFloat(),
+                Y = reader.GetFloat(),
             };
         }
 
@@ -27,6 +29,8 @@ namespace WoW.Client.Shared.Realm
             writer.Put(Data.Name);
             writer.Put(Data.Flags);
             writer.Put(Data.Level);
+            writer.Put(Data.X);
+            writer.Put(Data.Y);
         }
     }
 }

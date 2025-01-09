@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 
 namespace WoW.Client.Scenes
@@ -82,6 +83,13 @@ namespace WoW.Client.Scenes
             var netController = new NetPlayerController();
             var theOtherEntity = CreateEntity(theOtherPlayer.Name, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
             theOtherEntity.AddComponent(netController);
+        }
+
+        public void CreateNPC(RemoteNPC remoteData)
+        {
+            var npcController = new NetNPCController(remoteData);
+            var theNpcEntity = CreateEntity($"{remoteData.Name}{Nez.Random.NextInt(35000)}", new Vector2(remoteData.X, remoteData.Y));
+            theNpcEntity.AddComponent(npcController);
         }
 
         public override void Update()

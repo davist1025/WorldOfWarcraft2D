@@ -57,6 +57,7 @@ namespace WoW.Realmserver
             Console.WriteLine("Checking for script/NPC flag mismatch...");
             using (var ctx = new RealmContext())
             {
+                // todo: check for multiple flags which should use scripts (i.e: dialogue, merchant, etc)
                 var flagsNeedingScript = ctx.NPCs.Where(npc => ((NpcTypeFlags)npc.FlagType).HasFlag(NpcTypeFlags.CanDialogue)).ToList();
                 foreach (var npc in flagsNeedingScript)
                 {
@@ -288,6 +289,16 @@ namespace WoW.Realmserver
                     SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer() { Name = otherSession.Entity.Name, ZoneX = otherSession.Entity.Position.X, ZoneY = otherSession.Entity.Position.Y });
                 }
 
+                var allNpcs = Scene.FindComponentsOfType<NpcControllerComponent>().Where(n => n.Data != null).ToList();
+
+                for (int i = 0; i < allNpcs.Count; i++)
+                {
+                    var npcData = allNpcs[i];
+                    var newNpcPacket = new RealmClient_CreateNPC() { Data = npcData.Data };
+
+                    SendTo(thisEntity.Name, newNpcPacket);
+                }
+
                 // tells the client they can enter the world.
                 SendTo(thisEntity.Name, new RealmClient_EnterWorld() 
                 { 
@@ -382,7 +393,7 @@ namespace WoW.Realmserver
         public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(peer, packet, delivery);
 
-        private static void SendSerializableToAll<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+        public static void SendSerializableToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(_netManager, packet, delivery);
 
 
@@ -396,6 +407,10 @@ namespace WoW.Realmserver
 
         public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
+            // todo: log stuff like this to file/console output.
+            //if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
+            //    Console.WriteLine("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.");
+
             var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.Equals(gObjectId)).FirstOrDefault();
 
             if (peer != null)

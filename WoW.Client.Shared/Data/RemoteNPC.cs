@@ -11,5 +11,8 @@ namespace WoW.Client.Shared.Data
         public string Name { get; set; }
         public int Flags { get; set; }
         public int Level { get; set; }
+
+        public float X { get; set; }
+        public float Y { get; set; }
     }
 }

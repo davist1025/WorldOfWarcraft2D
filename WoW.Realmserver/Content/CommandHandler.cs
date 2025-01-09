@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,19 +49,30 @@ namespace WoW.Realmserver.Content
                 if (ctx.NPCs.Any(npc => npc.Id == npcId))
                 {
                     NonPlayerCharacter npc = ctx.NPCs.First(npc => npc.Id == npcId);
+
+                    var newNpEntity = Program.Scene.CreateEntity($"{npc.Id}{npc.Name}{Nez.Random.NextInt(34000)}", session.Entity.Transform.Position);
+                    
                     RemoteNPC serializedNpc = new RemoteNPC()
                     {
                         Name = npc.Name,
                         Flags = npc.FlagType,
-                        Level = npc.Level
+                        Level = npc.Level,
+                        X = session.Entity.Transform.Position.X,
+                        Y = session.Entity.Transform.Position.Y
                     };
+
+                    newNpEntity.AddComponent(new NpcControllerComponent()
+                    {
+                        Data = serializedNpc
+                    });
 
                     RealmClient_CreateNPC newNpcPacket = new RealmClient_CreateNPC()
                     {
                         Data = serializedNpc
                     };
 
-                    Program.SendSerializable(peer, newNpcPacket);
+                    Program.SendSerializableToAll(newNpcPacket);
+                    //Program.SendSerializable(peer, newNpcPacket);
                 }
             }
         }
