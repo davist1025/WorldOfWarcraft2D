@@ -90,7 +90,7 @@ namespace WoW.Realmserver
             _netProcessor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) => PacketManager.OnPlayerDeleteCharacter(deletion, peer));
 
             // not entirely sure if this packet is necessary.
-            _netProcessor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) => PacketManager.OnPlayerRwquestCharacters(req, peer));
+            _netProcessor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) => PacketManager.OnPlayerRequestCharacters(req, peer));
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 

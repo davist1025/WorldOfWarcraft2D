@@ -103,7 +103,7 @@ namespace WoW.Realmserver
         /// </summary>
         /// <param name="reqList"></param>
         /// <param name="peer"></param>
-        public static void OnPlayerRwquestCharacters(ClientRealm_RequestCharacterList reqList, NetPeer peer)
+        public static void OnPlayerRequestCharacters(ClientRealm_RequestCharacterList reqList, NetPeer peer)
         {
             WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
             SendCharactersTo(session.Account.Id, peer);
