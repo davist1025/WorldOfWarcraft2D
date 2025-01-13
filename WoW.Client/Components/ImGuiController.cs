@@ -186,6 +186,7 @@ namespace WoW.Client.Components
                     var raceTypeNames = Enum.GetNames<RaceType>();
                     ImGui.Combo("Race", ref _newCharacterRaceId, raceTypeNames, raceTypeNames.Length);
 
+                    // todo: implement hair values.
                     ImGui.Button("<-");
                     ImGui.SameLine();
                     ImGui.Text($"Hair {_newCharacterHairId}");
@@ -205,7 +206,8 @@ namespace WoW.Client.Components
                     if (NezImGui.CenteredButton("Back", 0.5f))
                     {
                         // todo: the client will need to ask for the character list, again. i dont think a packet exists for that :p
-
+                        Game1.Send(new ClientRealm_RequestCharacterList());
+                        Game1.NetState = GameNetworkState.Realm;
                     }
 
                     ImGui.End();

@@ -359,6 +359,23 @@ namespace WoW.Realmserver
                 }
             });
 
+            // not entirely sure if this packet is necessary.
+            _netProcessor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) =>
+            {
+                WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+                List<RemoteCharacter> characters = new List<RemoteCharacter>();
+
+                using (var ctx = new RealmContext())
+                {
+                    foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
+                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
+                }
+
+                Console.WriteLine($"Sending {characters.Count} to client...");
+
+                SendSerializable(peer, new RealmClient_PlayerCharacters() { Characters = characters });
+            });
+
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
             _netManager = new NetManager(_netEventListener);
