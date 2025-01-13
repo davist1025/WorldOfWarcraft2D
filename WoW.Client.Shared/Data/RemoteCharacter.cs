@@ -10,11 +10,13 @@ namespace WoW.Client.Shared.Data
     {
         public int CharacterId { get; init; }
         public string CharacterName { get; init; }
+        public int RaceId { get; init; }
 
-        public RemoteCharacter(int characterId, string characterName)
+        public RemoteCharacter(int characterId, string characterName, int raceId)
         {
             CharacterId = characterId;
             CharacterName = characterName;
+            RaceId = raceId;
         }
     }
 }

@@ -21,8 +21,9 @@ namespace WoW.Client.Shared.Realm
             {
                 int id = reader.GetInt();
                 string name = reader.GetString();
+                int raceId = reader.GetInt();
 
-                Characters.Add(new RemoteCharacter(id, name));
+                Characters.Add(new RemoteCharacter(id, name, raceId));
             }
         }
 
@@ -36,6 +37,7 @@ namespace WoW.Client.Shared.Realm
 
                 writer.Put(character.CharacterId);
                 writer.Put(character.CharacterName);
+                writer.Put(character.RaceId);
             }
         }
     }

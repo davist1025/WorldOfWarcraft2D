@@ -26,6 +26,9 @@ namespace WoW.Realmserver.DB.Model
         [Column("character_name", TypeName = "varchar(16)")]
         public string Name { get; set; }
 
+        [Column("character_race_id")]
+        public int RaceId { get; set; }
+
         [Column("zone_x_position")]
         public float XPosition { get; set; }
 

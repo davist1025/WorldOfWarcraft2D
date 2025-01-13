@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Shared
 {
+    public enum RaceType
+    {
+        Human = 1,
+        Orc
+    }
+
+    [Obsolete("Deprecated GObject type enum.")]
     public enum GameObjectType : int
     {
         Player

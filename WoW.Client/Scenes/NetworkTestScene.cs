@@ -1,11 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Aseprite;
+using Nez.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 
@@ -29,7 +32,7 @@ namespace WoW.Client.Scenes
         public override void Initialize()
         {
             // todo: more debug tiled code.
-            var map = Content.LoadTiledMap("world1.tmx");
+            var map = Content.LoadTiledMap("Content/Data/world1.tmx");
 
             CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
@@ -69,6 +72,23 @@ namespace WoW.Client.Scenes
         {
             _theController = new LocalPlayerController();
             _thePlayer = CreateEntity(thePlayer.Name, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+
+            AsepriteFile aseFile = null;
+            SpriteRenderer renderer; // todo: replace with animator.
+            RaceType characterRace = (RaceType)thePlayer.RaceId;
+
+            switch (characterRace)
+            {
+                case RaceType.Human:
+                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
+                    break;
+                case RaceType.Orc:
+                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
+                    break;
+            }
+
+            renderer = _thePlayer.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
             _thePlayer.AddComponent(_theController);
         }
 
@@ -82,6 +102,23 @@ namespace WoW.Client.Scenes
         {
             var netController = new NetPlayerController();
             var theOtherEntity = CreateEntity(theOtherPlayer.Name, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
+
+            AsepriteFile aseFile = null;
+            SpriteRenderer renderer; // todo: replace with animator.
+            RaceType characterRace = (RaceType)theOtherPlayer.RaceId;
+
+            switch (characterRace)
+            {
+                case RaceType.Human:
+                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
+                    break;
+                case RaceType.Orc:
+                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
+
+                    break;
+            }
+            renderer = theOtherEntity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
             theOtherEntity.AddComponent(netController);
         }
 

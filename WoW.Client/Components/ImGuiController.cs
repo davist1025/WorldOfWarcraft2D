@@ -21,6 +21,8 @@ namespace WoW.Client.Components
         private string _accountNameInput = "";
 
         private string _newCharacterNameInput = "";
+        private int _newCharacterRaceId = 1;
+        private int _newCharacterHairId = 0;
 
         private int _characterSelectIndex = -1;
 
@@ -126,8 +128,10 @@ namespace WoW.Client.Components
 
                     if (Characters.Count > 0)
                     {
-                        ImGui.Columns(1);
+                        ImGui.Columns(2);
                         ImGui.Text("Name");
+                        ImGui.NextColumn();
+                        ImGui.Text("Race");
                         ImGui.NextColumn();
 
                         for (int i = 0; i < Characters.Count; i++)
@@ -146,6 +150,8 @@ namespace WoW.Client.Components
 
                             ImGui.SameLine();
                             ImGui.Text($"{character.CharacterName}");
+                            ImGui.NextColumn();
+                            ImGui.Text($"{character.RaceId}");
                             ImGui.NextColumn();
                         }
                         ImGui.Columns(0);
@@ -177,9 +183,22 @@ namespace WoW.Client.Components
 
                     ImGui.InputText("Name", ref _newCharacterNameInput, 12);
 
+                    var raceTypeNames = Enum.GetNames<RaceType>();
+                    ImGui.Combo("Race", ref _newCharacterRaceId, raceTypeNames, raceTypeNames.Length);
+
+                    ImGui.Button("<-");
+                    ImGui.SameLine();
+                    ImGui.Text($"Hair {_newCharacterHairId}");
+                    ImGui.SameLine();
+                    ImGui.Button("->");
+
                     if (NezImGui.CenteredButton("Create", 0.5f))
                     {
-                        Game1.Send(new ClientRealm_CreateCharacter() { Name = _newCharacterNameInput.Trim() });
+                        Game1.Send(new ClientRealm_CreateCharacter() 
+                        { 
+                            Name = _newCharacterNameInput.Trim(),
+                            RaceId = _newCharacterRaceId
+                        });
                         Game1.NetState = GameNetworkState.Realm;
                     }
 

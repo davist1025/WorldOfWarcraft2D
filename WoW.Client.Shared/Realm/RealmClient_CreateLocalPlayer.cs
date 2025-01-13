@@ -12,6 +12,7 @@ namespace WoW.Client.Shared.Realm
     public class RealmClient_CreateLocalPlayer
     {
         public string Name { get; set; }
+        public int RaceId { get; set; }
         public float ZoneX { get; set; }
         public float ZoneY { get; set; }
 

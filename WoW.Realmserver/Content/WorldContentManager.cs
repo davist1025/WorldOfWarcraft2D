@@ -23,6 +23,7 @@ namespace WoW.Realmserver.Content
             _mapProcessors = new Dictionary<string, TiledMapProcessor>();
             // todo: verify integrity.
             // the realmserver should come equipped with the files it will need upon startup. Most of these, such as Tiled maps, cannot be generated.
+            // should a tool be created to package/unpackage them from the client?
         }
 
         public void LoadTiled()
@@ -31,7 +32,6 @@ namespace WoW.Realmserver.Content
 
             var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
 
-            // todo: this creates a processor for every tiled map found. is that effecient?
             for (int i = 0; i < tiledMaps.Length; i++)
                 LoadTiledMap(tiledMaps[i]);
         }

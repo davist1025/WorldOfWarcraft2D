@@ -34,6 +34,8 @@ namespace WoW.Authserver
                     .ExecuteUpdate(setters => setters
                         .SetProperty(p => p.SessionId, default(string)));
 
+                // todo: implement passwords.
+                // client doesnt even have input for this yet.
                 Console.WriteLine("Verifying default account integrity...");
                 if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("ADMIN")))
                 {
@@ -108,6 +110,7 @@ namespace WoW.Authserver
                     if (storedRealm != null)
                     {
                         Console.WriteLine($"Realmserver ({storedRealm.StoredEndPoint}) has come online.");
+                        // does this need additional security?
                     }
                     else
                     {

@@ -204,7 +204,6 @@ namespace WoW.Client
             _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) =>
             {
                 NetworkScene.CreateNPC(newNpc.Data);
-                // todo: create NPC controller
             });
 
             ClientNetwork = new NetManager(ClientListener);

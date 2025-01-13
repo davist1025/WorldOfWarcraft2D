@@ -32,8 +32,6 @@ namespace WoW.Client.Components
 
         public override void OnAddedToEntity()
         {
-            _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
-
             _xAxis = new VirtualIntegerAxis();
             _xAxis.AddKeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.A, Keys.D);
             _yAxis = new VirtualIntegerAxis();

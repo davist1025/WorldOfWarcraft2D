@@ -31,9 +31,6 @@ namespace WoW.Authserver.DB.Model
         public int? Flag { get; set; }
 
         [NotMapped]
-        public RealmFlags Flags => (RealmFlags)Flag;
-
-        [NotMapped]
         public IPEndPoint StoredEndPoint => new IPEndPoint(IPAddress.Parse(Hostname), Port);
     }
 

@@ -72,7 +72,6 @@ namespace WoW.Realmserver.Content
                     };
 
                     Program.SendSerializableToAll(newNpcPacket);
-                    //Program.SendSerializable(peer, newNpcPacket);
                 }
             }
         }

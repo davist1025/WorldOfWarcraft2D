@@ -99,6 +99,7 @@ namespace WoW.Realmserver
                     }
 
                     // todo: only send to players within the game world; not at character select, etc.
+                    // add some state manager to WorldSessionComponent.Account?
                     SendToExcept(entity.Name, new RealmClient_Disconnect() { Id = entity.Name, Code = DisconnectCode.Timeout }, DeliveryMethod.ReliableOrdered);
                 }
             };
@@ -191,7 +192,7 @@ namespace WoW.Realmserver
                         List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
                         foreach (var character in ctx.Characters.Where(a => a.AccountId == newSession.Account.Id))
-                            characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+                            characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
 
                         Console.WriteLine($"Sending {characters.Count} to client...");
 
@@ -229,6 +230,7 @@ namespace WoW.Realmserver
                             AccountId = session.Account.Id,
                             CharacterId = (lastCharacterId + 1),
                             Name = request.Name.ToUpper(),
+                            RaceId = request.RaceId,
                             XPosition = 50f,
                             YPosition = 50f
                         };
@@ -243,7 +245,7 @@ namespace WoW.Realmserver
                     List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
                     foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
-                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
 
                     Console.WriteLine($"Sending {characters.Count} to client...");
 
@@ -273,24 +275,40 @@ namespace WoW.Realmserver
                 Send(peer, new RealmClient_CreateLocalPlayer()
                 {
                     Name = thisSession.Character.Name,
+                    RaceId = thisSession.Character.RaceId,
                     MapId = "world1",
                     ZoneX = thisSession.Character.XPosition,
                     ZoneY = thisSession.Character.YPosition
                 });
                 Console.WriteLine($"{thisEntity.Name} is entering the world!");
 
-                SendToExcept(thisEntity.Name, new RealmClient_CreateNetPlayer() { Name = thisEntity.Name, ZoneX = thisSession.Character.XPosition, ZoneY = thisSession.Character.YPosition });
+                // send this player to all players.
+                SendToExcept(thisEntity.Name, new RealmClient_CreateNetPlayer() 
+                { 
+                    Name = thisEntity.Name,
+                    RaceId = thisSession.Character.RaceId,
+                    ZoneX = thisSession.Character.XPosition, 
+                    ZoneY = thisSession.Character.YPosition 
+                });
 
                 var allSessionsExceptThis = Scene.FindComponentsOfType<WorldSessionComponent>().Where(session => session.Account.Id != thisSession.Account.Id).ToList();
 
+                // send all players to this player.
                 for (int i = 0; i < allSessionsExceptThis.Count; i++)
                 {
                     var otherSession = allSessionsExceptThis[i];
-                    SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer() { Name = otherSession.Entity.Name, ZoneX = otherSession.Entity.Position.X, ZoneY = otherSession.Entity.Position.Y });
+                    SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer() 
+                    { 
+                        Name = otherSession.Entity.Name,
+                        RaceId = otherSession.Character.RaceId,
+                        ZoneX = otherSession.Entity.Position.X, 
+                        ZoneY = otherSession.Entity.Position.Y 
+                    });
                 }
 
                 var allNpcs = Scene.FindComponentsOfType<NpcControllerComponent>().Where(n => n.Data != null).ToList();
 
+                // send all npcs to this player.
                 for (int i = 0; i < allNpcs.Count; i++)
                 {
                     var npcData = allNpcs[i];
@@ -331,13 +349,12 @@ namespace WoW.Realmserver
                             List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
                             foreach (var character in ctx.Characters.Where(a => a.AccountId == session.Account.Id))
-                                characters.Add(new RemoteCharacter(character.CharacterId, character.Name));
+                                characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
 
                             Console.WriteLine($"Sending {characters.Count} to client...");
 
                             SendSerializable(peer, new RealmClient_PlayerCharacters() { Characters = characters });
                         }
-                        // todo: send character list to peer.
                     }
                 }
             });
@@ -357,7 +374,6 @@ namespace WoW.Realmserver
             _authListener = new EventBasedNetListener();
             _authListener.PeerConnectedEvent += (peer) =>
             {
-                // todo: grab from config.
                 SendToAuthserver(new RealmAuth_Registrar() { Ip = Configuration.IpAddress, Port = Configuration.Port });
             };
 

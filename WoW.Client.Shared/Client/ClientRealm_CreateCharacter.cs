@@ -13,5 +13,6 @@ namespace WoW.Client.Shared.Client
     public class ClientRealm_CreateCharacter
     {
         public string Name { get; set; }
+        public int RaceId { get; set; }
     }
 }
