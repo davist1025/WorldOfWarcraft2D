@@ -81,94 +81,21 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
-            _netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) =>
-            {
-                var guiEntity = NetworkScene.FindEntity("gui");
-                if (guiEntity == null)
-                {
-                    Debug.Error("Client GUI entity is null!");
-                    return;
-                }
+            _netProcessor.SubscribeReusable<RealmClient_Chat>((newChat) => PacketManager.OnChat(newChat));
 
-                var guiController = guiEntity.GetComponent<ImGuiController>();
-                Entity playerById = NetworkScene.FindEntity(newChat.Id);
-                string chatFormat = "";
+            _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
 
-                if (playerById != null)
-                {
-                    chatFormat = $"{playerById.Name} says: {newChat.Message}";
-                    guiController.Chat.Add(chatFormat);
-                }
-                else
-                    guiController.Chat.Add($"{newChat.Id} cannot be found.");
-            });
+            _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) => PacketManager.OnLogonResponse(logonCode));
 
-            _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) =>
-            {
-                if (newDisconenct.Code == DisconnectCode.Timeout)
-                {
-                    var entity = NetworkScene.FindEntity(newDisconenct.Id);
-                    var netController = entity.GetComponent<NetPlayerController>();
+            _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) => PacketManager.OnLogonSuccess(logon));
 
-                    Debug.Log($"{entity.Name} has disconnected; deleting entity...");
+            _netProcessor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) => PacketManager.OnRealmlist(realmlist));
 
-                    entity.Destroy();
-                }
-            });
+            _netProcessor.SubscribeReusable<RealmClient_CreateCharacter>((response) => PacketManager.OnCreateCharacter(response));
 
-            _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) =>
-            {
-                switch (logonCode.Code)
-                {
-                    case LogonCode.NoRecord:
-                        Game1.NetState = GameNetworkState.Auth_Invalid;
-                        break;
-                    case LogonCode.AlreadyOnline:
-                        Game1.NetState = GameNetworkState.Auth_IsOnline;
-                        break;
-                }
-            });
+            _netProcessor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) => PacketManager.OnCharacterList(characters));
 
-            _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) =>
-            {
-                SessionId = logon.SessionId;
-                // server sends the realmlist automatically.
-            });
-
-            _netProcessor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) =>
-            {
-                Debug.Log($"Received realms: {realmlist.Realmlist.Count}");
-
-                LogonScene scene = Core.Scene as LogonScene;
-                var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
-
-                gui.Realmlist.AddRange(realmlist.Realmlist);
-                NetState = GameNetworkState.Auth_Realmlist;
-            });
-
-            _netProcessor.SubscribeReusable<RealmClient_CreateCharacter>((response) =>
-            {
-                Debug.Log(response.CreationResult);
-                // todo: return to character select, ask for character list.
-            });
-
-            _netProcessor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) =>
-            {
-                Debug.Log($"Received {characters.Characters.Count} characters.");
-
-                var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
-
-                gui.Characters.Clear();
-
-                gui.Characters.AddRange(characters.Characters);
-                NetState = GameNetworkState.Realm_Characters;
-            });
-
-            _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) =>
-            {
-                NetworkScene = new NetworkTestScene();
-                NetworkScene.CreateLocalPlayer(thePlayer);
-            });
+            _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) => PacketManager.OnLocalPlayer(thePlayer));
 
             _netProcessor.SubscribeReusable<RealmClient_Debug_ServerPosition>((result) =>
             {
@@ -176,35 +103,14 @@ namespace WoW.Client
                 controller.LastServerPosition = new Vector2(result.X, result.Y);
             });
 
-            _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) =>
-            {
-                NetworkScene.CreateNetworkPlayer(newPlayer);
-            });
+            _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
 
             // mostly an empty packet. open to suggestions or later implementation :P
-            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) =>
-            {
-                Game1.MovementSpeed = worldParams.MovementSpeed;
+            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) => PacketManager.OnEnterWorld(worldParams));
 
-                Game1.NetState = GameNetworkState.World;
-                Core.StartSceneTransition(new FadeTransition(() => NetworkScene));
-            });
+            _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
 
-            _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((serverNetUpdate) =>
-            {
-                var netPlayer = Core.Scene.FindEntity(serverNetUpdate.Id);
-
-                if (netPlayer != null)
-                {
-                    var controller = netPlayer.GetComponent<NetPlayerController>();
-                    controller.MovementDirectionQueue.Enqueue(new Vector2(serverNetUpdate.MovementX, serverNetUpdate.MovementY));
-                }
-            });
-
-            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) =>
-            {
-                NetworkScene.CreateNPC(newNpc.Data);
-            });
+            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
