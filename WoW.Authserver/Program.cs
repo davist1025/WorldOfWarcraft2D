@@ -91,99 +91,13 @@ namespace WoW.Authserver
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.NetworkReceiveEvent += (peer, reader, delivery) => _netProcessor.ReadAllPackets(reader, peer);
 
-            _netProcessor.SubscribeReusable<RealmAuth_Disconnection, NetPeer>((disconnect, peer) =>
-            {
-                using (var ctx = new AuthContext())
-                {
-                    ctx.Accounts.Where(a => a.Id == disconnect.AccountId).ExecuteUpdate(setters => setters.SetProperty(p => p.SessionId, default(string)));
-                    Console.WriteLine($"Account ID: {disconnect.AccountId} has disconnected.");
-                }
-            });
+            _netProcessor.SubscribeReusable<RealmAuth_Disconnection, NetPeer>((disconnect, peer) => PacketManager.OnPlayerDisconnect(disconnect));
 
-            _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) =>
-            {
-                using (var ctx = new AuthContext())
-                {
-                    var realms = ctx.Realmlist.ToList();
-                    var storedRealm = realms.FirstOrDefault(r => r.StoredEndPoint.Equals(new IPEndPoint(IPAddress.Parse(newAuthRegistration.Ip), newAuthRegistration.Port)));
+            _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) => PacketManager.OnRealmRegister(newAuthRegistration, peer));
 
-                    if (storedRealm != null)
-                    {
-                        Console.WriteLine($"Realmserver ({storedRealm.StoredEndPoint}) has come online.");
-                        // does this need additional security?
-                    }
-                    else
-                    {
-                        Console.WriteLine("An unregistered realm is attempting to connect to this authentication server.");
-                        peer.Disconnect(); // what happens to the realmserver at this point?
-                    }
-                }
-            });
+            _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
 
-            _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) =>
-            {
-                Console.WriteLine($"{newAuth.AccountName} is trying to log in...");
-
-                using (var ctx = new AuthContext())
-                {
-                    AuthClient_LogonCode loginCode = new AuthClient_LogonCode();
-                    string accountSessionId = "";
-                    var account = ctx.Accounts.FirstOrDefault(a => a.Username.Equals(newAuth.AccountName.ToLower()));
-
-                    if (account != null && account.SessionId == default(string))
-                    {
-                        Console.WriteLine($"Generating session for {newAuth.AccountName}...");
-                        accountSessionId = Guid.NewGuid().ToString().Replace("-", "");
-                        account.SessionId = accountSessionId;
-                        loginCode.Code = LogonCode.Success;
-                    }
-                    else if (account == null)
-                    {
-                        loginCode.Code = LogonCode.NoRecord;
-                        Console.WriteLine("Invalid login.");
-                    }
-                    else
-                    {
-                        loginCode.Code = LogonCode.AlreadyOnline;
-                    }
-
-                    Send(peer, loginCode);
-
-                    if (loginCode.Code == LogonCode.Success)
-                    {
-                        Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
-
-                        var realms = new List<RemoteRealmserver>();
-
-                        foreach (var realm in ctx.Realmlist)
-                            realms.Add(new RemoteRealmserver(realm.Name, realm.Hostname, realm.Port));
-                        SendSerializable(peer, new AuthClient_Realm() { Realmlist = realms });
-                    }
-
-                    ctx.SaveChanges();
-                }
-            });
-
-            _netProcessor.SubscribeReusable<RealmAuth_SessionVerification, NetPeer>((request, peer) =>
-            {
-                using (var ctx = new AuthContext())
-                {
-                    Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.Equals(request.SessionId.ToLower()));
-                    if (account != null)
-                    {
-                        Console.WriteLine("Sending user verification to realm...");
-                        SendSerializable(peer, new AuthRealm_SessionVerification()
-                        {
-                            User = new PlayerAccount()
-                            {
-                                Id = account.Id,
-                                SessionId = account.SessionId,
-                                Security = account.Security
-                            }
-                        });
-                    }
-                }
-            });
+            _netProcessor.SubscribeReusable<RealmAuth_SessionVerification, NetPeer>((request, peer) => PacketManager.OnSessionVerification(request, peer));
 
             _netManager = new NetManager(_netEventListener);
             _netManager.Start(8070);
@@ -194,10 +108,10 @@ namespace WoW.Authserver
             }
         }
 
-        private static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(peer, packet, delivery);
 
-        private static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+        public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(peer, packet, delivery);
 
         static void Main(string[] args)
