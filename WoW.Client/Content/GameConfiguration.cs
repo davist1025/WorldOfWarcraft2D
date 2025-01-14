@@ -16,7 +16,7 @@ namespace WoW.Client.Content
         public Dictionary<ControlMap, Keys> KeyboardControlMap { get; set; }
 
         [JsonIgnore]
-        public Dictionary<ControlMap, EventHandler> ControlHandlers;
+        public Dictionary<ControlMap, EventHandler> ControlHandlers; // todo: implement input handlers.
 
         // todo: account name, last realm info.
 

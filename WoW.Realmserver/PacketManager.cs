@@ -56,6 +56,7 @@ namespace WoW.Realmserver
                         CharacterId = (lastCharacterId + 1),
                         Name = characterData.Name.ToUpper(),
                         RaceId = characterData.RaceId,
+                        HairId = characterData.HairId,
                         XPosition = 50f,
                         YPosition = 50f
                     };
@@ -139,6 +140,7 @@ namespace WoW.Realmserver
             {
                 Name = thisSession.Character.Name,
                 RaceId = thisSession.Character.RaceId,
+                HairId = thisSession.Character.HairId,
                 MapId = "world1",
                 ZoneX = thisSession.Character.XPosition,
                 ZoneY = thisSession.Character.YPosition
@@ -150,6 +152,7 @@ namespace WoW.Realmserver
             {
                 Name = thisEntity.Name,
                 RaceId = thisSession.Character.RaceId,
+                HairId = thisSession.Character.HairId,
                 ZoneX = thisSession.Character.XPosition,
                 ZoneY = thisSession.Character.YPosition
             });
@@ -164,6 +167,7 @@ namespace WoW.Realmserver
                 {
                     Name = otherSession.Entity.Name,
                     RaceId = otherSession.Character.RaceId,
+                    HairId = otherSession.Character.HairId,
                     ZoneX = otherSession.Entity.Position.X,
                     ZoneY = otherSession.Entity.Position.Y
                 });
@@ -299,7 +303,7 @@ namespace WoW.Realmserver
                     List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
                     foreach (var character in ctx.Characters.Where(a => a.AccountId == newSession.Account.Id))
-                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
+                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId));
 
                     Console.WriteLine($"Sending {characters.Count} to client...");
 
@@ -361,7 +365,7 @@ namespace WoW.Realmserver
             using (var ctx = new RealmContext())
             {
                 foreach (var character in ctx.Characters.Where(a => a.AccountId == accountId))
-                    characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId));
+                    characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId));
             }
             Console.WriteLine($"Sending {characters.Count} to client...");
 

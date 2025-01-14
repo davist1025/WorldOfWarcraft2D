@@ -8,7 +8,7 @@ namespace WoW.Client.Shared
 {
     public enum RaceType
     {
-        Human = 1,
+        Human = 0,
         Orc
     }
 

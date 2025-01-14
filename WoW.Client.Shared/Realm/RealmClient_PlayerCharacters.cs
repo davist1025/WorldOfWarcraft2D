@@ -22,8 +22,9 @@ namespace WoW.Client.Shared.Realm
                 int id = reader.GetInt();
                 string name = reader.GetString();
                 int raceId = reader.GetInt();
+                int hairId = reader.GetInt();
 
-                Characters.Add(new RemoteCharacter(id, name, raceId));
+                Characters.Add(new RemoteCharacter(id, name, raceId, hairId));
             }
         }
 
@@ -38,6 +39,7 @@ namespace WoW.Client.Shared.Realm
                 writer.Put(character.CharacterId);
                 writer.Put(character.CharacterName);
                 writer.Put(character.RaceId);
+                writer.Put(character.HairId);
             }
         }
     }

@@ -5,6 +5,7 @@ using Nez;
 using Nez.ImGuiTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace WoW.Client.Components
 
         private string _newCharacterNameInput = "";
         private int _newCharacterRaceId = 1;
-        private int _newCharacterHairId = 0;
+        private int _newCharacterHairId = 1;
 
         private int _characterSelectIndex = -1;
 
@@ -128,10 +129,12 @@ namespace WoW.Client.Components
 
                     if (Characters.Count > 0)
                     {
-                        ImGui.Columns(2);
+                        ImGui.Columns(3);
                         ImGui.Text("Name");
                         ImGui.NextColumn();
                         ImGui.Text("Race");
+                        ImGui.NextColumn();
+                        ImGui.Text("Hair");
                         ImGui.NextColumn();
 
                         for (int i = 0; i < Characters.Count; i++)
@@ -152,6 +155,8 @@ namespace WoW.Client.Components
                             ImGui.Text($"{character.CharacterName}");
                             ImGui.NextColumn();
                             ImGui.Text($"{character.RaceId}");
+                            ImGui.NextColumn();
+                            ImGui.Text($"{character.HairId}");
                             ImGui.NextColumn();
                         }
                         ImGui.Columns(0);
@@ -186,19 +191,35 @@ namespace WoW.Client.Components
                     var raceTypeNames = Enum.GetNames<RaceType>();
                     ImGui.Combo("Race", ref _newCharacterRaceId, raceTypeNames, raceTypeNames.Length);
 
-                    // todo: implement hair values.
-                    ImGui.Button("<-");
+                    var hairFiles = Directory.GetFiles("Content/Data/Characters/").Where(f => f.ToLower().Contains("hair")).ToArray();
+
+                    if (ImGui.Button("<-"))
+                    {
+                        if (_newCharacterHairId == 1)
+                            _newCharacterHairId = hairFiles.Length;
+                        else
+                            _newCharacterHairId--;
+                    }
                     ImGui.SameLine();
-                    ImGui.Text($"Hair {_newCharacterHairId}");
+                    ImGui.Text($"Hair: {_newCharacterHairId}");
                     ImGui.SameLine();
-                    ImGui.Button("->");
+                    if (ImGui.Button("->"))
+                    {
+                        if (_newCharacterHairId == hairFiles.Length)
+                            _newCharacterHairId = 1;
+                        else
+                            _newCharacterHairId++;
+                    }
+
+                    Debug.Log(_newCharacterRaceId);
 
                     if (NezImGui.CenteredButton("Create", 0.5f))
                     {
                         Game1.Send(new ClientRealm_CreateCharacter() 
                         { 
                             Name = _newCharacterNameInput.Trim(),
-                            RaceId = _newCharacterRaceId
+                            RaceId = _newCharacterRaceId,
+                            HairId = _newCharacterHairId
                         });
                         Game1.NetState = GameNetworkState.Realm;
                     }

@@ -14,5 +14,6 @@ namespace WoW.Client.Shared.Client
     {
         public string Name { get; set; }
         public int RaceId { get; set; }
+        public int HairId { get; set; }
     }
 }

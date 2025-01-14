@@ -31,6 +31,12 @@
     <ProjectReference Include="..\WoW.Client.Shared\WoW.Client.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Content\Data\Characters\hair_1_spritesheet.ase">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Data\Characters\hair_2_spritesheet.ase">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Data\Characters\human_spritesheet.ase">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

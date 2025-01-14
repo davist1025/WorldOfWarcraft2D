@@ -37,44 +37,13 @@ namespace WoW.Client.Scenes
             CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
-        //public void CreateEntity(RealmClient_CreateGameObject create)
-        //{
-        //    var newEntity = CreateEntity(create.Id, new Vector2(create.X, create.Y));
-        //    newEntity.Tag = (int)create.EntityType;
-        //}
-
-        //public void CreatePlayer(RealmClient_CreateNetPlayer newLogin)
-        //{
-        //    var existingEntity = FindEntity(newLogin.Id);
-
-        //    if (existingEntity != null)
-        //    {
-        //        var newController = new NetPlayerController(newLogin.PlayerCharacter);
-
-        //        existingEntity.AddComponent(newController);
-
-        //        Debug.Log($"New player: {newController.Character.Name} has connected!");
-        //    }
-        //}
-
-        //public void UpdatePlayerPosition(RealmClient_NetPositionInputUpdate posUpdate)
-        //{
-        //    // should player's receive another's input and formulate their own position??
-        //    // as the client, we could also receive this result position and interpolate in-between;
-        //    // the client calculates the direction in which the result is (i.e x=1, y=-1) and forms a smooth movement, animation, etc.
-
-        //    var player = FindEntity(posUpdate.Id);
-        //    if (player != null)
-        //        player.GetComponent<NetPlayerController>().Inputs.Enqueue(new Vector2(posUpdate.X, posUpdate.Y));
-        //}
-
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
             _theController = new LocalPlayerController();
             _thePlayer = CreateEntity(thePlayer.Name, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
 
             AsepriteFile aseFile = null;
-            SpriteRenderer renderer; // todo: replace with animator.
+            SpriteRenderer raceRenderer; // todo: replace with animator.
             RaceType characterRace = (RaceType)thePlayer.RaceId;
 
             switch (characterRace)
@@ -87,7 +56,14 @@ namespace WoW.Client.Scenes
                     break;
             }
 
-            renderer = _thePlayer.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+            raceRenderer = _thePlayer.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
+            if (thePlayer.HairId > 1)
+            {
+                var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
+
+                _thePlayer.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+            }
 
             _thePlayer.AddComponent(_theController);
         }
@@ -117,7 +93,15 @@ namespace WoW.Client.Scenes
 
                     break;
             }
+
             renderer = theOtherEntity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
+            if (theOtherPlayer.HairId > 1)
+            {
+                var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{theOtherPlayer.HairId}_spritesheet.ase");
+
+                theOtherEntity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+            }
 
             theOtherEntity.AddComponent(netController);
         }

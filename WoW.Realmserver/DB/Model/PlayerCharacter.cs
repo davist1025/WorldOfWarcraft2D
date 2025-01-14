@@ -29,6 +29,9 @@ namespace WoW.Realmserver.DB.Model
         [Column("character_race_id")]
         public int RaceId { get; set; }
 
+        [Column("character_hair_id")]
+        public int HairId { get; set; } = 1;
+
         [Column("zone_x_position")]
         public float XPosition { get; set; }
 
