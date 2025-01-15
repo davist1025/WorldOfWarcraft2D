@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 
 namespace WoW.Client.Components
 {
 
-    internal class LocalPlayerController : Component, IUpdatable
+    public class LocalPlayerController : Component, IUpdatable
     {
         private PrototypeSpriteRenderer _renderer;
 
@@ -29,6 +30,7 @@ namespace WoW.Client.Components
         //private List<InputChangeTick> _inputRecord;
 
         public Vector2 LastServerPosition = Vector2.Zero;
+        public string TargetWorldId = "";
 
         public override void OnAddedToEntity()
         {
@@ -40,8 +42,7 @@ namespace WoW.Client.Components
 
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
-            _circleCollder = Entity.AddComponent<CircleCollider>();
-            _circleCollder.SetRadius(8f);
+            _circleCollder = Entity.AddComponent(new CircleCollider(8f));
             // todo: should collider size be set by the server and transmitted?
         }
 
@@ -72,6 +73,17 @@ namespace WoW.Client.Components
         {
             // todo: need to set an "Origin" value server-side so this is automatically calculated and the position matches what the client would expect.
             batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
+
+            if (!string.IsNullOrEmpty(TargetWorldId))
+            {
+                // hack: find the target entity in a simpler way :p
+                var entity = Entity.Scene.FindEntitiesWithTag((int)EntityType.NPC).Where(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(TargetWorldId, StringComparison.OrdinalIgnoreCase)).Single();
+
+                if (entity != null)
+                {
+                    batcher.DrawLine(Entity.Position, entity.Position, Color.Yellow);
+                }
+            }
         }
     }
 }

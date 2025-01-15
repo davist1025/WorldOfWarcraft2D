@@ -14,7 +14,7 @@ using WoW.Server.Shared.Serializable;
 
 namespace WoW.Realmserver.Components
 {
-    public class WorldSessionComponent : Component, IUpdatable
+    public class WorldSessionComponent : Component, IUpdatable, ITriggerListener
     {
         public PlayerAccount Account;
         public PlayerCharacter Character;
@@ -27,7 +27,9 @@ namespace WoW.Realmserver.Components
         public float MovementSpeed = 100f;
 
         public Queue<Vector2> InputUpdates = new Queue<Vector2>();
-        public Queue<InputChangeTick> InputChanges = new Queue<InputChangeTick>();
+
+        public List<Entity> AvailableTargets = new List<Entity>();
+        public int TargetIndex = -1;
 
         public WorldSessionComponent(PlayerAccount user)
             => Account = user;
@@ -69,6 +71,17 @@ namespace WoW.Realmserver.Components
             _mover = Entity.AddComponent<Mover>();
 
             Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
+        }
+
+        public void OnTriggerEnter(Collider other, Collider local)
+            => AvailableTargets.AddIfNotPresent(other.Entity);
+
+        public void OnTriggerExit(Collider other, Collider local)
+        {
+            AvailableTargets.Remove(other.Entity);
+
+            if (TargetIndex > AvailableTargets.Count)
+                TargetIndex = AvailableTargets.Count - 1;
         }
     }
 }

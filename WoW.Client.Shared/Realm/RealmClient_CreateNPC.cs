@@ -16,6 +16,7 @@ namespace WoW.Client.Shared.Realm
         {
             Data = new RemoteNPC()
             {
+                WorldId = reader.GetString(),
                 Name = reader.GetString(),
                 Flags = reader.GetInt(),
                 Level = reader.GetInt(),
@@ -26,6 +27,7 @@ namespace WoW.Client.Shared.Realm
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(Data.WorldId);
             writer.Put(Data.Name);
             writer.Put(Data.Flags);
             writer.Put(Data.Level);

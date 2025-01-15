@@ -140,6 +140,22 @@ namespace WoW.Client
                 entity.Destroy();
             }
         }
+
+        public static void OnSetTarget(RealmClient_SetTarget target)
+        {
+            var npcs = Game1.NetworkScene.FindEntitiesWithTag((int)EntityType.NPC); // this should never be empty.
+            var matchingTarget = npcs.Find(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(target.WorldId, StringComparison.OrdinalIgnoreCase));
+            var controller = matchingTarget.GetComponent<NetNPCController>();
+
+            if (matchingTarget != null)
+            {
+                var player = Game1.Player.GetComponent<LocalPlayerController>();
+                player.TargetWorldId = target.WorldId;
+            }
+        }
         #endregion
+
+        public static void SendTabTargetRequest()
+            => Game1.Send(new ClientRealm_TabTarget(), LiteNetLib.DeliveryMethod.ReliableUnordered);
     }
 }

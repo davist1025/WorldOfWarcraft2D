@@ -8,6 +8,7 @@ namespace WoW.Client.Shared.Data
 {
     public class RemoteNPC
     {
+        public string WorldId { get; set; }
         public string Name { get; set; }
         public int Flags { get; set; }
         public int Level { get; set; }

@@ -21,6 +21,10 @@ namespace WoW.Client.Components
             var rendererer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             rendererer.SetColor(Color.LightBlue);
 
+            // utilized only to test trigger sights.
+            //var trigger = Entity.AddComponent(new CircleCollider(64f));
+            //trigger.IsTrigger = true;
+
             Entity.SetPosition(new Vector2(Remote.X, Remote.Y));
         }
 

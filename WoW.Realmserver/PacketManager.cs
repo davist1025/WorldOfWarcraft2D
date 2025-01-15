@@ -259,6 +259,25 @@ namespace WoW.Realmserver
             else
                 Program.SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = chat.Message });
         }
+
+        public static void OnTabTargetRequest(NetPeer peer)
+        {
+            Entity playerEntity = (peer.Tag as Entity);
+            WorldSessionComponent session = playerEntity.GetComponent<WorldSessionComponent>();
+
+            if (session.AvailableTargets.Count > 0)
+            {
+                session.TargetIndex += 1;
+
+                if (session.TargetIndex > session.AvailableTargets.Count - 1)
+                    session.TargetIndex = 0;
+
+                var newTarget = session.AvailableTargets[session.TargetIndex];
+                var controller = newTarget.GetComponent<NpcControllerComponent>();
+
+                Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Data.WorldId });
+            }
+        }
         #endregion
 
         #region Realm/auth packets

@@ -16,16 +16,17 @@ namespace WoW.Client.Scenes
 {
     public class NetworkTestScene : Scene
     {
-        private Entity _thePlayer;
         private LocalPlayerController _theController;
 
         public override void OnStart()
         {
             base.OnStart();
 
+            Scene.SetDefaultDesignResolution(800, 600, SceneResolutionPolicy.ShowAllPixelPerfect);
+
             //var playerEntity = CreateEntity("player").AddComponent(_theController);
             CreateEntity("gui").AddComponent(new ImGuiController());
-            Camera.Entity.AddComponent(new FollowCamera(_thePlayer, Camera));
+            Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
         }
 
@@ -40,7 +41,9 @@ namespace WoW.Client.Scenes
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
             _theController = new LocalPlayerController();
-            _thePlayer = CreateEntity(thePlayer.Name, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            Game1.Player = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            // todo: re-add the player's character name somewhere.
+            Game1.Player.Tag = (int)EntityType.LocalPlayer;
 
             AsepriteFile aseFile = null;
             SpriteRenderer raceRenderer; // todo: replace with animator.
@@ -56,16 +59,16 @@ namespace WoW.Client.Scenes
                     break;
             }
 
-            raceRenderer = _thePlayer.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+            raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
 
             if (thePlayer.HairId > 1)
             {
                 var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
 
-                _thePlayer.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+                Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
             }
 
-            _thePlayer.AddComponent(_theController);
+            Game1.Player.AddComponent(_theController);
         }
 
         /// <summary>
@@ -78,6 +81,7 @@ namespace WoW.Client.Scenes
         {
             var netController = new NetPlayerController();
             var theOtherEntity = CreateEntity(theOtherPlayer.Name, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
+            theOtherEntity.Tag = (int)EntityType.NetPlayer;
 
             AsepriteFile aseFile = null;
             SpriteRenderer renderer; // todo: replace with animator.
@@ -110,15 +114,20 @@ namespace WoW.Client.Scenes
         {
             var npcController = new NetNPCController(remoteData);
             var theNpcEntity = CreateEntity($"{remoteData.Name}{Nez.Random.NextInt(35000)}", new Vector2(remoteData.X, remoteData.Y));
+            theNpcEntity.Tag = (int)EntityType.NPC;
+
             theNpcEntity.AddComponent(npcController);
         }
 
         public override void Update()
         {
             base.Update();
-        }
 
-        public Entity GetPlayer()
-            => _thePlayer;
+            if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Client.Content.ControlMap.TabTarget]))
+            {
+                Game1.Configuration.ControlHandlers[Client.Content.ControlMap.TabTarget]?.Invoke(null, null);
+                // todo: formula for finding entities in a cone/radius infront of the player.
+            }
+        }
     }
 }

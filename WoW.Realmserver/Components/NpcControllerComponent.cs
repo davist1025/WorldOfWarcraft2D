@@ -15,6 +15,8 @@ namespace WoW.Realmserver.Components
         public override void OnAddedToEntity()
         {
             // todo: add Mover to NPC.
+            var trigger = Entity.AddComponent(new CircleCollider(64f));
+            trigger.IsTrigger = true;
         }
 
         public void Update()

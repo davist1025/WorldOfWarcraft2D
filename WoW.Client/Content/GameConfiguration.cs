@@ -43,6 +43,10 @@ namespace WoW.Client.Content
                 KeyboardControlMap = new Dictionary<ControlMap, Keys>()
                 {
                     { ControlMap.TabTarget, Keys.Tab }
+                },
+                ControlHandlers = new Dictionary<ControlMap, EventHandler>()
+                {
+                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() }
                 }
             };
         }

@@ -92,6 +92,8 @@ namespace WoW.Realmserver
             // not entirely sure if this packet is necessary.
             _netProcessor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) => PacketManager.OnPlayerRequestCharacters(req, peer));
 
+            _netProcessor.SubscribeReusable<ClientRealm_TabTarget, NetPeer>((req, peer) => PacketManager.OnTabTargetRequest(peer));
+
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
             _netManager = new NetManager(_netEventListener);

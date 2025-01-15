@@ -49,6 +49,8 @@ namespace WoW.Client
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
 
+        public static Entity Player;
+
         public static float MovementSpeed = 1f;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
@@ -58,7 +60,7 @@ namespace WoW.Client
         }
 
         protected override void Initialize()
-        {
+        {   
             // todo: network stuff init'd here.
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
@@ -111,6 +113,8 @@ namespace WoW.Client
             _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
 
             _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
+
+            _netProcessor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();

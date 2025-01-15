@@ -13,9 +13,11 @@ namespace WoW.Client.Shared
     }
 
     [Obsolete("Deprecated GObject type enum.")]
-    public enum GameObjectType : int
+    public enum EntityType : int
     {
-        Player
+        LocalPlayer,
+        NetPlayer,
+        NPC
     }
 
     public enum LogonCode

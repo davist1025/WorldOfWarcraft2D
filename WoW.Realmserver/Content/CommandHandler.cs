@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using Microsoft.Xna.Framework;
+using Nez;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,7 @@ namespace WoW.Realmserver.Content
                     
                     RemoteNPC serializedNpc = new RemoteNPC()
                     {
+                        WorldId = Guid.NewGuid().ToString(),
                         Name = npc.Name,
                         Flags = npc.FlagType,
                         Level = npc.Level,
