@@ -40,9 +40,9 @@ namespace WoW.Client.Scenes
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
-            _theController = new LocalPlayerController();
+            _theController = new LocalPlayerController(thePlayer.Name);
             Game1.Player = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
-            // todo: re-add the player's character name somewhere.
+            // todo: use mapid.
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
 
             AsepriteFile aseFile = null;

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
@@ -257,7 +258,11 @@ namespace WoW.Realmserver
                 }
             }
             else
-                Program.SendToAll(new RealmClient_Chat() { Id = entity.Name, Message = chat.Message });
+                Program.SendToAll(new RealmClient_Chat() 
+                { 
+                    Id = entity.Name, 
+                    Message = chat.Message 
+                });
         }
 
         public static void OnTabTargetRequest(NetPeer peer)

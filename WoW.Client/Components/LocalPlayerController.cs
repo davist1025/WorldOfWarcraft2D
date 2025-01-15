@@ -29,8 +29,12 @@ namespace WoW.Client.Components
         private int _tickCount = 0;
         //private List<InputChangeTick> _inputRecord;
 
+        public string Name { get; init; }
         public Vector2 LastServerPosition = Vector2.Zero;
         public string TargetWorldId = "";
+
+        public LocalPlayerController(string name)
+            => Name = name;
 
         public override void OnAddedToEntity()
         {

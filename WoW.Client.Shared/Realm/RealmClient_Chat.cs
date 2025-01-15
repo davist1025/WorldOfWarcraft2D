@@ -16,7 +16,7 @@ namespace WoW.Client.Shared.Realm
     {
         // todo: channel
 
-        public string Id { get; set; }
+        public string Id { get; set; } // can be an NPCs WorldId, a player's character name, etc.
         public string Message { get; set; }
     }
 }
