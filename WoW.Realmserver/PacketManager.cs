@@ -134,11 +134,11 @@ namespace WoW.Realmserver
                 thisSession.Character = activeCharacter;
             }
             thisSession.InitializeGameComponents();
-            thisEntity.Name = thisSession.Character.Name;
 
             // let the client create their local player object.
             Program.Send(peer, new RealmClient_CreateLocalPlayer()
             {
+                WorldId = thisEntity.Name,
                 Name = thisSession.Character.Name,
                 RaceId = thisSession.Character.RaceId,
                 HairId = thisSession.Character.HairId,
@@ -146,12 +146,13 @@ namespace WoW.Realmserver
                 ZoneX = thisSession.Character.XPosition,
                 ZoneY = thisSession.Character.YPosition
             });
-            Console.WriteLine($"{thisEntity.Name} is entering the world!");
+            Console.WriteLine($"{thisSession.Character.Name} is entering the world!");
 
             // send this player to all players.
             Program.SendToExcept(thisEntity.Name, new RealmClient_CreateNetPlayer()
             {
-                Name = thisEntity.Name,
+                WorldId = thisEntity.Name,
+                Name = thisSession.Character.Name,
                 RaceId = thisSession.Character.RaceId,
                 HairId = thisSession.Character.HairId,
                 ZoneX = thisSession.Character.XPosition,
@@ -166,7 +167,8 @@ namespace WoW.Realmserver
                 var otherSession = allSessionsExceptThis[i];
                 Program.SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer()
                 {
-                    Name = otherSession.Entity.Name,
+                    WorldId = otherSession.Entity.Name,
+                    Name = otherSession.Character.Name,
                     RaceId = otherSession.Character.RaceId,
                     HairId = otherSession.Character.HairId,
                     ZoneX = otherSession.Entity.Position.X,
@@ -314,7 +316,8 @@ namespace WoW.Realmserver
                 Program.TransferSessions.Remove(verification.User.SessionId);
 
                 WorldSessionComponent newSession = new WorldSessionComponent(verification.User);
-                Entity newEntity = Program.Scene.CreateEntity(newSession.Account.SessionId);
+                Entity newEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString());
+                newEntity.Tag = (int)EntityType.NetPlayer;
                 newEntity.AddComponent(newSession);
                 sessionPeer.Tag = newEntity;
 

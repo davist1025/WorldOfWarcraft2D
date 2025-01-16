@@ -51,8 +51,6 @@ namespace WoW.Client
         #region Characters
         public static void OnCreateCharacter(RealmClient_CreateCharacter response)
         {
-            Debug.Log(response.CreationResult);
-
             Game1.Send(new ClientRealm_RequestCharacterList());
             Game1.NetState = GameNetworkState.Realm;
         }
@@ -124,7 +122,17 @@ namespace WoW.Client
 
             if (playerById != null)
             {
-                chatFormat = $"{playerById.Name} says: {chat.Message}";
+                // todo: check for server message.
+
+                NetPlayerController netController = null;
+                LocalPlayerController localController = null;
+
+                if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
+                    netController = playerById.GetComponent<NetPlayerController>();
+                else
+                    localController = playerById.GetComponent<LocalPlayerController>();
+
+                chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
                 guiController.Chat.Add(chatFormat);
             }
             else

@@ -40,7 +40,7 @@ namespace WoW.Client.Scenes
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
             _theController = new LocalPlayerController(thePlayer.Name);
-            Game1.Player = CreateEntity("thePlayer", new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            Game1.Player = CreateEntity(thePlayer.WorldId, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
             // todo: use mapid.
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
 
@@ -78,9 +78,11 @@ namespace WoW.Client.Scenes
         /// <param name="theOtherPlayer"></param>
         public void CreateNetworkPlayer(RealmClient_CreateNetPlayer theOtherPlayer)
         {
-            var netController = new NetPlayerController();
-            var theOtherEntity = CreateEntity(theOtherPlayer.Name, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
+            var netController = new NetPlayerController(theOtherPlayer);
+            var theOtherEntity = CreateEntity(theOtherPlayer.WorldId, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
             theOtherEntity.Tag = (int)EntityType.NetPlayer;
+
+            Debug.Log($"Player: {theOtherEntity.Name} ({netController.Name}) has joined the world!");
 
             AsepriteFile aseFile = null;
             SpriteRenderer renderer; // todo: replace with animator.

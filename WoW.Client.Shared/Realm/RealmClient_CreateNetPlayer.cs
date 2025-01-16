@@ -13,6 +13,8 @@ namespace WoW.Client.Shared.Realm
     /// </summary>
     public class RealmClient_CreateNetPlayer
     {
+        public string WorldId { get; set; }
+
         /// <summary>
         /// The unique character name for this player.
         /// </summary>

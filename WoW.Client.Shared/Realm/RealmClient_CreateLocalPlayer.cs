@@ -11,6 +11,7 @@ namespace WoW.Client.Shared.Realm
     /// </summary>
     public class RealmClient_CreateLocalPlayer
     {
+        public string WorldId { get; set; }
         public string Name { get; set; }
         public int RaceId { get; set; }
         public int HairId { get; set; }

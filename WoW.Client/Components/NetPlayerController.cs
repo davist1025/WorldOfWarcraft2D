@@ -5,11 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared.Realm;
 
 namespace WoW.Client.Components
 {
     public class NetPlayerController : Component, IUpdatable
     {
+        public string Name;
+        public int RaceId;
+        public int HairId;
+
         private PrototypeSpriteRenderer _renderer;
         private Vector2 _currentMoveDirection = Vector2.Zero;
         private SubpixelVector2 _subPixelMovement;
@@ -17,6 +22,13 @@ namespace WoW.Client.Components
         private CircleCollider _circleCollider;
 
         public Queue<Vector2> MovementDirectionQueue = new Queue<Vector2>();
+
+        public NetPlayerController(RealmClient_CreateNetPlayer networkPlayer)
+        {
+            Name = networkPlayer.Name;
+            RaceId = networkPlayer.RaceId;
+            HairId = networkPlayer.HairId;
+        }
 
         public override void OnAddedToEntity()
         {
