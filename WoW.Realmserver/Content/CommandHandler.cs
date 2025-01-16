@@ -77,5 +77,28 @@ namespace WoW.Realmserver.Content
                 }
             }
         }
+
+        [CommandHandler("ServerCommand_SendMessage")]
+        public static void ServerCommand_SendMessage(string[] message, WorldSessionComponent session, NetPeer peer)
+        {
+            string fullMsg = "";
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                var part = message[i];
+
+                if (i == message.Length - 1)
+                    fullMsg += part;
+                else
+                    fullMsg += $"{part} ";
+            }
+
+            RealmClient_Chat serverMessage = new RealmClient_Chat()
+            {
+                Id = "server",
+                Message = fullMsg
+            };
+            Program.SendToAll(serverMessage);
+        }
     }
 }

@@ -116,27 +116,36 @@ namespace WoW.Client
             // todo: fix chatting. broke after implementing tab targeting because i changed the player entity's name to "thePlayer".
             // this expects a character name.
             // expand this to allow NPCs, other players and the server.
-            var guiController = guiEntity.GetComponent<ImGuiController>();
-            Entity playerById = Game1.NetworkScene.FindEntity(chat.Id);
             string chatFormat = "";
+            var guiController = guiEntity.GetComponent<ImGuiController>();
 
-            if (playerById != null)
+            if (chat.Id.Equals("server", StringComparison.OrdinalIgnoreCase))
             {
-                // todo: check for server message.
-
-                NetPlayerController netController = null;
-                LocalPlayerController localController = null;
-
-                if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
-                    netController = playerById.GetComponent<NetPlayerController>();
-                else
-                    localController = playerById.GetComponent<LocalPlayerController>();
-
-                chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
+                chatFormat = $"SERVER: {chat.Message}";
                 guiController.Chat.Add(chatFormat);
             }
             else
-                guiController.Chat.Add($"{chat.Id} cannot be found.");
+            {
+                Entity playerById = Game1.NetworkScene.FindEntity(chat.Id);
+
+                if (playerById != null)
+                {
+                    // todo: check for server message.
+
+                    NetPlayerController netController = null;
+                    LocalPlayerController localController = null;
+
+                    if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
+                        netController = playerById.GetComponent<NetPlayerController>();
+                    else
+                        localController = playerById.GetComponent<LocalPlayerController>();
+
+                    chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
+                    guiController.Chat.Add(chatFormat);
+                }
+                else
+                    guiController.Chat.Add($"{chat.Id} cannot be found.");
+            }
         }
 
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)
