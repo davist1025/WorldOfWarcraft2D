@@ -184,7 +184,7 @@ namespace WoW.Realmserver
                 var npcData = allNpcs[i];
                 var newNpcPacket = new RealmClient_CreateNPC() { Data = npcData.Data };
 
-                Program.SendTo(thisEntity.Name, newNpcPacket);
+                Program.SendSerializable(peer, newNpcPacket);
             }
 
             // tells the client they can enter the world.
