@@ -146,15 +146,29 @@ namespace WoW.Client
 
         public static void OnSetTarget(RealmClient_SetTarget target)
         {
-            var npcs = Game1.NetworkScene.FindEntitiesWithTag((int)EntityType.NPC); // this should never be empty.
-            var matchingTarget = npcs.Find(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(target.WorldId, StringComparison.OrdinalIgnoreCase));
-            var controller = matchingTarget.GetComponent<NetNPCController>();
+            var targetEntity = Game1.NetworkScene.FindEntity(target.WorldId);
 
-            if (matchingTarget != null)
+            if (targetEntity != null)
             {
                 var player = Game1.Player.GetComponent<LocalPlayerController>();
                 player.TargetWorldId = target.WorldId;
+                //switch ((EntityType)targetEntity.Tag)
+                //{
+                //    case EntityType.NPC:
+
+                //        break;
+                //}
             }
+
+            //var npcs = Game1.NetworkScene.FindEntitiesWithTag((int)EntityType.NPC); // this should never be empty.
+            //var matchingTarget = npcs.Find(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(target.WorldId, StringComparison.OrdinalIgnoreCase));
+            //var controller = matchingTarget.GetComponent<NetNPCController>();
+
+            //if (matchingTarget != null)
+            //{
+            //    var player = Game1.Player.GetComponent<LocalPlayerController>();
+            //    player.TargetWorldId = target.WorldId;
+            //}
         }
         #endregion
 

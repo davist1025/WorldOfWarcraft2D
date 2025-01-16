@@ -24,7 +24,6 @@ namespace WoW.Client.Scenes
 
             Scene.SetDefaultDesignResolution(800, 600, SceneResolutionPolicy.ShowAllPixelPerfect);
 
-            //var playerEntity = CreateEntity("player").AddComponent(_theController);
             CreateEntity("gui").AddComponent(new ImGuiController());
             Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
@@ -113,7 +112,7 @@ namespace WoW.Client.Scenes
         public void CreateNPC(RemoteNPC remoteData)
         {
             var npcController = new NetNPCController(remoteData);
-            var theNpcEntity = CreateEntity($"{remoteData.Name}{Nez.Random.NextInt(35000)}", new Vector2(remoteData.X, remoteData.Y));
+            var theNpcEntity = CreateEntity($"{remoteData.WorldId}", new Vector2(remoteData.X, remoteData.Y));
             theNpcEntity.Tag = (int)EntityType.NPC;
 
             theNpcEntity.AddComponent(npcController);
@@ -124,10 +123,7 @@ namespace WoW.Client.Scenes
             base.Update();
 
             if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Client.Content.ControlMap.TabTarget]))
-            {
                 Game1.Configuration.ControlHandlers[Client.Content.ControlMap.TabTarget]?.Invoke(null, null);
-                // todo: formula for finding entities in a cone/radius infront of the player.
-            }
         }
     }
 }
