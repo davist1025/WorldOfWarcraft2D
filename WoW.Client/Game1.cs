@@ -50,6 +50,7 @@ namespace WoW.Client
         public static NetworkTestScene NetworkScene;
 
         public static Entity Player;
+        private static ClientAuth_Logon _temporaryLogonPacket;
 
         public static float MovementSpeed = 1f;
 
@@ -70,7 +71,9 @@ namespace WoW.Client
                     NetState = GameNetworkState.Auth_LoggingIn;
 
                 if (NetState == GameNetworkState.Auth_LoggingIn)
-                    Send(new ClientAuth_Logon() { AccountName = AccountName });
+                {
+                    Send(_temporaryLogonPacket);
+                }
 
                 if (NetState == GameNetworkState.Realm)
                     Send(new ClientRealm_TransferLogon() { SessionId = SessionId });
@@ -143,6 +146,17 @@ namespace WoW.Client
         {
             base.Update(gameTime);
             ClientNetwork.PollEvents();
+        }
+
+        public static void ConnectAndLogin(string accountName, string password)
+        {
+            ClientNetwork.Connect("127.0.0.1", 8070, "");
+
+            _temporaryLogonPacket = new ClientAuth_Logon()
+            {
+                AccountName = accountName,
+                Password = password
+            };
         }
 
         public static void Send<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()

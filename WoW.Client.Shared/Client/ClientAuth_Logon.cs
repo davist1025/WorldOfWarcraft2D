@@ -15,11 +15,6 @@ namespace WoW.Client.Shared.Client
     public class ClientAuth_Logon
     {
         public string AccountName { get; set; }
-
-        /* todo: client auth
-         * password (what kind of encryption?)
-         * game client version/build
-         * ???
-         */
+        public string Password { get; set; }
     }
 }

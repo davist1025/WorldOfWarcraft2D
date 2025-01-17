@@ -28,6 +28,9 @@ namespace WoW.Client
                 case LogonCode.AlreadyOnline:
                     Game1.NetState = GameNetworkState.Auth_IsOnline;
                     break;
+                case LogonCode.InvalidPassword:
+                    Game1.NetState = GameNetworkState.Auth_Invalid;
+                    break;
             }
         }
 

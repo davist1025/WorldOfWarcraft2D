@@ -20,6 +20,7 @@ namespace WoW.Client.Components
     {
         private string _chatInput = "";
         private string _accountNameInput = "";
+        private string _accountPasswordInput = "";
 
         private string _newCharacterNameInput = "";
         private int _newCharacterRaceId = 1;
@@ -45,13 +46,15 @@ namespace WoW.Client.Components
                 case GameNetworkState.Offline:
                     ImGui.Begin("Login");
                     ImGui.InputText("Account Name", ref _accountNameInput, 32);
+                    ImGui.InputText("Password", ref _accountPasswordInput, 64, ImGuiInputTextFlags.Password);
                     // todo: password.
                     //ImGui.InputText("Passowrd")
 
                     if (ImGui.Button("Connect"))
                     {
-                        Game1.AccountName = _accountNameInput;
-                        Game1.ClientNetwork.Connect("127.0.0.1", 8070, "");
+                        Game1.ConnectAndLogin(_accountNameInput, _accountPasswordInput);
+                        //Game1.AccountName = _accountNameInput;
+                        //Game1.ClientNetwork.Connect("127.0.0.1", 8070, "");
                     }
                     ImGui.End();
                     break;

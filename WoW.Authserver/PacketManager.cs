@@ -15,6 +15,7 @@ using WoW.Server.Shared;
 using Org.BouncyCastle.Asn1.Ocsp;
 using WoW.Authserver.DB.Model;
 using WoW.Server.Shared.Serializable;
+using Isopoh.Cryptography.Argon2;
 
 namespace WoW.Authserver
 {
@@ -32,10 +33,17 @@ namespace WoW.Authserver
 
                 if (account != null && account.SessionId == default(string))
                 {
-                    Console.WriteLine($"Generating session for {logon.AccountName}...");
-                    accountSessionId = Guid.NewGuid().ToString().Replace("-", "");
-                    account.SessionId = accountSessionId;
-                    loginCode.Code = LogonCode.Success;
+                    Console.WriteLine($"Verifying password of {logon.AccountName}...");
+
+                    if (Argon2.Verify(account.HashedPassword, logon.Password))
+                    {
+                        Console.WriteLine($"Generating session for {logon.AccountName}...");
+                        accountSessionId = Guid.NewGuid().ToString().Replace("-", "");
+                        account.SessionId = accountSessionId;
+                        loginCode.Code = LogonCode.Success;
+                    }
+                    else
+                        loginCode.Code = LogonCode.InvalidPassword;
                 }
                 else if (account == null)
                 {

@@ -27,6 +27,7 @@ namespace WoW.Client.Shared
         Suspended,
         AlreadyOnline,
         NoRecord,
+        InvalidPassword
     }
 
     [Flags]

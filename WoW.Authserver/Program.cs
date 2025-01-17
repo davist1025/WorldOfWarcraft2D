@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using Isopoh.Cryptography.Argon2;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -42,7 +43,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "admin".ToUpper(),
-                        HashedPassword = "123",
+                        HashedPassword = Argon2.Hash("123"),
                         SecurityLevel = (int)SecurityLevel.Administrator
                     });
                 }
@@ -52,7 +53,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "gamemaster".ToUpper(),
-                        HashedPassword = "123",
+                        HashedPassword = Argon2.Hash("456"),
                         SecurityLevel = (int)SecurityLevel.Gamemaster
                     });
                 }
@@ -62,7 +63,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "player".ToUpper(),
-                        HashedPassword = "123",
+                        HashedPassword = Argon2.Hash("789"),
                         SecurityLevel = (int)SecurityLevel.Player
                     });
                 }

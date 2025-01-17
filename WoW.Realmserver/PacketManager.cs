@@ -283,8 +283,7 @@ namespace WoW.Realmserver
                     }
                 }
             }
-
-            if (!chat.IsWhisper)
+            else if (!chat.IsWhisper)
             {
                 Program.SendToAll(new RealmClient_Chat()
                 {
