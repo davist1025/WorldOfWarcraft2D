@@ -119,32 +119,45 @@ namespace WoW.Client
             string chatFormat = "";
             var guiController = guiEntity.GetComponent<ImGuiController>();
 
-            if (chat.Id.Equals("server", StringComparison.OrdinalIgnoreCase))
+            Debug.Log(chat.IsWhisper + " " + chat.FromWorldId);
+
+            if (chat.IsWhisper) // mostly for formatting purposes.
             {
-                chatFormat = $"SERVER: {chat.Message}";
+                var fromEntity = Core.Scene.FindEntity(chat.FromWorldId);
+                var controller = fromEntity.GetComponent<NetPlayerController>();
+
+                chatFormat = $"{controller.Name} says: {chat.Message}";
                 guiController.Chat.Add(chatFormat);
             }
-            else
+
+            if (!chat.IsWhisper)
             {
-                Entity playerById = Game1.NetworkScene.FindEntity(chat.Id);
-
-                if (playerById != null)
+                if (chat.FromWorldId.Equals("server", StringComparison.OrdinalIgnoreCase))
                 {
-                    // todo: check for server message.
-
-                    NetPlayerController netController = null;
-                    LocalPlayerController localController = null;
-
-                    if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
-                        netController = playerById.GetComponent<NetPlayerController>();
-                    else
-                        localController = playerById.GetComponent<LocalPlayerController>();
-
-                    chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
+                    chatFormat = $"SERVER: {chat.Message}";
                     guiController.Chat.Add(chatFormat);
                 }
                 else
-                    guiController.Chat.Add($"{chat.Id} cannot be found.");
+                {
+                    Entity playerById = Game1.NetworkScene.FindEntity(chat.FromWorldId);
+
+                    if (playerById != null)
+                    {
+                        NetPlayerController netController = null;
+                        LocalPlayerController localController = null;
+
+                        if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
+                            netController = playerById.GetComponent<NetPlayerController>();
+                        else
+                            localController = playerById.GetComponent<LocalPlayerController>();
+
+                        chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
+                        guiController.Chat.Add(chatFormat);
+                    }
+                    else
+                        guiController.Chat.Add($"{chat.FromWorldId} cannot be found.");
+                }
+                
             }
         }
 

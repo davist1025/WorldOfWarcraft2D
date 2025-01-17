@@ -15,8 +15,9 @@ namespace WoW.Client.Shared.Realm
     public class RealmClient_Chat
     {
         // todo: channel
+        public bool IsWhisper { get; set; }
 
-        public string Id { get; set; } // can be an NPCs WorldId, a player's character name, etc.
+        public string FromWorldId { get; set; } // can be an NPCs WorldId, a player's character name, etc.
         public string Message { get; set; }
     }
 }

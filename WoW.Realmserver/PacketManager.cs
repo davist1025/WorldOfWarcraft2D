@@ -218,6 +218,30 @@ namespace WoW.Realmserver
             var entity = peer.Tag as Entity;
             var session = entity.GetComponent<WorldSessionComponent>();
 
+            if (chat.IsWhisper)
+            {
+                string characterName = chat.Name;
+                string message = chat.Message;
+
+                var networkPlayers = Program.Scene.FindEntitiesWithTag((int)EntityType.NetPlayer);
+                for (int i = 0; i <  networkPlayers.Count; i++)
+                {
+                    var netPlayer = networkPlayers[i];
+                    var sessionComp = netPlayer.GetComponent<WorldSessionComponent>();
+
+                    if (sessionComp.Character.Name.Equals(characterName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        RealmClient_Chat newWhisper = new RealmClient_Chat()
+                        {
+                            IsWhisper = true,
+                            FromWorldId = entity.Name,
+                            Message = message
+                        };
+                        Program.SendTo(netPlayer.Name, newWhisper);
+                    }
+                }
+            }
+
             if (chat.Message.StartsWith("."))
             {
                 if (chat.Message.Contains(" "))
@@ -259,12 +283,16 @@ namespace WoW.Realmserver
                     }
                 }
             }
-            else
-                Program.SendToAll(new RealmClient_Chat() 
-                { 
-                    Id = entity.Name, 
-                    Message = chat.Message 
+
+            if (!chat.IsWhisper)
+            {
+                Program.SendToAll(new RealmClient_Chat()
+                {
+                    IsWhisper = false,
+                    FromWorldId = entity.Name,
+                    Message = chat.Message
                 });
+            }
         }
 
         public static void OnTabTargetRequest(NetPeer peer)

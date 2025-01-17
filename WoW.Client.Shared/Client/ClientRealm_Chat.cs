@@ -13,6 +13,9 @@ namespace WoW.Client.Shared.Client
     /// </summary>
     public class ClientRealm_Chat
     {
+        public bool IsWhisper { get; set; }
+        public string Name { get; set; } = "";
+
         public string Message { get; set; }
     }
 }

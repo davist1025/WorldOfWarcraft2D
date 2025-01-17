@@ -282,7 +282,35 @@ namespace WoW.Client.Components
 
                     if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
                     {
-                        Game1.Send(new ClientRealm_Chat() { Message = _chatInput });
+                        if (_chatInput.StartsWith("/"))
+                        {
+                            var rawInput = _chatInput.Substring(1);
+                            var splitInput = rawInput.Split(' ');
+
+                            if (splitInput[0].Equals("whisper", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string message = "";
+                                for (int i = 2; i < splitInput.Length; i++)
+                                {
+                                    if (i == splitInput.Length - 1)
+                                        message += $"{splitInput[i]}";
+                                    else
+                                        message += $"{splitInput[i]} ";
+                                }
+
+                                ClientRealm_Chat newChatWhisper = new ClientRealm_Chat()
+                                {
+                                    IsWhisper = true,
+                                    Message = message,
+                                    Name = splitInput[1]
+                                };
+                                Game1.Send(newChatWhisper);
+                            }
+                        }
+                        else
+                        {
+                            Game1.Send(new ClientRealm_Chat() { Message = _chatInput });
+                        }
                         _chatInput = "";
                     }
 

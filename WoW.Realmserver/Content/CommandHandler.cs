@@ -95,7 +95,7 @@ namespace WoW.Realmserver.Content
 
             RealmClient_Chat serverMessage = new RealmClient_Chat()
             {
-                Id = "server",
+                FromWorldId = "server",
                 Message = fullMsg
             };
             Program.SendToAll(serverMessage);

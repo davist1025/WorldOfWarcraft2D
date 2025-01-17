@@ -81,7 +81,8 @@ namespace WoW.Client.Components
             if (!string.IsNullOrEmpty(TargetWorldId))
             {
                 // hack: find the target entity in a simpler way :p
-                var entity = Entity.Scene.FindEntitiesWithTag((int)EntityType.NPC).Where(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(TargetWorldId, StringComparison.OrdinalIgnoreCase)).Single();
+                var entity = Entity.Scene.FindEntity(TargetWorldId);
+                //var entity = Entity.Scene.FindEntitiesWithTag((int)EntityType.NPC).Where(npc => npc.GetComponent<NetNPCController>().Remote.WorldId.Equals(TargetWorldId, StringComparison.OrdinalIgnoreCase)).Single();
 
                 if (entity != null)
                 {
