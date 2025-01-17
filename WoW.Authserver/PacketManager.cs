@@ -29,7 +29,7 @@ namespace WoW.Authserver
             {
                 AuthClient_LogonCode loginCode = new AuthClient_LogonCode();
                 string accountSessionId = "";
-                var account = ctx.Accounts.FirstOrDefault(a => a.Username.Equals(logon.AccountName.ToLower()));
+                var account = ctx.Accounts.FirstOrDefault(a => a.Username.Equals(logon.AccountName, StringComparison.OrdinalIgnoreCase));
 
                 if (account != null && account.SessionId == default(string))
                 {
@@ -76,7 +76,7 @@ namespace WoW.Authserver
         {
             using (var ctx = new AuthContext())
             {
-                Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.Equals(verification.SessionId.ToLower()));
+                Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.Equals(verification.SessionId, StringComparison.OrdinalIgnoreCase));
                 if (account != null)
                 {
                     Console.WriteLine("Sending user verification to realm...");
