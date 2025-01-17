@@ -31,7 +31,7 @@ namespace WoW.Realmserver
         {
             using (var ctx = new RealmContext())
             {
-                bool characterExists = ctx.Characters.Any(c => c.Name.Equals(characterData.Name.ToUpper()));
+                bool characterExists = ctx.Characters.Any(c => c.Name.Equals(characterData.Name, StringComparison.OrdinalIgnoreCase));
 
                 RealmClient_CreateCharacter.Result creationResult = RealmClient_CreateCharacter.Result.NameInUse;
                 WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
@@ -251,16 +251,16 @@ namespace WoW.Realmserver
 
                     using (var ctx = new RealmContext())
                     {
-                        if (ctx.Commands.Any(c => c.Name.Equals(commandName) && c.Security == (int)session.Account.Security))
+                        if (ctx.Commands.Any(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase) && c.Security == (int)session.Account.Security))
                         {
-                            var command = ctx.Commands.Single(c => c.Name.Equals(commandName));
+                            var command = ctx.Commands.Single(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
                             if (command.HandlerId == null)
                             {
                                 string childCommandName = msgCopy[1];
 
-                                if (ctx.ChildCommands.Any(c => c.Name.Equals(childCommandName) && c.Security == (int)session.Account.Security))
+                                if (ctx.ChildCommands.Any(c => c.Name.Equals(childCommandName, StringComparison.OrdinalIgnoreCase) && c.Security == (int)session.Account.Security))
                                 {
-                                    var childCommand = ctx.ChildCommands.Single(c => c.Name.Equals(childCommandName));
+                                    var childCommand = ctx.ChildCommands.Single(c => c.Name.Equals(childCommandName, StringComparison.OrdinalIgnoreCase));
                                     var childCommandHandlerId = childCommand.HandlerId;
 
                                     Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName} {childCommandName}'.");
@@ -268,7 +268,7 @@ namespace WoW.Realmserver
                                     var handlerFunc = typeof(CommandHandler)
                                         .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
                                         .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.Equals(childCommandHandlerId))
+                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.Equals(childCommandHandlerId, StringComparison.OrdinalIgnoreCase))
                                         .Single();
 
                                     handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(2).ToArray(), session, peer });

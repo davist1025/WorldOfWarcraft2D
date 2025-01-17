@@ -162,7 +162,7 @@ namespace WoW.Realmserver
             //if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
             //    Console.WriteLine("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.");
 
-            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.Equals(gObjectId)).FirstOrDefault();
+            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.Equals(gObjectId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (peer != null)
                 Send(peer, packet, delivery);

@@ -114,13 +114,8 @@ namespace WoW.Client
                 return;
             }
 
-            // todo: fix chatting. broke after implementing tab targeting because i changed the player entity's name to "thePlayer".
-            // this expects a character name.
-            // expand this to allow NPCs, other players and the server.
             string chatFormat = "";
             var guiController = guiEntity.GetComponent<ImGuiController>();
-
-            Debug.Log(chat.IsWhisper + " " + chat.FromWorldId);
 
             if (chat.IsWhisper) // mostly for formatting purposes.
             {
