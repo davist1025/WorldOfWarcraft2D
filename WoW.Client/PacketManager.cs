@@ -23,13 +23,11 @@ namespace WoW.Client
             switch (code.Code)
             {
                 case LogonCode.NoRecord:
+                case LogonCode.InvalidPassword:
                     Game1.NetState = GameNetworkState.Auth_Invalid;
                     break;
                 case LogonCode.AlreadyOnline:
                     Game1.NetState = GameNetworkState.Auth_IsOnline;
-                    break;
-                case LogonCode.InvalidPassword:
-                    Game1.NetState = GameNetworkState.Auth_Invalid;
                     break;
             }
         }
