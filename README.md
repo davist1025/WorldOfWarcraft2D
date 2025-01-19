@@ -17,6 +17,7 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 	- [x] Hair
 	- [ ] Skin
 	- [x] Name
+ - [ ] Character visual on creation screen
 - [x] Hashed password
 - [x] Chat command processing
 - [ ] 2 playable classes to level 10
