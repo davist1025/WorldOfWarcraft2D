@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Xna.Framework;
 using MySqlX.XDevAPI;
 using Nez;
+using Nez.ECS.Headless;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
@@ -128,6 +129,7 @@ namespace WoW.Realmserver
         {
             Entity thisEntity = peer.Tag as Entity;
             WorldSessionComponent thisSession = thisEntity.GetComponent<WorldSessionComponent>();
+            var processorComponents = CoreHeadless.Scene.FindComponentsOfType<TiledMapProcessor>();
 
             using (var ctx = new RealmContext())
             {
@@ -138,6 +140,12 @@ namespace WoW.Realmserver
                 thisSession.Character = activeCharacter;
             }
             thisSession.InitializeGameComponents();
+
+            // add this entity to the matching processor.
+            var mapProcessor = processorComponents.Find(processor => processor.Map.Properties["id"].ToLower().Equals(thisSession.Character.MapId));
+            var collider = thisEntity.GetComponent<CircleCollider>();
+            Flags.SetFlagExclusive(ref collider.PhysicsLayer, mapProcessor.PhysicsLayer);
+            Console.WriteLine($"Set player physics layer = {collider.PhysicsLayer}");
 
             // let the client create their local player object.
             Program.Send(peer, new RealmClient_CreateLocalPlayer()

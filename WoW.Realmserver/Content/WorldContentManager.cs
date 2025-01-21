@@ -33,10 +33,10 @@ namespace WoW.Realmserver.Content
             var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
 
             for (int i = 0; i < tiledMaps.Length; i++)
-                LoadTiledMap(tiledMaps[i]);
+                LoadTiledMap(tiledMaps[i], i);
         }
 
-        private void LoadTiledMap(string name)
+        private void LoadTiledMap(string name, int physicsLayerIndex)
         {
             TmxMap map = new TmxMap().LoadTmxMapHeadless(name);
             string mapName = map.Properties["id"];
@@ -48,11 +48,14 @@ namespace WoW.Realmserver.Content
             // random note: the server could hypothetically only load maps that contains at least one player, and unload them when there are none?
             Entity mapEntity = CoreHeadless.Scene.CreateEntity(mapName);
             TiledMapProcessor processor = new TiledMapProcessor(map, "collision_layer");
+
+            // todo: human collides with both maps, orc only collides with theirs.
+            processor.PhysicsLayer = (physicsLayerIndex == 0) ? 1 << 0 : 1 << physicsLayerIndex;
             mapEntity.AddComponent(processor);
 
             _mapProcessors.Add(mapName, new TiledMapProcessor(map, "collision_layer"));
 
-            Console.WriteLine($"Created a Tiled processor for: '{mapName}'");
+            Console.WriteLine($"Created a Tiled processor for: '{mapName}'; Physics: {processor.PhysicsLayer}");
         }
 
         public TiledMapProcessor GetMap(string name)

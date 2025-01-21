@@ -10,17 +10,19 @@ namespace Nez.ECS.Headless
 	/// </summary>
 	public class TiledMapProcessor : Component
 	{
-		public TmxMap TiledMap;
+		public TmxMap Map;
 		public TmxLayer CollisionLayer;
-		public int PhysicsLayer = 1 << 0; // investigage this :p
+		public int PhysicsLayer = 1 << 0; // todo: investigage this :p
 
 		private Collider[] _colliders;
+		public List<Entity> Creatures;
 
 		// the server needs access to all map data all the time.
 
 		public TiledMapProcessor(TmxMap tiledMap, string collisionLayerName = null)
 		{
-			TiledMap = tiledMap;
+			Map = tiledMap;
+			Creatures = new List<Entity>();
 
 			if (collisionLayerName != null )
 				CollisionLayer = tiledMap.TileLayers[collisionLayerName];
