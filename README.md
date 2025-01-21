@@ -17,6 +17,7 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 	- [x] Hair
 	- [ ] Skin
 	- [x] Name
+	- [ ] Character visual on creation screen
 - [x] Hashed password
 - [x] Chat command processing
 - [ ] 2 playable classes to level 10
@@ -50,6 +51,7 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 	- [ ] Dialogue
 	- [ ] Pathfinding
 	- [ ] Attacking
+- [ ] Questing in the starting zones for each of the two races
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
