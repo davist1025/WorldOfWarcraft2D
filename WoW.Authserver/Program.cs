@@ -35,10 +35,8 @@ namespace WoW.Authserver
                     .ExecuteUpdate(setters => setters
                         .SetProperty(p => p.SessionId, default(string)));
 
-                // todo: implement passwords.
-                // client doesnt even have input for this yet.
                 Console.WriteLine("Verifying default account integrity...");
-                if (!ctx.Accounts.Any(a => a.Username.Equals("admin", StringComparison.OrdinalIgnoreCase)))
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
@@ -48,7 +46,7 @@ namespace WoW.Authserver
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.Equals("gamemaster", StringComparison.OrdinalIgnoreCase)))
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("gamemaster")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
@@ -58,7 +56,7 @@ namespace WoW.Authserver
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.Equals("player", StringComparison.OrdinalIgnoreCase)))
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("player")))
                 {
                     ctx.Accounts.Add(new Account()
                     {

@@ -68,6 +68,34 @@ namespace WoW.Realmserver
                 }
             }
 
+            Console.WriteLine("Verifying default racial spawn locations...");
+            using (var ctx = new RealmContext())
+            {
+                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Human))
+                {
+                    ctx.RaceSpawns.Add(new CharacterRaceSpawn()
+                    {
+                        RaceId = (int)RaceType.Human,
+                        MapId = "elwynn_forest",
+                        X = 50f,
+                        Y = 50f,
+                    });
+                }
+
+                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Orc))
+                {
+                    ctx.RaceSpawns.Add(new CharacterRaceSpawn()
+                    {
+                        RaceId = (int)RaceType.Orc,
+                        MapId = "valley_of_trials",
+                        X = 50f,
+                        Y = 50f,
+                    });
+                }
+
+                ctx.SaveChanges();
+            }
+
             _netEventListener = new EventBasedNetListener();
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.PeerConnectedEvent += (peer) => { };
@@ -162,7 +190,7 @@ namespace WoW.Realmserver
             //if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
             //    Console.WriteLine("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.");
 
-            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.Equals(gObjectId, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
 
             if (peer != null)
                 Send(peer, packet, delivery);

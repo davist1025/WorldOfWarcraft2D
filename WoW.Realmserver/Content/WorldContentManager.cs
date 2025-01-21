@@ -39,7 +39,7 @@ namespace WoW.Realmserver.Content
         private void LoadTiledMap(string name)
         {
             TmxMap map = new TmxMap().LoadTmxMapHeadless(name);
-            string mapName = map.Properties["name"];
+            string mapName = map.Properties["id"];
 
             // todo: check for an empty name prop.
 

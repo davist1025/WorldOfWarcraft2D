@@ -31,7 +31,7 @@ namespace WoW.Realmserver
         {
             using (var ctx = new RealmContext())
             {
-                bool characterExists = ctx.Characters.Any(c => c.Name.Equals(characterData.Name, StringComparison.OrdinalIgnoreCase));
+                bool characterExists = ctx.Characters.Any(c => c.Name.ToLower().Equals(characterData.Name));
 
                 RealmClient_CreateCharacter.Result creationResult = RealmClient_CreateCharacter.Result.NameInUse;
                 WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
@@ -49,6 +49,9 @@ namespace WoW.Realmserver
                             .Select(c => c.CharacterId)
                             .Max();
                     }
+
+                    string racialSpawnMapId = ctx.RaceSpawns.Where(raceSpawn => raceSpawn.RaceId == characterData.RaceId).FirstOrDefault().MapId;
+
                     // todo: check for max character count.
 
                     var newCharacter = new PlayerCharacter()
@@ -58,6 +61,7 @@ namespace WoW.Realmserver
                         Name = characterData.Name.ToUpper(),
                         RaceId = characterData.RaceId,
                         HairId = characterData.HairId,
+                        MapId = racialSpawnMapId,
                         XPosition = 50f,
                         YPosition = 50f
                     };
@@ -142,7 +146,7 @@ namespace WoW.Realmserver
                 Name = thisSession.Character.Name,
                 RaceId = thisSession.Character.RaceId,
                 HairId = thisSession.Character.HairId,
-                MapId = "world1",
+                MapId = thisSession.Character.MapId,
                 ZoneX = thisSession.Character.XPosition,
                 ZoneY = thisSession.Character.YPosition
             });
@@ -229,7 +233,7 @@ namespace WoW.Realmserver
                     var netPlayer = networkPlayers[i];
                     var sessionComp = netPlayer.GetComponent<WorldSessionComponent>();
 
-                    if (sessionComp.Character.Name.Equals(characterName, StringComparison.OrdinalIgnoreCase))
+                    if (sessionComp.Character.Name.ToLower().Equals(characterName))
                     {
                         RealmClient_Chat newWhisper = new RealmClient_Chat()
                         {
@@ -251,16 +255,16 @@ namespace WoW.Realmserver
 
                     using (var ctx = new RealmContext())
                     {
-                        if (ctx.Commands.Any(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase) && c.Security == (int)session.Account.Security))
+                        if (ctx.Commands.Any(c => c.Name.ToLower().Equals(commandName) && c.Security == (int)session.Account.Security))
                         {
-                            var command = ctx.Commands.Single(c => c.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
+                            var command = ctx.Commands.Single(c => c.Name.ToLower().Equals(commandName));
                             if (command.HandlerId == null)
                             {
                                 string childCommandName = msgCopy[1];
 
-                                if (ctx.ChildCommands.Any(c => c.Name.Equals(childCommandName, StringComparison.OrdinalIgnoreCase) && c.Security == (int)session.Account.Security))
+                                if (ctx.ChildCommands.Any(c => c.Name.ToLower().Equals(childCommandName) && c.Security == (int)session.Account.Security))
                                 {
-                                    var childCommand = ctx.ChildCommands.Single(c => c.Name.Equals(childCommandName, StringComparison.OrdinalIgnoreCase));
+                                    var childCommand = ctx.ChildCommands.Single(c => c.Name.ToLower().Equals(childCommandName));
                                     var childCommandHandlerId = childCommand.HandlerId;
 
                                     Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName} {childCommandName}'.");
@@ -268,7 +272,7 @@ namespace WoW.Realmserver
                                     var handlerFunc = typeof(CommandHandler)
                                         .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
                                         .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.Equals(childCommandHandlerId, StringComparison.OrdinalIgnoreCase))
+                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(childCommandHandlerId))
                                         .Single();
 
                                     handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(2).ToArray(), session, peer });
@@ -360,7 +364,7 @@ namespace WoW.Realmserver
                     List<RemoteCharacter> characters = new List<RemoteCharacter>();
 
                     foreach (var character in ctx.Characters.Where(a => a.AccountId == newSession.Account.Id))
-                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId));
+                        characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId, character.MapId));
 
                     Console.WriteLine($"Sending {characters.Count} to client...");
 
@@ -422,7 +426,7 @@ namespace WoW.Realmserver
             using (var ctx = new RealmContext())
             {
                 foreach (var character in ctx.Characters.Where(a => a.AccountId == accountId))
-                    characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId));
+                    characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId, character.MapId));
             }
             Console.WriteLine($"Sending {characters.Count} to client...");
 

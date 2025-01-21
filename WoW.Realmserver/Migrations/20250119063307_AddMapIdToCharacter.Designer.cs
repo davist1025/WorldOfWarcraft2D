@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WoW.Realmserver.DB;
 
@@ -10,9 +11,11 @@ using WoW.Realmserver.DB;
 namespace WoW.Realmserver.Migrations
 {
     [DbContext(typeof(RealmContext))]
-    partial class RealmContextModelSnapshot : ModelSnapshot
+    [Migration("20250119063307_AddMapIdToCharacter")]
+    partial class AddMapIdToCharacter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,30 +23,6 @@ namespace WoW.Realmserver.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.CharacterRaceSpawn", b =>
-                {
-                    b.Property<int>("RaceId")
-                        .HasColumnType("int")
-                        .HasColumnName("race_id");
-
-                    b.Property<string>("MapId")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("map_id");
-
-                    b.Property<float>("X")
-                        .HasColumnType("float")
-                        .HasColumnName("x_position");
-
-                    b.Property<float>("Y")
-                        .HasColumnType("float")
-                        .HasColumnName("y_position");
-
-                    b.HasKey("RaceId");
-
-                    b.ToTable("character_race_spawn");
-                });
 
             modelBuilder.Entity("WoW.Realmserver.DB.Model.Chat.ChatCommand", b =>
                 {

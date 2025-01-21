@@ -290,7 +290,7 @@ namespace WoW.Client.Components
                             var rawInput = _chatInput.Substring(1);
                             var splitInput = rawInput.Split(' ');
 
-                            if (splitInput[0].Equals("whisper", StringComparison.OrdinalIgnoreCase))
+                            if (splitInput[0].ToLower().Equals("whisper"))
                             {
                                 string message = "";
                                 for (int i = 2; i < splitInput.Length; i++)

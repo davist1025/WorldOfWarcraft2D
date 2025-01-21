@@ -37,5 +37,8 @@ namespace WoW.Realmserver.DB.Model
 
         [Column("zone_y_position")]
         public float YPosition { get; set; }
+
+        [Column("map_id")]
+        public string MapId { get; set; }
     }
 }

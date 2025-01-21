@@ -2,6 +2,7 @@
 using Nez;
 using Nez.Aseprite;
 using Nez.Sprites;
+using Nez.Tiled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +33,9 @@ namespace WoW.Client.Scenes
         public override void Initialize()
         {
             // todo: more debug tiled code.
-            var map = Content.LoadTiledMap("Content/Data/world1.tmx");
+            //var map = Content.LoadTiledMap("Content/Data/world1.tmx");
 
-            CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
+            //CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
@@ -68,6 +69,16 @@ namespace WoW.Client.Scenes
             }
 
             Game1.Player.AddComponent(_theController);
+
+            TmxMap tmxMapByMapId;
+            tmxMapByMapId = Game1.Maps.Where(map => map.Properties["id"].ToLower().Equals(thePlayer.MapId)).FirstOrDefault();
+            TiledMapRenderer mapRenderer = null;
+
+            if (tmxMapByMapId != null)
+                mapRenderer = CreateEntity("map").AddComponent(new TiledMapRenderer(tmxMapByMapId, "collision_layer"));
+
+            if (mapRenderer != null)
+                mapRenderer.RenderLayer = 10;
         }
 
         /// <summary>

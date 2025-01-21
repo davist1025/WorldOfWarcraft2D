@@ -19,6 +19,8 @@ namespace WoW.Realmserver.DB
         public DbSet<ChatCommand> Commands { get; set; }
         public DbSet<ChatCommandChild> ChildCommands { get; set; }
 
+        public DbSet<CharacterRaceSpawn> RaceSpawns { get; set; }
+
         private const string _connectionString = "server=127.0.0.1;uid=root;pwd=1111;database=wpp_realm";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

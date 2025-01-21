@@ -5,9 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.ImGuiTools;
+using Nez.Tiled;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using WoW.Client.Components;
 using WoW.Client.Content;
 using WoW.Client.Scenes;
@@ -41,6 +44,7 @@ namespace WoW.Client
         public static EventBasedNetListener ClientListener;
         private static NetPacketProcessor _netProcessor;
 
+        public static TmxMap[] Maps;
         public static GameConfiguration Configuration;
 
         // todo: store these globally.
@@ -128,6 +132,17 @@ namespace WoW.Client
 
             IsFixedTimeStep = true;
 
+            Debug.Log($"Loading Tiled maps...");
+            var tmxFiles = Directory.GetFiles("Content/Data/").Where(f => f.EndsWith(".tmx")).ToArray();
+            Maps = new TmxMap[tmxFiles.Length];
+            for (int i = 0; i < tmxFiles.Length; i++)
+            {
+                var mapFile = tmxFiles[i];
+                Maps[i] = Core.Content.LoadTiledMap(mapFile);
+                Debug.Log($"Loaded {Maps[i].Properties["id"]}");
+            }
+
+            NetworkScene = new NetworkTestScene();
             var guiManager = new ImGuiManager()
             {
                 ShowCoreWindow = false,

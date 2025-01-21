@@ -63,7 +63,6 @@ namespace WoW.Client
             var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
 
             gui.Characters.Clear();
-
             gui.Characters.AddRange(characterList.Characters);
             Game1.NetState = GameNetworkState.Realm_Characters;
         }
@@ -72,7 +71,6 @@ namespace WoW.Client
         #region World
         public static void OnLocalPlayer(RealmClient_CreateLocalPlayer myPlayer)
         {
-            Game1.NetworkScene = new NetworkTestScene();
             Game1.NetworkScene.CreateLocalPlayer(myPlayer);
         }
 
@@ -128,7 +126,7 @@ namespace WoW.Client
 
             if (!chat.IsWhisper)
             {
-                if (chat.FromWorldId.Equals("server", StringComparison.OrdinalIgnoreCase))
+                if (chat.FromWorldId.ToLower().Equals("server"))
                 {
                     chatFormat = $"SERVER: {chat.Message}";
                     guiController.Chat.Add(chatFormat);
