@@ -21,6 +21,7 @@ namespace WoW.Client.Shared.Realm
         public string Name { get; set; }
         public int RaceId { get; set; }
         public int HairId { get; set; }
+        public string MapId { get; set; }
 
         public float ZoneX { get; set; }
         public float ZoneY { get; set; }

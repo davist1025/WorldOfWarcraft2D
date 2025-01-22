@@ -52,6 +52,7 @@ namespace WoW.Client
         public static string SessionId;
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
+        public static string CurrentMapId = "";
 
         public static Entity Player;
         private static ClientAuth_Logon _temporaryLogonPacket;

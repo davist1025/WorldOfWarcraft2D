@@ -42,8 +42,8 @@ namespace WoW.Client.Scenes
         {
             _theController = new LocalPlayerController(thePlayer.Name);
             Game1.Player = CreateEntity(thePlayer.WorldId, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
-            // todo: use mapid.
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
+            Game1.CurrentMapId = thePlayer.MapId;
 
             AsepriteFile aseFile = null;
             SpriteRenderer raceRenderer; // todo: replace with animator.
@@ -95,30 +95,33 @@ namespace WoW.Client.Scenes
 
             Debug.Log($"Player: {theOtherEntity.Name} ({netController.Name}) has joined the world!");
 
-            AsepriteFile aseFile = null;
-            SpriteRenderer renderer; // todo: replace with animator.
-            RaceType characterRace = (RaceType)theOtherPlayer.RaceId;
-
-            switch (characterRace)
+            // only create a renderer(s) if we're on the same map as them.
+            if (theOtherPlayer.MapId.ToLower().Equals(Game1.CurrentMapId))
             {
-                case RaceType.Human:
-                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
-                    break;
-                case RaceType.Orc:
-                    aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
+                AsepriteFile aseFile = null;
+                SpriteRenderer renderer; // todo: replace with animator.
+                RaceType characterRace = (RaceType)theOtherPlayer.RaceId;
 
-                    break;
+                switch (characterRace)
+                {
+                    case RaceType.Human:
+                        aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
+                        break;
+                    case RaceType.Orc:
+                        aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
+
+                        break;
+                }
+
+                renderer = theOtherEntity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
+                if (theOtherPlayer.HairId > 1)
+                {
+                    var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{theOtherPlayer.HairId}_spritesheet.ase");
+
+                    theOtherEntity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+                }
             }
-
-            renderer = theOtherEntity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
-
-            if (theOtherPlayer.HairId > 1)
-            {
-                var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{theOtherPlayer.HairId}_spritesheet.ase");
-
-                theOtherEntity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
-            }
-
             theOtherEntity.AddComponent(netController);
         }
 
@@ -135,6 +138,7 @@ namespace WoW.Client.Scenes
         {
             base.Update();
 
+            // todo: crashes from a null reference?
             if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Client.Content.ControlMap.TabTarget]))
                 Game1.Configuration.ControlHandlers[Client.Content.ControlMap.TabTarget]?.Invoke(null, null);
         }

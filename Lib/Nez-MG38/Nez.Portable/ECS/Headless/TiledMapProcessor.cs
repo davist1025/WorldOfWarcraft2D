@@ -15,12 +15,12 @@ namespace Nez.ECS.Headless
 		public int PhysicsLayer = 1 << 0; // todo: investigage this :p
 
 		private Collider[] _colliders;
-
-		// the server needs access to all map data all the time.
+		public List<Entity> Creatures;
 
 		public TiledMapProcessor(TmxMap tiledMap, string collisionLayerName = null)
 		{
 			Map = tiledMap;
+			Creatures = new List<Entity>();
 
 			if (collisionLayerName != null )
 				CollisionLayer = tiledMap.TileLayers[collisionLayerName];

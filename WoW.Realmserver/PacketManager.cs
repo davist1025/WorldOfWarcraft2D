@@ -140,12 +140,12 @@ namespace WoW.Realmserver
                 thisSession.Character = activeCharacter;
             }
             thisSession.InitializeGameComponents();
+            var collider = thisEntity.GetComponent<CircleCollider>();
 
             // add this entity to the matching processor.
             var mapProcessor = processorComponents.Find(processor => processor.Map.Properties["id"].ToLower().Equals(thisSession.Character.MapId));
-            var collider = thisEntity.GetComponent<CircleCollider>();
-            Flags.SetFlagExclusive(ref collider.PhysicsLayer, mapProcessor.PhysicsLayer);
-            Console.WriteLine($"Set player physics layer = {collider.PhysicsLayer}");
+            mapProcessor.Creatures.Add(thisEntity);
+            collider.CollidesWithLayers = mapProcessor.PhysicsLayer;
 
             // let the client create their local player object.
             Program.Send(peer, new RealmClient_CreateLocalPlayer()
@@ -160,18 +160,24 @@ namespace WoW.Realmserver
             });
             Console.WriteLine($"{thisSession.Character.Name} is entering the world!");
 
+            var allSessionsExceptThis = Program
+                .Scene
+                .FindComponentsOfType<WorldSessionComponent>()
+                .Where(session => session.Account.Id != thisSession.Account.Id)
+                .ToList();
+
             // send this player to all players.
+            // even if these players aren't on the same map, all clients still need some knowledge of each player.
             Program.SendToExcept(thisEntity.Name, new RealmClient_CreateNetPlayer()
             {
                 WorldId = thisEntity.Name,
                 Name = thisSession.Character.Name,
                 RaceId = thisSession.Character.RaceId,
                 HairId = thisSession.Character.HairId,
+                MapId = thisSession.Character.MapId,
                 ZoneX = thisSession.Character.XPosition,
                 ZoneY = thisSession.Character.YPosition
             });
-
-            var allSessionsExceptThis = Program.Scene.FindComponentsOfType<WorldSessionComponent>().Where(session => session.Account.Id != thisSession.Account.Id).ToList();
 
             // send all players to this player.
             for (int i = 0; i < allSessionsExceptThis.Count; i++)
@@ -183,18 +189,21 @@ namespace WoW.Realmserver
                     Name = otherSession.Character.Name,
                     RaceId = otherSession.Character.RaceId,
                     HairId = otherSession.Character.HairId,
+                    MapId = otherSession.Character.MapId,
                     ZoneX = otherSession.Entity.Position.X,
                     ZoneY = otherSession.Entity.Position.Y
                 });
             }
 
-            var allNpcs = Program.Scene.FindComponentsOfType<NpcControllerComponent>().Where(n => n.Data != null).ToList();
+            // todo: fix sending all NPCs in a world to the player.
+            var npcsOnMap = mapProcessor.Creatures.Where(c => c.HasComponent<NpcControllerComponent>()).ToList();
 
             // send all npcs to this player.
-            for (int i = 0; i < allNpcs.Count; i++)
+            for (int i = 0; i < npcsOnMap.Count; i++)
             {
-                var npcData = allNpcs[i];
-                var newNpcPacket = new RealmClient_CreateNPC() { Data = npcData.Data };
+                var npcData = npcsOnMap[i];
+                var component = npcData.GetComponent<NpcControllerComponent>();
+                var newNpcPacket = new RealmClient_CreateNPC() { Data = component.Data };
 
                 Program.SendSerializable(peer, newNpcPacket);
             }
@@ -411,6 +420,13 @@ namespace WoW.Realmserver
                             .SetProperty(c => c.YPosition, session.Entity.Position.Y));
                         // todo: set mapid.
                     }
+                }
+
+                var processors = Program.Scene.FindComponentsOfType<TiledMapProcessor>().ToArray();
+                for (int i = 0; i < processors.Length; i++)
+                {
+                    if (processors[i].Creatures.Remove(entity))
+                        Console.WriteLine($"Removed {session.Character.Name} from {processors[i].Map.Properties["id"]}");
                 }
 
                 // todo: only send to players within the game world; not at character select, etc.
