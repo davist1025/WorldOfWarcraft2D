@@ -100,5 +100,17 @@ namespace WoW.Realmserver.Content
             };
             Program.SendToAll(serverMessage);
         }
+
+        /// <summary>
+        /// Summons the given Character to this player./>
+        /// </summary>
+        /// <param name="characterName"></param>
+        /// <param name="session"></param>
+        /// <param name="peer"></param>
+        [CommandHandler("PlayerActionCommand_Summon")]
+        public static void PlayerActionCommand_Summon(string characterName, WorldSessionComponent session, NetPeer peer)
+        {
+
+        }
     }
 }
