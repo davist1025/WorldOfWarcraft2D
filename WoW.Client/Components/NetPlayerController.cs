@@ -14,6 +14,7 @@ namespace WoW.Client.Components
         public string Name;
         public int RaceId;
         public int HairId;
+        public string MapId;
 
         private PrototypeSpriteRenderer _renderer;
         private Vector2 _currentMoveDirection = Vector2.Zero;
@@ -28,6 +29,7 @@ namespace WoW.Client.Components
             Name = networkPlayer.Name;
             RaceId = networkPlayer.RaceId;
             HairId = networkPlayer.HairId;
+            MapId = networkPlayer.MapId;
         }
 
         public override void OnAddedToEntity()
