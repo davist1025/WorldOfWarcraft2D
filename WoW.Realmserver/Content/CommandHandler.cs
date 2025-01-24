@@ -129,19 +129,27 @@ namespace WoW.Realmserver.Content
 
             if (characterToSummon != null)
             {
-                var tiledProcessor = Program.Scene.FindComponentsOfType<TiledMapProcessor>().Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
+                var allMapProcessors = Program.Scene.FindComponentsOfType<TiledMapProcessor>();
+                var thisProcessor = allMapProcessors.Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
 
-                if (tiledProcessor != null)
+                if (thisProcessor != null)
                 {
-                    for (int i = 0; i < tiledProcessor.Creatures.Count; i++)
+                    for (int i = 0; i < thisProcessor.Creatures.Count; i++)
                     {
-                        Program.SendTo(tiledProcessor.Creatures[i].Name, new RealmClient_Teleport()
+                        Program.SendTo(thisProcessor.Creatures[i].Name, new RealmClient_Teleport()
                         {
                             WorldId = characterToSummon.Entity.Name,
+                            MapId = session.Character.MapId,
                             X = session.Entity.Transform.Position.X,
                             Y = session.Entity.Transform.Position.Y
                         });
                     }
+                    thisProcessor.Creatures.Remove(characterToSummon.Entity);
+
+                    // set the new tiled processor for the character being summoned.
+                    var newProcessor = allMapProcessors.Find(p => p.Map.Properties["id"].ToLower().Equals(session.Character.MapId));
+                    newProcessor.Creatures.Add(characterToSummon.Entity);
+                    characterToSummon.GetComponent<CircleCollider>().CollidesWithLayers = newProcessor.PhysicsLayer;
                 }
             }
 

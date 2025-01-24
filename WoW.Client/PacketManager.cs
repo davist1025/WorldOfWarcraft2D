@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
+using Nez.Tiled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -223,12 +224,28 @@ namespace WoW.Client
                 if (entity.HasComponent<LocalPlayerController>())
                 {
                     Debug.Log("We are being teleported...");
-                    /* TODO FOR TELEPORT ON LOCAL PLAYER
-                     * 
-                     * - Enter a Scene transition to the current Scene.
-                     * - Reset the TiledMapRenderer to the given MapId.
-                     * - Set our position to the given position.
-                     */ 
+
+                    var newLoadTransition = new FadeTransition();
+                    newLoadTransition.OnScreenObscured = () =>
+                    {
+                        // Find the map given by the MapId.
+                        TmxMap tmxMapByMapId;
+                        tmxMapByMapId = Game1.Maps.Where(map => map.Properties["id"].ToLower().Equals(teleport.MapId)).FirstOrDefault();
+                        TiledMapRenderer mapRenderer = null;
+
+                        // Destroy the current map renderer/entity.
+                        Core.Scene.FindEntity("map").Destroy();
+
+                        // Create a new map renderer.
+                        mapRenderer = Core.Scene.CreateEntity("map").AddComponent(new TiledMapRenderer(tmxMapByMapId, "collision_layer"));
+                        mapRenderer.RenderLayer = 10;
+
+                        // Set our local posiiton.
+                        entity.Transform.SetPosition(new Vector2(teleport.X, teleport.Y));
+
+                        // todo: create renderers, movers, etc for all players on the map.
+                    };
+                    Core.StartSceneTransition(newLoadTransition);
                 }
             }
         }

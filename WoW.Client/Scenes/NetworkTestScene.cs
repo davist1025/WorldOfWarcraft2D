@@ -60,12 +60,14 @@ namespace WoW.Client.Scenes
             }
 
             raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+            raceRenderer.RenderLayer = 5;
 
             if (thePlayer.HairId > 1)
             {
                 var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
 
-                Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+                var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+                hairRenderer.RenderLayer = 0;
             }
 
             Game1.Player.AddComponent(_theController);
