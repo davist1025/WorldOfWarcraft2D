@@ -297,8 +297,16 @@ namespace WoW.Realmserver
                             }
                             else
                             {
-                                // todo: use parent handlerid w/ Reflection to process command.
-                                // children will not be processed if a handler exists for the top-most command.
+                                Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName}'.");
+
+                                var handlerFunc = typeof(CommandHandler)
+                                    .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                                    .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
+                                    .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(command.HandlerId.ToLower()))
+                                    .Single();
+
+                                handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(1).ToArray(), session, peer });
+
                             }
                         }
                     }

@@ -124,6 +124,8 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
 
+            _netProcessor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
+
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
 

@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,9 +109,49 @@ namespace WoW.Realmserver.Content
         /// <param name="session"></param>
         /// <param name="peer"></param>
         [CommandHandler("PlayerActionCommand_Summon")]
-        public static void PlayerActionCommand_Summon(string characterName, WorldSessionComponent session, NetPeer peer)
+        public static void PlayerActionCommand_Summon(string[] data, WorldSessionComponent session, NetPeer peer)
         {
+            string characterName = "";
 
+            if (data.Length > 1)
+            {
+                Console.WriteLine($"This command accepts a single argument!");
+                return;
+            }
+
+            characterName = data[0];
+
+            // todo: crash here if none are found. catch this exception or determine the return value and handle accordingly.
+            var characterToSummon = Program.Scene
+                .FindComponentsOfType<WorldSessionComponent>()
+                .Where(s => s.Account.Id != session.Account.Id && s.Character.Name.ToLower().Equals(characterName.ToLower()))
+                .Single();
+
+            if (characterToSummon != null)
+            {
+                var tiledProcessor = Program.Scene.FindComponentsOfType<TiledMapProcessor>().Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
+
+                if (tiledProcessor != null)
+                {
+                    for (int i = 0; i < tiledProcessor.Creatures.Count; i++)
+                    {
+                        Program.SendTo(tiledProcessor.Creatures[i].Name, new RealmClient_Teleport()
+                        {
+                            WorldId = characterToSummon.Entity.Name,
+                            X = session.Entity.Transform.Position.X,
+                            Y = session.Entity.Transform.Position.Y
+                        });
+                    }
+                }
+            }
+
+            // todo: summon a player to me!
+            // when this occurs, we'll only need to know the character name (we could also send the worldid in place of the character name? this can be grabbed from the client-side when putting in a character name.
+            
+            // when the character is summoned, they'll need to be removed/added to a new Tiled processor.
+            // all players in the incoming map need to be made aware of this character so they can create a renderer, etc)
+            // the summoned client could do a fade transition into the same scene and while the scene is transitioning, reset the TiledMapRenderer.
+            // when summoned, the client should create a renderer for all players/NPCs.
         }
     }
 }

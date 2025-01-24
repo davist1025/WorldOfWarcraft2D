@@ -16,7 +16,6 @@ namespace WoW.Client.Components
         public int HairId;
         public string MapId;
 
-        private PrototypeSpriteRenderer _renderer;
         private Vector2 _currentMoveDirection = Vector2.Zero;
         private SubpixelVector2 _subPixelMovement;
         private Mover _mover;

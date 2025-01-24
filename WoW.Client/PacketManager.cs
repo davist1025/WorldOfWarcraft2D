@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Nez;
+using Nez.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -193,6 +194,43 @@ namespace WoW.Client
             //    var player = Game1.Player.GetComponent<LocalPlayerController>();
             //    player.TargetWorldId = target.WorldId;
             //}
+        }
+
+        /// <summary>
+        /// Sent only to players on the map this WorldId exists on.
+        /// </summary>
+        /// <param name="teleport"></param>
+        public static void OnTeleport(RealmClient_Teleport teleport)
+        {
+            var entity = Core.Scene.FindEntity(teleport.WorldId);
+
+            if (entity != null)
+            {
+                if (entity.HasComponent<NetPlayerController>())
+                {
+                    // todo: move this code to the netplayercontroller
+                    // i.e: "RemoveFromWorld()"
+                    var controller = entity.GetComponent<NetPlayerController>();
+                    controller.MapId = teleport.MapId;
+
+                    entity.RemoveComponent<SpriteRenderer>();
+                    entity.RemoveComponent<CircleCollider>();
+                    entity.RemoveComponent<Mover>();
+
+                    Debug.Log($"{controller.Name} has been teleported.");
+                }
+
+                if (entity.HasComponent<LocalPlayerController>())
+                {
+                    Debug.Log("We are being teleported...");
+                    /* TODO FOR TELEPORT ON LOCAL PLAYER
+                     * 
+                     * - Enter a Scene transition to the current Scene.
+                     * - Reset the TiledMapRenderer to the given MapId.
+                     * - Set our position to the given position.
+                     */ 
+                }
+            }
         }
         #endregion
 
