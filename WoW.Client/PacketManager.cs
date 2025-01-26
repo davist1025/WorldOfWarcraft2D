@@ -100,8 +100,15 @@ namespace WoW.Client
 
             if (netPlayer != null)
             {
-                var controller = netPlayer.GetComponent<NetPlayerController>();
-                controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
+                if (netUpdate.IsTeleportUpdate)
+                {
+                    netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
+                }
+                else
+                {
+                    var controller = netPlayer.GetComponent<NetPlayerController>();
+                    controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
+                }
             }
         }
 
@@ -216,7 +223,7 @@ namespace WoW.Client
                     if (Game1.CurrentMapId.ToLower().Equals(teleport.MapId))
                     {
                         controller.AddToMap();
-                        controller.Entity.Transform.SetPosition(new Vector2(teleport.X, teleport.Y));
+                        controller.Entity.Position = new Vector2(teleport.X, teleport.Y);
                     }
                     else
                     {
@@ -250,7 +257,8 @@ namespace WoW.Client
                         mapRenderer.RenderLayer = 10;
 
                         // Set our local posiiton.
-                        entity.Transform.SetPosition(new Vector2(teleport.X, teleport.Y));
+                        entity.SetPosition(new Vector2(teleport.X, teleport.Y));
+                        Debug.Log($"New position: {entity.Position.X}:{entity.Position.Y}");
 
                         var netPlayersOnMap = Core.Scene
                             .FindComponentsOfType<NetPlayerController>()

@@ -16,10 +16,6 @@ namespace WoW.Client.Components
 
     public class LocalPlayerController : Component, IUpdatable
     {
-        private PrototypeSpriteRenderer _renderer;
-
-        // todo: create a renderer based on the character race.
-
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
@@ -64,7 +60,6 @@ namespace WoW.Client.Components
                 
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
 
-                //_mover.CalculateMovement(ref moveDirection, out var _);
                 _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref moveDirection);
                 _mover.ApplyMovement(moveDirection);

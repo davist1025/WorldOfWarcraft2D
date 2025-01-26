@@ -140,14 +140,36 @@ namespace WoW.Realmserver.Content
                     var newProcessor = allMapProcessors.Find(p => p.Map.Properties["id"].ToLower().Equals(session.Character.MapId));
                     newProcessor.Creatures.Add(characterToSummon.Entity);
                     characterToSummon.GetComponent<CircleCollider>().CollidesWithLayers = newProcessor.PhysicsLayer;
+
+                    characterToSummon.Entity.Position = new Vector2(session.Entity.Position.X, session.Entity.Position.Y);
+
+                    // this feels crash-prone.
+                    var creaturesInNewProcessor = newProcessor.Creatures
+                        .Where(creature => creature.HasComponent<WorldSessionComponent>() && !creature.Name.ToLower().Equals(characterToSummon.Entity.Name.ToLower()))
+                        .ToArray();
+
+                    // send the current positions of all players in the summoned map since we don't send input updates outside of the players' map.
+                    foreach (var player in creaturesInNewProcessor)
+                    {
+                        Program.SendTo(characterToSummon.Entity.Name,
+                            new RealmClient_NetPositionInputUpdate()
+                            {
+                                Id = player.Name,
+                                ResultX = player.Transform.Position.X,
+                                ResultY = player.Transform.Position.Y,
+                                MovementX = 0f,
+                                MovementY = 0f,
+                                IsTeleportUpdate = true
+                            }, DeliveryMethod.ReliableOrdered);
+                    }
                 }
 
                 Program.SendToAll(new RealmClient_Teleport()
                 {
                     WorldId = characterToSummon.Entity.Name,
                     MapId = session.Character.MapId,
-                    X = session.Entity.Transform.Position.X,
-                    Y = session.Entity.Transform.Position.Y
+                    X = characterToSummon.Entity.Position.X,
+                    Y = characterToSummon.Entity.Position.Y
                 });
             }
         }

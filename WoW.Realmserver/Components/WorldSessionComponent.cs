@@ -51,6 +51,7 @@ namespace WoW.Realmserver.Components
                         ResultY = Entity.Transform.Position.Y,
                         MovementX = input.X,
                         MovementY = input.Y,
+                        IsTeleportUpdate = false
                     }, DeliveryMethod.Unreliable);
 
                 // show the player the server's resulting calculation.
