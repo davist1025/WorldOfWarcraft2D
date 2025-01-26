@@ -207,16 +207,25 @@ namespace WoW.Client
 
             if (entity != null)
             {
+                // Another player is being teleported.
                 if (entity.HasComponent<NetPlayerController>())
                 {
-                    // todo: move this code to the netplayercontroller
-                    // i.e: "RemoveFromWorld()"
                     var controller = entity.GetComponent<NetPlayerController>();
                     controller.MapId = teleport.MapId;
 
-                    entity.RemoveComponent<SpriteRenderer>();
-                    entity.RemoveComponent<CircleCollider>();
-                    entity.RemoveComponent<Mover>();
+                    if (Game1.CurrentMapId.ToLower().Equals(teleport.MapId))
+                    {
+                        controller.AddToMap();
+                        controller.Entity.Transform.SetPosition(new Vector2(teleport.X, teleport.Y));
+                    }
+                    else
+                    {
+                        // todo: move this code to the netplayercontroller
+                        // i.e: "RemoveFromWorld()"
+                        entity.RemoveComponent<SpriteRenderer>();
+                        entity.RemoveComponent<CircleCollider>();
+                        entity.RemoveComponent<Mover>();
+                    }
 
                     Debug.Log($"{controller.Name} has been teleported.");
                 }
@@ -243,7 +252,13 @@ namespace WoW.Client
                         // Set our local posiiton.
                         entity.Transform.SetPosition(new Vector2(teleport.X, teleport.Y));
 
-                        // todo: create renderers, movers, etc for all players on the map.
+                        var netPlayersOnMap = Core.Scene
+                            .FindComponentsOfType<NetPlayerController>()
+                            .Where(player => player.MapId.ToLower().Equals(tmxMapByMapId.Properties["id"]))
+                            .ToArray();
+
+                        foreach (var player in netPlayersOnMap)
+                            player.AddToMap();
                     };
                     Core.StartSceneTransition(newLoadTransition);
                 }

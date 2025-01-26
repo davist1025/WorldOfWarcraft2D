@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Aseprite;
+using Nez.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Realm;
 
 namespace WoW.Client.Components
@@ -50,6 +53,36 @@ namespace WoW.Client.Components
                 _mover.CalculateMovementExcluding(ref direction, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
                 _subPixelMovement.Update(ref direction);
                 _mover.ApplyMovement(direction);
+            }
+        }
+
+        /// <summary>
+        /// Creates renderers, Movers, etc.
+        /// </summary>
+        public void AddToMap()
+        {
+            AsepriteFile aseFile = null;
+            SpriteRenderer renderer; // todo: replace with animator.
+            RaceType characterRace = (RaceType)RaceId;
+
+            switch (characterRace)
+            {
+                case RaceType.Human:
+                    aseFile = Core.Scene.Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
+                    break;
+                case RaceType.Orc:
+                    aseFile = Core.Scene.Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
+
+                    break;
+            }
+
+            renderer = Entity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+
+            if (HairId > 1)
+            {
+                var hairSprite = Core.Scene.Content.LoadAsepriteFile($"Content/Data/Characters/hair_{HairId}_spritesheet.ase");
+
+                Entity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
             }
         }
     }

@@ -93,38 +93,15 @@ namespace WoW.Client.Scenes
         {
             var netController = new NetPlayerController(theOtherPlayer);
             var theOtherEntity = CreateEntity(theOtherPlayer.WorldId, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
+
+            theOtherEntity.AddComponent(netController);
             theOtherEntity.Tag = (int)EntityType.NetPlayer;
 
             Debug.Log($"Player: {theOtherEntity.Name} ({netController.Name}) has joined the world!");
 
             // only create a renderer(s) if we're on the same map as them.
             if (theOtherPlayer.MapId.ToLower().Equals(Game1.CurrentMapId))
-            {
-                AsepriteFile aseFile = null;
-                SpriteRenderer renderer; // todo: replace with animator.
-                RaceType characterRace = (RaceType)theOtherPlayer.RaceId;
-
-                switch (characterRace)
-                {
-                    case RaceType.Human:
-                        aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
-                        break;
-                    case RaceType.Orc:
-                        aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
-
-                        break;
-                }
-
-                renderer = theOtherEntity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
-
-                if (theOtherPlayer.HairId > 1)
-                {
-                    var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{theOtherPlayer.HairId}_spritesheet.ase");
-
-                    theOtherEntity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
-                }
-            }
-            theOtherEntity.AddComponent(netController);
+                netController.AddToMap();
         }
 
         public void CreateNPC(RemoteNPC remoteData)

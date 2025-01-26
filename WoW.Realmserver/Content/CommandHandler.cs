@@ -134,16 +134,6 @@ namespace WoW.Realmserver.Content
 
                 if (thisProcessor != null)
                 {
-                    for (int i = 0; i < thisProcessor.Creatures.Count; i++)
-                    {
-                        Program.SendTo(thisProcessor.Creatures[i].Name, new RealmClient_Teleport()
-                        {
-                            WorldId = characterToSummon.Entity.Name,
-                            MapId = session.Character.MapId,
-                            X = session.Entity.Transform.Position.X,
-                            Y = session.Entity.Transform.Position.Y
-                        });
-                    }
                     thisProcessor.Creatures.Remove(characterToSummon.Entity);
 
                     // set the new tiled processor for the character being summoned.
@@ -151,6 +141,14 @@ namespace WoW.Realmserver.Content
                     newProcessor.Creatures.Add(characterToSummon.Entity);
                     characterToSummon.GetComponent<CircleCollider>().CollidesWithLayers = newProcessor.PhysicsLayer;
                 }
+
+                Program.SendToAll(new RealmClient_Teleport()
+                {
+                    WorldId = characterToSummon.Entity.Name,
+                    MapId = session.Character.MapId,
+                    X = session.Entity.Transform.Position.X,
+                    Y = session.Entity.Transform.Position.Y
+                });
             }
 
             // todo: summon a player to me!
