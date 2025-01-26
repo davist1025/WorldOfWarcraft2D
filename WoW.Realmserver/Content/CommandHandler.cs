@@ -150,14 +150,6 @@ namespace WoW.Realmserver.Content
                     Y = session.Entity.Transform.Position.Y
                 });
             }
-
-            // todo: summon a player to me!
-            // when this occurs, we'll only need to know the character name (we could also send the worldid in place of the character name? this can be grabbed from the client-side when putting in a character name.
-            
-            // when the character is summoned, they'll need to be removed/added to a new Tiled processor.
-            // all players in the incoming map need to be made aware of this character so they can create a renderer, etc)
-            // the summoned client could do a fade transition into the same scene and while the scene is transitioning, reset the TiledMapRenderer.
-            // when summoned, the client should create a renderer for all players/NPCs.
         }
     }
 }
