@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nez
 {
@@ -72,6 +74,62 @@ namespace Nez
 
             return collisionResult.Collider != null;
         }
+
+		/// <summary>
+		/// Excludes the given <paramref name="entities">excluded entities</paramref> from collision on this Entity, regardless of physics layer.
+		/// </summary>
+		/// <param name="motion"></param>
+		/// <param name="entities"></param>
+		/// <param name="collisionResult"></param>
+		/// <returns></returns>
+		public bool CalculateMovementExcluding(ref Vector2 motion, Entity[] entities, out CollisionResult collisionResult)
+		{
+			collisionResult = new CollisionResult();
+
+			// no collider? just move and forget about it
+			if (Entity.GetComponent<Collider>() == null || _triggerHelper == null)
+				return false;
+
+			// 1. move all non-trigger Colliders and get closest collision
+			var colliders = Entity.GetComponents<Collider>();
+			for (var i = 0; i < colliders.Count; i++)
+			{
+				var collider = colliders[i];
+
+				// skip triggers for now. we will revisit them after we move.
+				if (collider.IsTrigger)
+					continue;
+
+				// fetch anything that we might collide with at our new position
+				var bounds = collider.Bounds;
+				bounds.X += motion.X;
+				bounds.Y += motion.Y;
+
+				var neighbors =
+					Physics.BoxcastBroadphaseExcludingSelf(collider, ref bounds, collider.CollidesWithLayers).Where(c => !entities.Contains(c.Entity));
+
+				foreach (var neighbor in neighbors)
+				{
+					// skip triggers for now. we will revisit them after we move.
+					if (neighbor.IsTrigger)
+						continue;
+
+					if (collider.CollidesWith(neighbor, motion, out CollisionResult _InternalcollisionResult))
+					{
+						// hit. back off our motion
+						motion -= _InternalcollisionResult.MinimumTranslationVector;
+
+						// If we hit multiple objects, only take on the first for simplicity sake.
+						if (_InternalcollisionResult.Collider != null)
+							collisionResult = _InternalcollisionResult;
+					}
+				}
+			}
+
+			ListPool<Collider>.Free(colliders);
+
+			return collisionResult.Collider != null;
+		}
 
         /// <summary>
         /// Calculates the movement modifying the motion vector to take into account any collisions that will

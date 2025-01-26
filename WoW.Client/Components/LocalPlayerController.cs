@@ -64,7 +64,8 @@ namespace WoW.Client.Components
                 
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
 
-                _mover.CalculateMovement(ref moveDirection, out var _);
+                //_mover.CalculateMovement(ref moveDirection, out var _);
+                _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref moveDirection);
                 _mover.ApplyMovement(moveDirection);
             }

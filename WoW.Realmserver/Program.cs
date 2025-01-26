@@ -202,6 +202,17 @@ namespace WoW.Realmserver
                 Send(_netManager.ConnectedPeerList[i], packet, delivery);
         }
 
+        public static void SendToMapFromPlayer<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        {
+            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
+            var entity = peer.Tag as Entity;
+            var processor = Scene.FindComponentsOfType<TiledMapProcessor>().Where(processor => processor.Creatures.Contains(entity)).FirstOrDefault();
+            var players = processor.Creatures.Where(e => e.HasComponent<WorldSessionComponent>() && !e.Name.ToLower().Equals(gObjectId)).ToArray();
+
+            foreach (var p in players)
+                SendTo(p.Name, packet, delivery);
+        }
+
         public static void SendToAuthserver<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(_authNetManager, packet, delivery);
 

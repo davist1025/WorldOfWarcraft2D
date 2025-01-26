@@ -39,17 +39,11 @@ namespace WoW.Realmserver.Components
             if (InputUpdates.TryDequeue(out var input))
             {
                 _moveDirection = MovementSpeed * Time.DeltaTime * input;
-                _mover.CalculateMovement(ref _moveDirection, out var res);
-
-                // todo: this is debug code for collision; check for collision ONLY on the map the player is on.
-                if (res.Collider != null)
-                    Console.WriteLine($"{Character.Name} collided with {res.Collider.Bounds.ToString()}!");
-
+                _mover.CalculateMovementExcluding(ref _moveDirection, Entity.Scene.FindComponentsOfType<WorldSessionComponent>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
-                // todo: only send to players on the same map as the player.
 
-                Program.SendToExcept(Entity.Name,
+                Program.SendToMapFromPlayer(Entity.Name,
                     new RealmClient_NetPositionInputUpdate()
                     {
                         Id = Entity.Name,
