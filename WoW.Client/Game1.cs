@@ -11,6 +11,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using WoW.Client.Components;
 using WoW.Client.Content;
 using WoW.Client.Scenes;
@@ -171,10 +173,18 @@ namespace WoW.Client
             // todo: grab auth ip/port from config.
             ClientNetwork.Connect("127.0.0.1", 8070, "");
 
+            string shaHash = "";
+
+            using (var hash = SHA256.Create())
+            {
+                var byteArray = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                shaHash = Convert.ToHexString(byteArray);
+            }
+
             _temporaryLogonPacket = new ClientAuth_Logon()
             {
                 AccountName = accountName,
-                Password = password
+                Password = shaHash.ToLower()
             };
         }
 

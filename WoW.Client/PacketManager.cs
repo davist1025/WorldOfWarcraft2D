@@ -88,6 +88,7 @@ namespace WoW.Client
 
         public static void OnEnterWorld(RealmClient_EnterWorld worldParams)
         {
+            // todo: there may be a few of these, organize them in a dictionary or some other object.
             Game1.MovementSpeed = worldParams.MovementSpeed;
 
             Game1.NetState = GameNetworkState.World;
@@ -258,7 +259,6 @@ namespace WoW.Client
 
                         // Set our local posiiton.
                         entity.SetPosition(new Vector2(teleport.X, teleport.Y));
-                        Debug.Log($"New position: {entity.Position.X}:{entity.Position.Y}");
 
                         var netPlayersOnMap = Core.Scene
                             .FindComponentsOfType<NetPlayerController>()

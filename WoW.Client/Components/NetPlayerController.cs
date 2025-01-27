@@ -28,6 +28,7 @@ namespace WoW.Client.Components
 
         public NetPlayerController(RealmClient_CreateNetPlayer networkPlayer)
         {
+            // todo: can 'RemoteCharacter' be used here?
             Name = networkPlayer.Name;
             RaceId = networkPlayer.RaceId;
             HairId = networkPlayer.HairId;

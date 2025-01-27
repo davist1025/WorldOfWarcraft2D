@@ -289,7 +289,7 @@ namespace WoW.Realmserver
                                     var handlerFunc = typeof(CommandHandler)
                                         .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
                                         .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(childCommandHandlerId))
+                                        .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(childCommandHandlerId.ToLower()))
                                         .Single();
 
                                     handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(2).ToArray(), session, peer });
