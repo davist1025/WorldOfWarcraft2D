@@ -173,18 +173,10 @@ namespace WoW.Client
             // todo: grab auth ip/port from config.
             ClientNetwork.Connect("127.0.0.1", 8070, "");
 
-            string shaHash = "";
-
-            using (var hash = SHA256.Create())
-            {
-                var byteArray = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-                shaHash = Convert.ToHexString(byteArray);
-            }
-
             _temporaryLogonPacket = new ClientAuth_Logon()
             {
                 AccountName = accountName,
-                Password = shaHash.ToLower()
+                Password = Shared.Utils.ToSHA256(password)
             };
         }
 

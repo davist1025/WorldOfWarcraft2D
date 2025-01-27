@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,4 +39,24 @@ namespace WoW.Client.Shared
         CanDialogue = 1 << 2
     }
 
+    public static class Utils
+    {
+        /// <summary>
+        /// Converts the given <paramref name="input"/> into a SHA256 hashed string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToSHA256(string input)
+        {
+            string shaHash = "";
+
+            using (var hash = SHA256.Create())
+            {
+                var byteArray = hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+                shaHash = Convert.ToHexString(byteArray).ToLower();
+            }
+
+            return shaHash;
+        }
+    }
 }

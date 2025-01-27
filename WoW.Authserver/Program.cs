@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using WoW.Authserver.DB;
 using WoW.Authserver.DB.Model;
@@ -37,42 +38,38 @@ namespace WoW.Authserver
                     .ExecuteUpdate(setters => setters
                         .SetProperty(p => p.SessionId, default(string)));
 
-                using (var hash = SHA256.Create())
+                Console.WriteLine("Verifying default account integrity...");
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
                 {
-                    Console.WriteLine("Verifying default account integrity...");
-                    if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
+                    ctx.Accounts.Add(new Account()
                     {
-                        ctx.Accounts.Add(new Account()
-                        {
-                            Username = "admin".ToUpper(),
-                            HashedPassword = Argon2.Hash(Convert.ToHexString(hash.ComputeHash(Encoding.UTF8.GetBytes("123"))).ToLower()),
-                            SecurityLevel = (int)SecurityLevel.Administrator
-                        });
-                    }
-
-                    if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("gamemaster")))
-                    {
-                        ctx.Accounts.Add(new Account()
-                        {
-                            Username = "gamemaster".ToUpper(),
-                            HashedPassword = Argon2.Hash(Convert.ToHexString(hash.ComputeHash(Encoding.UTF8.GetBytes("456"))).ToLower()),
-                            SecurityLevel = (int)SecurityLevel.Gamemaster
-                        });
-                    }
-
-                    if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("player")))
-                    {
-                        ctx.Accounts.Add(new Account()
-                        {
-                            Username = "player".ToUpper(),
-                            HashedPassword = Argon2.Hash(Convert.ToHexString(hash.ComputeHash(Encoding.UTF8.GetBytes("789"))).ToLower()),
-                            SecurityLevel = (int)SecurityLevel.Player
-                        });
-                    }
-
-                    ctx.SaveChanges();
-
+                        Username = "admin".ToUpper(),
+                        HashedPassword = Argon2.Hash(Utils.ToSHA256("123")),
+                        SecurityLevel = (int)SecurityLevel.Administrator
+                    });
                 }
+
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("gamemaster")))
+                {
+                    ctx.Accounts.Add(new Account()
+                    {
+                        Username = "gamemaster".ToUpper(),
+                        HashedPassword = Argon2.Hash(Utils.ToSHA256("456")),
+                        SecurityLevel = (int)SecurityLevel.Gamemaster
+                    });
+                }
+
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("player")))
+                {
+                    ctx.Accounts.Add(new Account()
+                    {
+                        Username = "player".ToUpper(),
+                        HashedPassword = Argon2.Hash(Utils.ToSHA256("789")),
+                        SecurityLevel = (int)SecurityLevel.Player
+                    });
+                }
+
+                ctx.SaveChanges();
 
                 // todo: set a configuration setting for using default realms.
                 Console.WriteLine("Verifying default realmlist integrity...");
