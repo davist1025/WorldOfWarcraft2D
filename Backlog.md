@@ -29,3 +29,4 @@
 - NPC flag usage (IsAggressive,)
 - NPCs should persist, visually, only on the map the local player exists, data should persist everywhere
 	- See Devlog 1/26/25
+- Prediction and reconciliation on input updates
