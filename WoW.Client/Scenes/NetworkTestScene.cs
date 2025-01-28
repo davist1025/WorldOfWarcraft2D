@@ -106,7 +106,8 @@ namespace WoW.Client.Scenes
 
         public void CreateNPC(RemoteNPC remoteData)
         {
-            var npcController = new NetNPCController(remoteData);
+            var npcController = new NpcController(remoteData);
+            npcController.AddToMap();
             var theNpcEntity = CreateEntity($"{remoteData.WorldId}", new Vector2(remoteData.X, remoteData.Y));
             theNpcEntity.Tag = (int)EntityType.NPC;
 

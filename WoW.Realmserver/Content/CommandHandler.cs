@@ -58,8 +58,10 @@ namespace WoW.Realmserver.Content
                     {
                         WorldId = Guid.NewGuid().ToString(),
                         Name = npc.Name,
+                        ModelId = npc.ModelId,
                         Flags = npc.FlagType,
                         Level = npc.Level,
+                        MapId = session.Character.MapId,
                         X = session.Entity.Transform.Position.X,
                         Y = session.Entity.Transform.Position.Y
                     };
@@ -69,12 +71,16 @@ namespace WoW.Realmserver.Content
                         Data = serializedNpc
                     });
 
-                    RealmClient_CreateNPC newNpcPacket = new RealmClient_CreateNPC()
-                    {
-                        Data = serializedNpc
-                    };
+                    var playersInMap = Program.Scene
+                        .FindComponentsOfType<TiledMapProcessor>()
+                        .Where(processor => processor.Map.Properties["id"].ToLower().Equals(session.Character.MapId.ToLower()))
+                        .Single()
+                        .Creatures
+                        .Where(c => c.HasComponent<WorldSessionComponent>()).ToArray();
 
-                    Program.SendSerializableToAll(newNpcPacket);
+
+                    foreach (var player in playersInMap)
+                        Program.SendTo(player.Name, new RealmClient_CreateNPC() { Data = serializedNpc });
                 }
             }
         }

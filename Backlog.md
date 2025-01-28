@@ -14,6 +14,7 @@
 	- Targeting players
 	- Behaviors
 	- Dialogue
+- Fix column data types for each Model
 
 ### Client
 - Implement camera bounds/Tiled boundaries 

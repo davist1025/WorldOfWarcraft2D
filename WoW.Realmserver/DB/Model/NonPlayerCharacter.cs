@@ -16,6 +16,12 @@ namespace WoW.Realmserver.DB.Model
         [Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Utilized by the end user to determine what sprite/animation to draw while an instance of this NPC is in the game world.
+        /// </summary>
+        [Column("model_id")]
+        public string ModelId { get; set; }
+
         [Column("name")]
         public string Name { get; set; }
 
