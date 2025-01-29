@@ -21,12 +21,15 @@ namespace WoW.Client.Components
             var model = Metadata.ModelId;
             // todo: load model from Content.
 
+            Debug.Log($"{Metadata.Name} has a model of: {model}");
+
             // Create renderers, mover, etc.
             var renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             renderer.SetColor(Color.MonoGameOrange);
 
             var collisionTrigger = Entity.AddComponent(new CircleCollider(64f));
             collisionTrigger.IsTrigger = true;
+
             /*
              * AsepriteFile aseFile = null;
             SpriteRenderer renderer; // todo: replace with animator.

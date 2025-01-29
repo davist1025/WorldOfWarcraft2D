@@ -39,6 +39,8 @@ namespace WoW.Realmserver.Components
             if (InputUpdates.TryDequeue(out var input))
             {
                 _moveDirection = MovementSpeed * Time.DeltaTime * input;
+                _moveDirection.Round();
+
                 _mover.CalculateMovementExcluding(ref _moveDirection, Entity.Scene.FindComponentsOfType<WorldSessionComponent>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);

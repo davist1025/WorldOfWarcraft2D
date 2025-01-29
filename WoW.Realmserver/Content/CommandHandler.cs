@@ -68,7 +68,7 @@ namespace WoW.Realmserver.Content
 
                     newNpEntity.AddComponent(new NpcControllerComponent()
                     {
-                        Data = serializedNpc
+                        Metadata = serializedNpc
                     });
 
                     var playersInMap = Program.Scene

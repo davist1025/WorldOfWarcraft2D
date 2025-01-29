@@ -50,6 +50,7 @@ namespace WoW.Client.Components
             {
                 Vector2 movement = new Vector2(serverOut.X, serverOut.Y);
                 var direction = Game1.MovementSpeed * Time.DeltaTime * movement;
+                direction.Round();
 
                 _mover.CalculateMovementExcluding(ref direction, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
                 _subPixelMovement.Update(ref direction);

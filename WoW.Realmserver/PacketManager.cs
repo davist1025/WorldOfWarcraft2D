@@ -203,7 +203,7 @@ namespace WoW.Realmserver
             {
                 var npcData = npcsOnMap[i];
                 var component = npcData.GetComponent<NpcControllerComponent>();
-                var newNpcPacket = new RealmClient_CreateNPC() { Data = component.Data };
+                var newNpcPacket = new RealmClient_CreateNPC() { Data = component.Metadata };
 
                 Program.SendSerializable(peer, newNpcPacket);
             }
@@ -341,7 +341,7 @@ namespace WoW.Realmserver
                 var newTarget = session.AvailableTargets[session.TargetIndex];
                 var controller = newTarget.GetComponent<NpcControllerComponent>();
 
-                Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Data.WorldId });
+                Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Metadata.WorldId });
             }
         }
         #endregion

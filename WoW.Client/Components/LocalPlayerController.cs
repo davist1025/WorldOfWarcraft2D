@@ -59,6 +59,7 @@ namespace WoW.Client.Components
                 Game1.Send(new ClientRealm_Movement() { X = _movementInput.X, Y = _movementInput.Y, Tick = _tickCount }, LiteNetLib.DeliveryMethod.Unreliable);
                 
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
+                moveDirection.Round();
 
                 _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref moveDirection);
