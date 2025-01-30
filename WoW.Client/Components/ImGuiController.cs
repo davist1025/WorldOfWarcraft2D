@@ -319,13 +319,22 @@ namespace WoW.Client.Components
 
                     ImGui.End();
 
+                    if (Game1.ShouldShowEscapeMenu)
+                    {
+                        System.Numerics.Vector2 windowSize = new System.Numerics.Vector2();
+                        System.Numerics.Vector2 position = new System.Numerics.Vector2();
+
+                        Debug.Log("Drawing escape!");
+                    }
+
                     break;
             };
         }
 
         public void Update()
         {
-
+            if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Content.ControlMap.EscapeMenu]))
+                Game1.Configuration.ControlHandlers[Content.ControlMap.EscapeMenu]?.Invoke(null, null);
         }
     }
 }
