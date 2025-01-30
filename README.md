@@ -1,3 +1,4 @@
+
 ## Dependencies
 Included under the `Lib` section of the root directory of the project;
 - Nez for MonoGame 3.8
@@ -47,7 +48,7 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 	- [ ] Stamina
 	- [ ] Spirit
 - [ ] Gamemaster ticket support system
-- [ ] NPC behaviors
+- [x] NPC behaviors
 	- [ ] Dialogue
 	- [ ] Pathfinding
 	- [ ] Attacking
@@ -55,6 +56,16 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
+
+## Project Status
+
+As of 1/30/25, functional implementation exists for: 
+
+- MySQL w/ EntityFramework
+- Account, character and realmlist support
+- Basic networking infrastructure: authentication, realmlist, character list/creation/deletion, entering the world (player & npc packets, some local character data, movement, and chat/command processing)
+- Headless realmserver environment using Nez (See WoW.Realmserver)
+- Basic character customization
 
 ## Disclaimer
 This project is undergoing rapid change in its codebase, data structures, object definitions, and general infrastructure and as such, should be considered *wildly* unstable.
