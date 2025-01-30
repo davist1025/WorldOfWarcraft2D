@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
@@ -51,12 +52,12 @@ namespace WoW.Realmserver.Content
                 if (ctx.NPCs.Any(npc => npc.Id == npcId))
                 {
                     NonPlayerCharacter npc = ctx.NPCs.First(npc => npc.Id == npcId);
+                    Entity npcEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString(), session.Entity.Transform.Position);
+                    npcEntity.Tag = (int)EntityType.NPC;
 
-                    var newNpEntity = Program.Scene.CreateEntity($"{npc.Id}{npc.Name}{Nez.Random.NextInt(34000)}", session.Entity.Transform.Position);
-                    
                     RemoteNPC serializedNpc = new RemoteNPC()
                     {
-                        WorldId = Guid.NewGuid().ToString(),
+                        WorldId = npcEntity.Name,
                         Name = npc.Name,
                         ModelId = npc.ModelId,
                         Flags = npc.FlagType,
@@ -66,21 +67,24 @@ namespace WoW.Realmserver.Content
                         Y = session.Entity.Transform.Position.Y
                     };
 
-                    newNpEntity.AddComponent(new NpcControllerComponent()
-                    {
-                        Metadata = serializedNpc
-                    });
-
-                    var playersInMap = Program.Scene
+                    var processorOfRecipient = Program.Scene
                         .FindComponentsOfType<TiledMapProcessor>()
-                        .Where(processor => processor.Map.Properties["id"].ToLower().Equals(session.Character.MapId.ToLower()))
-                        .Single()
-                        .Creatures
-                        .Where(c => c.HasComponent<WorldSessionComponent>()).ToArray();
+                        .Single(proc => proc.Map.Properties["id"].ToLower().Equals(session.Character.MapId.ToLower()));
 
+                    if (processorOfRecipient != null)
+                    {
+                        npcEntity.AddComponent(new NpcControllerComponent()
+                        {
+                            Metadata = serializedNpc
+                        });
 
-                    foreach (var player in playersInMap)
-                        Program.SendTo(player.Name, new RealmClient_CreateNPC() { Data = serializedNpc });
+                        processorOfRecipient.AddCreature(npcEntity, true);
+
+                        var allPlayersInProc = processorOfRecipient.Creatures.Where(creature => creature.HasComponent<WorldSessionComponent>()).ToArray();
+
+                        foreach (var player in allPlayersInProc)
+                            Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Data = serializedNpc });
+                    }
                 }
             }
         }
@@ -135,6 +139,14 @@ namespace WoW.Realmserver.Content
 
             if (characterToSummon != null)
             {
+                Program.SendToAll(new RealmClient_Teleport()
+                {
+                    WorldId = characterToSummon.Entity.Name,
+                    MapId = session.Character.MapId,
+                    X = session.Entity.Position.X,
+                    Y = session.Entity.Position.Y
+                });
+
                 var allMapProcessors = Program.Scene.FindComponentsOfType<TiledMapProcessor>();
                 var thisProcessor = allMapProcessors.Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
 
@@ -144,18 +156,17 @@ namespace WoW.Realmserver.Content
 
                     // set the new tiled processor for the character being summoned.
                     var newProcessor = allMapProcessors.Find(p => p.Map.Properties["id"].ToLower().Equals(session.Character.MapId));
-                    newProcessor.Creatures.Add(characterToSummon.Entity);
-                    characterToSummon.GetComponent<CircleCollider>().CollidesWithLayers = newProcessor.PhysicsLayer;
+                    newProcessor.AddCreature(characterToSummon.Entity);
 
                     characterToSummon.Entity.Position = new Vector2(session.Entity.Position.X, session.Entity.Position.Y);
 
                     // this feels crash-prone.
-                    var creaturesInNewProcessor = newProcessor.Creatures
+                    var playersInNewProcessor = newProcessor.Creatures
                         .Where(creature => creature.HasComponent<WorldSessionComponent>() && !creature.Name.ToLower().Equals(characterToSummon.Entity.Name.ToLower()))
                         .ToArray();
 
                     // send the current positions of all players in the summoned map since we don't send input updates outside of the players' map.
-                    foreach (var player in creaturesInNewProcessor)
+                    foreach (var player in playersInNewProcessor)
                     {
                         Program.SendTo(characterToSummon.Entity.Name,
                             new RealmClient_NetPositionInputUpdate()
@@ -168,15 +179,21 @@ namespace WoW.Realmserver.Content
                                 IsTeleportUpdate = true
                             }, DeliveryMethod.ReliableOrdered);
                     }
-                }
 
-                Program.SendToAll(new RealmClient_Teleport()
-                {
-                    WorldId = characterToSummon.Entity.Name,
-                    MapId = session.Character.MapId,
-                    X = characterToSummon.Entity.Position.X,
-                    Y = characterToSummon.Entity.Position.Y
-                });
+                    // send all NPCs to this summoned player.
+                    var npcsInNewProcessor = newProcessor.Creatures.Where(creature => creature.HasComponent<NpcControllerComponent>()).ToArray();
+
+                    foreach (var npc in npcsInNewProcessor)
+                    {
+                        var component = npc.GetComponent<NpcControllerComponent>();
+
+                        Program.SendSerializable(characterToSummon.Entity.Name,
+                            new RealmClient_CreateNPC()
+                            {
+                                Data = component.Metadata
+                            });
+                    }
+                }
             }
         }
     }

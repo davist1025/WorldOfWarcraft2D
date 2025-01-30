@@ -26,6 +26,7 @@ namespace WoW.Client.Components
             // Create renderers, mover, etc.
             var renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             renderer.SetColor(Color.MonoGameOrange);
+            renderer.RenderLayer = 0;
 
             var collisionTrigger = Entity.AddComponent(new CircleCollider(64f));
             collisionTrigger.IsTrigger = true;

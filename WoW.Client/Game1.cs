@@ -152,7 +152,7 @@ namespace WoW.Client
             {
                 ShowCoreWindow = false,
                 ShowDemoWindow = false,
-                ShowSceneGraphWindow = false,
+                ShowSceneGraphWindow = true,
                 ShowSeperateGameWindow = false,
                 ShowMenuBar = false,
                 ShowStyleEditor = false,

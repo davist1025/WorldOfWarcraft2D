@@ -242,6 +242,10 @@ namespace WoW.Client
                 {
                     Debug.Log("We are being teleported...");
 
+                    // todo: bug may occur here where if we are summoned/teleported to the map we're already in, duplicate NPCs might be created.
+
+                    Game1.CurrentMapId = teleport.MapId;
+
                     var newLoadTransition = new FadeTransition();
                     newLoadTransition.OnScreenObscured = () =>
                     {
@@ -252,6 +256,10 @@ namespace WoW.Client
 
                         // Destroy the current map renderer/entity.
                         Core.Scene.FindEntity("map").Destroy();
+                        var npcEntities = Core.Scene.FindEntitiesWithTag((int)EntityType.NPC);
+
+                        //for (int i = 0; i < npcEntities.Count; i++)
+                        //    npcEntities[i].Destroy();
 
                         // Create a new map renderer.
                         mapRenderer = Core.Scene.CreateEntity("map").AddComponent(new TiledMapRenderer(tmxMapByMapId, "collision_layer"));
@@ -267,6 +275,17 @@ namespace WoW.Client
 
                         foreach (var player in netPlayersOnMap)
                             player.AddToMap();
+                    };
+
+                    newLoadTransition.OnTransitionCompleted += () =>
+                    {
+                        var allNpcs = Core.Scene.FindComponentsOfType<NpcController>().Where(npc => !npc.Metadata.MapId.ToLower().Equals(Game1.CurrentMapId.ToLower())).ToArray();
+
+                        foreach (var npc in allNpcs)
+                        {
+                            Debug.Log($"Destroying NPC: {npc.Metadata.WorldId} from the previous map...");
+                            npc.Entity.Destroy();
+                        }
                     };
                     Core.StartSceneTransition(newLoadTransition);
                 }

@@ -48,5 +48,22 @@ namespace Nez.ECS.Headless
 				Physics.AddCollider(collider);
 			}
 		}
+
+		public void AddCreature(Entity entity, bool isNpc = false)
+		{
+			if (Creatures.AddIfNotPresent(entity))
+			{
+				if (!entity.HasComponent<Collider>())
+				{
+					var collider = entity.AddComponent(new CircleCollider(64f));
+					collider.CollidesWithLayers = PhysicsLayer;
+
+					if (isNpc)
+						collider.IsTrigger = true;
+				}
+				//var collider = entity.GetComponent<Collider>();
+				//collider.CollidesWithLayers = PhysicsLayer;
+			}
+		}
 	}
 }

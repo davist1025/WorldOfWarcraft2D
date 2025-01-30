@@ -172,6 +172,9 @@ namespace WoW.Realmserver
         public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(peer, packet, delivery);
 
+        public static void SendSerializable<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+            => SendSerializable(_netManager.ConnectedPeerList.Where(peer => (peer.Tag as Entity).Name.ToLower().Equals(gObjectId)).First(), packet);
+
         public static void SendSerializableToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
             => _netProcessor.SendNetSerializable(_netManager, packet, delivery);
 

@@ -18,8 +18,10 @@ namespace WoW.Client.Shared.Realm
             {
                 WorldId = reader.GetString(),
                 Name = reader.GetString(),
+                ModelId = reader.GetString(),
                 Flags = reader.GetInt(),
                 Level = reader.GetInt(),
+                MapId = reader.GetString(),
                 X = reader.GetFloat(),
                 Y = reader.GetFloat(),
             };
@@ -29,8 +31,10 @@ namespace WoW.Client.Shared.Realm
         {
             writer.Put(Data.WorldId);
             writer.Put(Data.Name);
+            writer.Put(Data.ModelId);
             writer.Put(Data.Flags);
             writer.Put(Data.Level);
+            writer.Put(Data.MapId);
             writer.Put(Data.X);
             writer.Put(Data.Y);
         }
