@@ -196,5 +196,11 @@ namespace WoW.Realmserver.Content
                 }
             }
         }
+
+        [CommandHandler("PlayerActionCommand_TestSec")]
+        public static void PlayerActionCommand_TestSecurity(string[] data, WorldSessionComponent session, NetPeer peer)
+        {
+            Console.WriteLine($"{session.Character.Name} has valid security for this command!");
+        }
     }
 }

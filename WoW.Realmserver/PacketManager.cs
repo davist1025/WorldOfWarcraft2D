@@ -272,19 +272,21 @@ namespace WoW.Realmserver
 
                     using (var ctx = new RealmContext())
                     {
-                        if (ctx.Commands.Any(c => c.Name.ToLower().Equals(commandName) && c.Security == (int)session.Account.Security))
+                        var existingCommandPrefix = ctx.Commands.First(command => command.Name.ToLower().Equals(commandName.ToLower()));
+
+                        if (existingCommandPrefix != null && (existingCommandPrefix.Security >= (int)session.Account.Security))
                         {
-                            var command = ctx.Commands.Single(c => c.Name.ToLower().Equals(commandName));
-                            if (command.HandlerId == null)
+                            if (existingCommandPrefix.HandlerId == null)
                             {
                                 string childCommandName = msgCopy[1];
+                                var existingChildCommandPrefix = ctx.ChildCommands.First(childCmd => childCmd.Name.ToLower().Equals(childCommandName.ToLower()));
 
-                                if (ctx.ChildCommands.Any(c => c.Name.ToLower().Equals(childCommandName) && c.Security == (int)session.Account.Security))
+                                if (existingChildCommandPrefix != null && (existingChildCommandPrefix.Security >= (int)session.Account.Security))
                                 {
                                     var childCommand = ctx.ChildCommands.Single(c => c.Name.ToLower().Equals(childCommandName));
                                     var childCommandHandlerId = childCommand.HandlerId;
 
-                                    Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName} {childCommandName}'.");
+                                    Console.WriteLine($"{session.Character.Name} is invoking command: '{commandName} {childCommandName}'.");
 
                                     var handlerFunc = typeof(CommandHandler)
                                         .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
@@ -297,12 +299,12 @@ namespace WoW.Realmserver
                             }
                             else
                             {
-                                Console.WriteLine($"{session.Character.Name} is attempting to process command: '{commandName}'.");
+                                Console.WriteLine($"{session.Character.Name} is invoking command: '{commandName}'.");
 
                                 var handlerFunc = typeof(CommandHandler)
                                     .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                                    .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                    .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(command.HandlerId.ToLower()))
+                                .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
+                                    .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(existingCommandPrefix.HandlerId.ToLower()))
                                     .Single();
 
                                 handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(1).ToArray(), session, peer });
