@@ -250,7 +250,7 @@ namespace WoW.Realmserver
                     var netPlayer = networkPlayers[i];
                     var sessionComp = netPlayer.GetComponent<WorldSessionComponent>();
 
-                    if (sessionComp.Character.Name.ToLower().Equals(characterName))
+                    if (sessionComp.Character.Name.ToLower().Equals(characterName.ToLower()))
                     {
                         RealmClient_Chat newWhisper = new RealmClient_Chat()
                         {
