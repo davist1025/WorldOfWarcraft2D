@@ -10,6 +10,8 @@ using WoW.Realmserver.DB;
 
 namespace WoW.Realmserver
 {
+    // todo: empty world scene on the server.
+    // can anything else be done with this object?
     public class WorldScene : Scene
     {
         public override void Initialize()

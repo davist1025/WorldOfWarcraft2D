@@ -144,8 +144,7 @@ namespace WoW.Realmserver
 
             // add this entity to the matching processor.
             var mapProcessor = processorComponents.Find(processor => processor.Map.Properties["id"].ToLower().Equals(thisSession.Character.MapId));
-            mapProcessor.Creatures.Add(thisEntity);
-            collider.CollidesWithLayers = mapProcessor.PhysicsLayer;
+            mapProcessor.AddCreature(thisEntity);
 
             // let the client create their local player object.
             Program.Send(peer, new RealmClient_CreateLocalPlayer()
@@ -195,7 +194,6 @@ namespace WoW.Realmserver
                 });
             }
 
-            // todo: fix sending all NPCs in a world to the player.
             var npcsOnMap = mapProcessor.Creatures.Where(c => c.HasComponent<NpcControllerComponent>()).ToList();
 
             // send all npcs to this player.
