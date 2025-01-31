@@ -48,7 +48,7 @@ This release should capture the core gameplay loop of vanilla. Players should ha
 	- [ ] Stamina
 	- [ ] Spirit
 - [ ] Gamemaster ticket support system
-- [x] NPC behaviors
+- [ ] NPC behaviors
 	- [ ] Dialogue
 	- [ ] Pathfinding
 	- [ ] Attacking

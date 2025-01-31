@@ -319,13 +319,39 @@ namespace WoW.Client.Components
 
                     ImGui.End();
 
+                    // todo: finish escape menu.
+                    if (Game1.ShouldShowEscapeMenu)
+                    {
+                        System.Numerics.Vector2 windowSize = new System.Numerics.Vector2(200, 200);
+                        System.Numerics.Vector2 position = new System.Numerics.Vector2(Core.GraphicsDevice.Viewport.Width / 2 - (windowSize.X / 2), Core.GraphicsDevice.Viewport.Height / 2 - (windowSize.Y / 2));
+
+                        ImGui.SetNextWindowSize(windowSize);
+                        ImGui.SetNextWindowPos(position);
+                        ImGui.Begin("", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize);
+
+                        // todo: display game client options.
+                        // show player/npc names, etc.
+                        NezImGui.CenteredButton("Options", 0.75f);
+
+                        // todo: key bindings.
+                        NezImGui.CenteredButton("Key Bindings", 0.75f);
+
+                        // instantly closes the game.
+                        // server will auto-detect disconnection.
+                        if (NezImGui.CenteredButton("Logout", 0.75f))
+                            Game1.Exit();
+
+                        ImGui.End();
+                    }
+
                     break;
             };
         }
 
         public void Update()
         {
-
+            if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Content.ControlMap.EscapeMenu]))
+                Game1.Configuration.ControlHandlers[Content.ControlMap.EscapeMenu]?.Invoke(null, null);
         }
     }
 }

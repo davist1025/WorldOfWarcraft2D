@@ -55,6 +55,7 @@ namespace WoW.Client
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
         public static string CurrentMapId = "";
+        public static bool ShouldShowEscapeMenu = false;
 
         public static Entity Player;
         private static ClientAuth_Logon _temporaryLogonPacket;
@@ -136,6 +137,7 @@ namespace WoW.Client
             base.Initialize();
 
             IsFixedTimeStep = true;
+            ExitOnEscapeKeypress = false;
 
             Debug.Log($"Loading Tiled maps...");
             var tmxFiles = Directory.GetFiles("Content/Data/").Where(f => f.EndsWith(".tmx")).ToArray();

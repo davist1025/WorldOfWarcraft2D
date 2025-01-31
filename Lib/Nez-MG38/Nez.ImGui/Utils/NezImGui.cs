@@ -88,11 +88,10 @@ namespace Nez.ImGuiTools
 		/// </summary>
 		/// <param name="percentWidth"></param>
 		/// <returns></returns>
-		public static bool CenteredButton(string label, float percentWidth, float xIndent = 0)
+		public static bool CenteredButton(string label, float percentWidth, float xIndent = 8f)
 		{
-			var buttonWidth = ImGui.GetWindowWidth() * percentWidth;
-			//var buttonWidth = ImGui.GetWindowContentRegionWidth() * percentWidth;
-			//ImGui.SetCursorPosX(xIndent + (ImGui.GetWindowContentRegionWidth() - buttonWidth) / 2f);
+			var buttonWidth = ImGui.GetContentRegionAvail().X * percentWidth;
+			ImGui.SetCursorPosX(xIndent + (ImGui.GetContentRegionAvail().X - buttonWidth) / 2f);
 			return ImGui.Button(label, new System.Numerics.Vector2(buttonWidth, GetDefaultWidgetHeight()));
 		}
 

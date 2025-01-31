@@ -16,7 +16,7 @@ namespace WoW.Client.Content
         public Dictionary<ControlMap, Keys> KeyboardControlMap { get; set; }
 
         [JsonIgnore]
-        public Dictionary<ControlMap, EventHandler> ControlHandlers; // todo: implement input handlers.
+        public Dictionary<ControlMap, EventHandler> ControlHandlers;
 
         // todo: account name, last realm info.
 
@@ -34,26 +34,37 @@ namespace WoW.Client.Content
             {
                 Debug.Log("Loading game configuration...");
                 var objData = JsonConvert.DeserializeObject<GameConfiguration>(File.ReadAllText("./game.config"));
+                objData.ControlHandlers = new Dictionary<ControlMap, EventHandler>()
+                {
+                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
+                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu }
+                };
                 return objData;
             }
 
             Debug.Log("Failed to find game.config; creating a new one...");
-            return new GameConfiguration()
+            var config = new GameConfiguration()
             {
                 KeyboardControlMap = new Dictionary<ControlMap, Keys>()
                 {
-                    { ControlMap.TabTarget, Keys.Tab }
+                    { ControlMap.TabTarget, Keys.Tab },
+                    { ControlMap.EscapeMenu, Keys.Escape }
                 },
+
                 ControlHandlers = new Dictionary<ControlMap, EventHandler>()
                 {
-                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() }
+                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
+                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu }
                 }
             };
+            config.Save();
+            return config;
         }
     }
 
     public enum ControlMap
     {
-        TabTarget
+        TabTarget,
+        EscapeMenu,
     }
 }

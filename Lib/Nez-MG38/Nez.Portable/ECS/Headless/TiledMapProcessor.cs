@@ -51,16 +51,18 @@ namespace Nez.ECS.Headless
 
 		public void AddCreature(Entity entity, bool isNpc = false)
 		{
+			Collider collider = null;
 			if (Creatures.AddIfNotPresent(entity))
 			{
-				if (!entity.HasComponent<Collider>())
-				{
-					var collider = entity.AddComponent(new CircleCollider(64f));
-					collider.CollidesWithLayers = PhysicsLayer;
+				if (!entity.HasComponent<Collider>() && isNpc)
+					entity.AddComponent(new CircleCollider(64f));
 
-					if (isNpc)
-						collider.IsTrigger = true;
-				}
+				if (isNpc)
+					collider.IsTrigger = true;
+
+				collider = entity.GetComponent<CircleCollider>();
+				if (collider != null)
+					collider.CollidesWithLayers = PhysicsLayer;
 				//var collider = entity.GetComponent<Collider>();
 				//collider.CollidesWithLayers = PhysicsLayer;
 			}
