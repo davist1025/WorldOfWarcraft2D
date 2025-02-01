@@ -59,16 +59,24 @@ namespace WoW.Client.Scenes
                     break;
             }
 
-            raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
-            raceRenderer.RenderLayer = 5;
+            var actorSpriteAtlas = aseFile.ToSpriteAtlas();
+            var animation = actorSpriteAtlas.GetAnimation("idle_south");
+            var animator = Game1.Player.AddComponent<SpriteAnimator>();
+            animator.AddAnimationsFromAtlas(actorSpriteAtlas);
+            animator.Play("idle_south", SpriteAnimator.LoopMode.Loop);
+            animator.RenderLayer = 5;
+            // this works!!
 
-            if (thePlayer.HairId > 1)
-            {
-                var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
+            //raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+            //raceRenderer.RenderLayer = 5;
 
-                var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
-                hairRenderer.RenderLayer = 0;
-            }
+            //if (thePlayer.HairId > 1)
+            //{
+            //    var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
+
+            //    var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+            //    hairRenderer.RenderLayer = 0;
+            //}
 
             Game1.Player.AddComponent(_theController);
 
