@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.ImGuiTools;
+using Nez.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,11 @@ namespace WoW.Client.Components
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
+        private SpriteDirection _direction;
+
         private Mover _mover;
         private CircleCollider _circleCollder;
+        private SpriteAnimator _animator;
 
         private int _tickCount = 0;
         //private List<InputChangeTick> _inputRecord;
@@ -43,6 +47,7 @@ namespace WoW.Client.Components
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
             _circleCollder = Entity.AddComponent(new CircleCollider(8f));
+            _animator = Entity.GetComponent<SpriteAnimator>();
             // todo: should collider size be set by the server and transmitted?
         }
 
@@ -60,6 +65,30 @@ namespace WoW.Client.Components
                 
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
+
+                if (_movementInput.X < 0f) _direction = SpriteDirection.West;
+
+                if (_movementInput.X > 0f) _direction = SpriteDirection.East;
+
+                if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
+
+                if (_movementInput.Y < 0f) _direction = SpriteDirection.North;
+
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        _animator.Play("idle_north");
+                        break;
+                    case SpriteDirection.East:
+                        _animator.Play("idle_east");
+                        break;
+                    case SpriteDirection.South:
+                        _animator.Play("idle_south");
+                        break;
+                    case SpriteDirection.West:
+                        _animator.Play("idle_west");
+                        break;
+                }
 
                 _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref moveDirection);

@@ -60,12 +60,10 @@ namespace WoW.Client.Scenes
             }
 
             var actorSpriteAtlas = aseFile.ToSpriteAtlas();
-            var animation = actorSpriteAtlas.GetAnimation("idle_south");
             var animator = Game1.Player.AddComponent<SpriteAnimator>();
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
-            animator.Play("idle_south", SpriteAnimator.LoopMode.Loop);
+            //animator.Play("idle_south", SpriteAnimator.LoopMode.Loop);
             animator.RenderLayer = 5;
-            // this works!!
 
             //raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
             //raceRenderer.RenderLayer = 5;
