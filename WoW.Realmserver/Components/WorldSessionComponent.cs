@@ -24,7 +24,6 @@ namespace WoW.Realmserver.Components
         private Mover _mover;
 
         private Vector2 _moveDirection = Vector2.Zero;
-        public float MovementSpeed = 100f;
 
         public Queue<Vector2> InputUpdates = new Queue<Vector2>();
 
@@ -38,7 +37,7 @@ namespace WoW.Realmserver.Components
         {
             if (InputUpdates.TryDequeue(out var input))
             {
-                _moveDirection = MovementSpeed * Time.DeltaTime * input;
+                _moveDirection = Program.Configuration.WorldParameters["global_movement_speed"] * Time.DeltaTime * input;
                 _moveDirection.Round();
 
                 _mover.CalculateMovementExcluding(ref _moveDirection, Entity.Scene.FindComponentsOfType<WorldSessionComponent>().Select(x => x.Entity).ToArray(), out var res);

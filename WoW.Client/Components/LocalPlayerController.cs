@@ -57,6 +57,9 @@ namespace WoW.Client.Components
             _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
             _animator.Update();
 
+            if (!_animator.IsRunning)
+                _animator.Play("idle_south"); // avoids a null-reference exception.
+
             if (_movementInput != Vector2.Zero)
             {
                 ++_tickCount; // todo: unused client tick.

@@ -32,10 +32,6 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
-            // todo: more debug tiled code.
-            //var map = Content.LoadTiledMap("Content/Data/world1.tmx");
-
-            //CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
@@ -62,7 +58,6 @@ namespace WoW.Client.Scenes
             var actorSpriteAtlas = aseFile.ToSpriteAtlas();
             var animator = Game1.Player.AddComponent<SpriteAnimator>();
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
-            animator.Play("idle_south", SpriteAnimator.LoopMode.Loop);
             animator.RenderLayer = 5;
 
             //raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
