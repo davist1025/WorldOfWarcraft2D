@@ -82,8 +82,8 @@ namespace WoW.Client.Components
                 switch (_direction)
                 {
                     case SpriteDirection.North:
-                        if (!_animator.CurrentAnimationName.Equals("idle_north"))
-                            _animator.Play("idle_north");
+                        if (!_animator.CurrentAnimationName.Equals("run_north"))
+                            _animator.Play("run_north");
                         break;
                     case SpriteDirection.East:
                         if (!_animator.CurrentAnimationName.Equals("idle_east"))
