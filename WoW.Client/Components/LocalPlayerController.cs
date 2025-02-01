@@ -20,7 +20,7 @@ namespace WoW.Client.Components
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
-        private SpriteDirection _direction;
+        private SpriteDirection _direction = SpriteDirection.South;
 
         private Mover _mover;
         private CircleCollider _circleCollder;
@@ -48,12 +48,14 @@ namespace WoW.Client.Components
             _mover = Entity.AddComponent<Mover>();
             _circleCollder = Entity.AddComponent(new CircleCollider(8f));
             _animator = Entity.GetComponent<SpriteAnimator>();
+            _animator.Speed = 0.5f;
             // todo: should collider size be set by the server and transmitted?
         }
 
         public void Update()
         {
             _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
+            _animator.Update();
 
             if (_movementInput != Vector2.Zero)
             {
@@ -77,16 +79,20 @@ namespace WoW.Client.Components
                 switch (_direction)
                 {
                     case SpriteDirection.North:
-                        _animator.Play("idle_north");
+                        if (!_animator.CurrentAnimationName.Equals("idle_north"))
+                            _animator.Play("idle_north");
                         break;
                     case SpriteDirection.East:
-                        _animator.Play("idle_east");
+                        if (!_animator.CurrentAnimationName.Equals("idle_east"))
+                            _animator.Play("idle_east");
                         break;
                     case SpriteDirection.South:
-                        _animator.Play("idle_south");
+                        if (!_animator.CurrentAnimationName.Equals("run_south"))
+                            _animator.Play("run_south");
                         break;
                     case SpriteDirection.West:
-                        _animator.Play("idle_west");
+                        if (!_animator.CurrentAnimationName.Equals("idle_west"))
+                            _animator.Play("idle_west");
                         break;
                 }
 
@@ -97,6 +103,29 @@ namespace WoW.Client.Components
 
             if (_movementInput == Vector2.Zero && _tickCount > 0)
                 _tickCount = 0;
+
+            if (_movementInput == Vector2.Zero)
+            {
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        if (!_animator.CurrentAnimationName.Equals("idle_north"))
+                            _animator.Play("idle_north");
+                        break;
+                    case SpriteDirection.East:
+                        if (!_animator.CurrentAnimationName.Equals("idle_east"))
+                            _animator.Play("idle_east");
+                        break;
+                    case SpriteDirection.South:
+                        if (!_animator.CurrentAnimationName.Equals("idle_south"))
+                            _animator.Play("idle_south");
+                        break;
+                    case SpriteDirection.West:
+                        if (!_animator.CurrentAnimationName.Equals("idle_west"))
+                            _animator.Play("idle_west");
+                        break;
+                }
+            }
         }
 
         public override void DebugRender(Batcher batcher)
