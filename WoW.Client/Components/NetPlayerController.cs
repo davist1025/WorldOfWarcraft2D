@@ -75,9 +75,16 @@ namespace WoW.Client.Components
                 _animator.Play(startingAnimation); // avoids a null-reference exception.
             }
 
-            if (MovementDirectionQueue.TryDequeue(out Vector2 serverOut))
+            // // SEE BELOW COMMENT ON IDLE ANIMATION PLAYING //
+            // Move dequeue out of this big if statement and set a local V2 variable.
+            // if this vector is 0 next frame, play an idle animation, instead of using a 0-count check on the processing queue.
+
+            Vector2 serverInputOut = Vector2.Zero;
+            MovementDirectionQueue.TryDequeue(out serverInputOut);
+
+            if (serverInputOut != Vector2.Zero)
             {
-                Vector2 movement = new Vector2(serverOut.X, serverOut.Y);
+                Vector2 movement = new Vector2(serverInputOut.X, serverInputOut.Y);
                 var velocity = Game1.MovementSpeed * Time.DeltaTime * movement;
                 velocity.Round();
 
@@ -137,7 +144,7 @@ namespace WoW.Client.Components
 
             // todo: animation seems to stick at idle during the first few frames of movement, and i think this is why.
             // movement is processing faster than animations can be played.
-            if (MovementDirectionQueue.Count == 0)
+            if (serverInputOut == Vector2.Zero)
             {
                 switch (Direction)
                 {
