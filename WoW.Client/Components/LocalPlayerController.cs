@@ -86,16 +86,16 @@ namespace WoW.Client.Components
                             _animator.Play("run_north");
                         break;
                     case SpriteDirection.East:
-                        if (!_animator.CurrentAnimationName.Equals("idle_east"))
-                            _animator.Play("idle_east");
+                        if (!_animator.CurrentAnimationName.Equals("run_east"))
+                            _animator.Play("run_east");
                         break;
                     case SpriteDirection.South:
                         if (!_animator.CurrentAnimationName.Equals("run_south"))
                             _animator.Play("run_south");
                         break;
                     case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("idle_west"))
-                            _animator.Play("idle_west");
+                        if (!_animator.CurrentAnimationName.Equals("run_west"))
+                            _animator.Play("run_west");
                         break;
                 }
 
