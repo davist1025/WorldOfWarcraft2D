@@ -135,6 +135,8 @@ namespace WoW.Client.Components
                 _mover.ApplyMovement(velocity);
             }
 
+            // todo: animation seems to stick at idle during the first few frames of movement, and i think this is why.
+            // movement is processing faster than animations can be played.
             if (MovementDirectionQueue.Count == 0)
             {
                 switch (Direction)
@@ -184,6 +186,7 @@ namespace WoW.Client.Components
             _animator = new SpriteAnimator();
             _animator.AddAnimationsFromAtlas(actorSpriteAtlas);
             _animator.RenderLayer = 5;
+            _animator.Speed = 0.5f;
 
             //renderer = Entity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
 

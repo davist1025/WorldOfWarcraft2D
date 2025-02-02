@@ -107,6 +107,7 @@ namespace WoW.Client
                 }
                 else
                 {
+                    // todo: try setting direction here so we don't need to calculate it for the networked player?
                     var controller = netPlayer.GetComponent<NetPlayerController>();
                     controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
                 }
