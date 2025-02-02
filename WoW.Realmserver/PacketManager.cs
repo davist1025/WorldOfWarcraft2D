@@ -63,8 +63,9 @@ namespace WoW.Realmserver
                         RaceId = characterData.RaceId,
                         HairId = characterData.HairId,
                         MapId = racialSpawnMapId,
-                        XPosition = 50f,
-                        YPosition = 50f
+                        XPosition = 50f, // todo: use Tiled for position setting when creating a new char.
+                        YPosition = 50f,
+                        Direction = 3
                     };
                     ctx.Add(newCharacter);
                     ctx.SaveChanges();
@@ -155,7 +156,8 @@ namespace WoW.Realmserver
                 HairId = thisSession.Character.HairId,
                 MapId = thisSession.Character.MapId,
                 ZoneX = thisSession.Character.XPosition,
-                ZoneY = thisSession.Character.YPosition
+                ZoneY = thisSession.Character.YPosition,
+                Direction = thisSession.Character.Direction
             });
             Console.WriteLine($"{thisSession.Character.Name} is entering the world!");
 
@@ -175,7 +177,8 @@ namespace WoW.Realmserver
                 HairId = thisSession.Character.HairId,
                 MapId = thisSession.Character.MapId,
                 ZoneX = thisSession.Character.XPosition,
-                ZoneY = thisSession.Character.YPosition
+                ZoneY = thisSession.Character.YPosition,
+                Direction = thisSession.Character.Direction
             });
 
             // send all players to this player.
@@ -190,7 +193,8 @@ namespace WoW.Realmserver
                     HairId = otherSession.Character.HairId,
                     MapId = otherSession.Character.MapId,
                     ZoneX = otherSession.Entity.Position.X,
-                    ZoneY = otherSession.Entity.Position.Y
+                    ZoneY = otherSession.Entity.Position.Y,
+                    Direction = otherSession.Character.Direction
                 });
             }
 
@@ -425,7 +429,8 @@ namespace WoW.Realmserver
                         .Where(c => c.CharacterId == session.Character.CharacterId && c.AccountId == session.Account.Id)
                         .ExecuteUpdate(setters => setters
                             .SetProperty(c => c.XPosition, session.Entity.Position.X)
-                            .SetProperty(c => c.YPosition, session.Entity.Position.Y));
+                            .SetProperty(c => c.YPosition, session.Entity.Position.Y)
+                            .SetProperty(c => c.MapId, session.Character.MapId));
                         // todo: set mapid.
                     }
                 }

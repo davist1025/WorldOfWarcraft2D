@@ -33,8 +33,11 @@ namespace WoW.Client.Components
         public Vector2 LastServerPosition = Vector2.Zero;
         public string TargetWorldId = "";
 
-        public LocalPlayerController(string name)
-            => Name = name;
+        public LocalPlayerController(string name, SpriteDirection direction)
+        {
+            Name = name;
+            _direction = direction;
+        }
 
         public override void OnAddedToEntity()
         {
@@ -58,7 +61,25 @@ namespace WoW.Client.Components
             _animator.Update();
 
             if (!_animator.IsRunning)
-                _animator.Play("idle_south"); // avoids a null-reference exception.
+            {
+                string startingAnimation = "";
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        startingAnimation = "idle_north";
+                        break;
+                    case SpriteDirection.East:
+                        startingAnimation = "idle_east";
+                        break;
+                    case SpriteDirection.South:
+                        startingAnimation = "idle_south";
+                        break;
+                    case SpriteDirection.West:
+                        startingAnimation = "idle_west";
+                        break;
+                }
+                _animator.Play(startingAnimation); // avoids a null-reference exception.
+            }
 
             if (_movementInput != Vector2.Zero)
             {

@@ -44,6 +44,14 @@ namespace WoW.Realmserver.Components
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
 
+                if (input.X < 0f) Character.Direction = (int)SpriteDirection.West;
+
+                if (input.X > 0f) Character.Direction = (int)SpriteDirection.East;
+
+                if (input.Y > 0f) Character.Direction = (int)SpriteDirection.South;
+
+                if (input.Y < 0f) Character.Direction = (int)SpriteDirection.North;
+
                 Program.SendToMapFromPlayer(Entity.Name,
                     new RealmClient_NetPositionInputUpdate()
                     {
@@ -52,6 +60,7 @@ namespace WoW.Realmserver.Components
                         ResultY = Entity.Transform.Position.Y,
                         MovementX = input.X,
                         MovementY = input.Y,
+                        Direction = Character.Direction,
                         IsTeleportUpdate = false
                     }, DeliveryMethod.Unreliable);
 

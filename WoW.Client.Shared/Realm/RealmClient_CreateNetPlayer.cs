@@ -25,5 +25,6 @@ namespace WoW.Client.Shared.Realm
 
         public float ZoneX { get; set; }
         public float ZoneY { get; set; }
+        public int Direction { get; set; }
     }
 }
