@@ -10,7 +10,7 @@ namespace WoW.Realmserver.Components
 {
     public class NpcControllerComponent : Component, IUpdatable
     {
-        public RemoteNPC Metadata { get; init; }
+        public NpcMetadata Metadata { get; init; }
 
         public override void OnAddedToEntity()
         {

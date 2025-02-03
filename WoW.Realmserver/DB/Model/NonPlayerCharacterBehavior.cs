@@ -8,15 +8,8 @@ using System.Threading.Tasks;
 
 namespace WoW.Realmserver.DB.Model
 {
-    public enum NpcBehaviorType
-    {
-        Aggressive = 1,
-        Passive,
-        Scripted,
-    }
-
     [Table("npc_behavior")]
-    public class NPC_Behavior
+    public class NonPlayerCharacterBehavior
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,15 +19,10 @@ namespace WoW.Realmserver.DB.Model
         [Column("npc_id")]
         public int NpcId { get; set; }
 
-        [Column("behavior_type")]
-        public int BehaviorType { get; set; }
-
         /// <summary>
         /// The name of the script this behavior uses.
-        /// 
-        /// TODO: Currently unused, but will be used when behavior scripts are implemented. 
         /// </summary>
-        [Column("script")]
+        [Column("behavior_code_id")]
         public string? Script { get; set; }
     }
 }

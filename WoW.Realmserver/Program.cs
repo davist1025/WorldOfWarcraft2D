@@ -54,19 +54,19 @@ namespace WoW.Realmserver
             // todo: ensurecreated for testing.
             // data doesn't need to persist across test runs, and can be initialized on startup.
 
-            Console.WriteLine("Checking for script/NPC flag mismatch...");
-            using (var ctx = new RealmContext())
-            {
-                // todo: check for multiple flags which should use scripts (i.e: dialogue, merchant, etc)
-                var flagsNeedingScript = ctx.NPCs.Where(npc => ((NpcTypeFlags)npc.FlagType).HasFlag(NpcTypeFlags.CanDialogue)).ToList();
-                foreach (var npc in flagsNeedingScript)
-                {
-                    bool isMissingScript = ctx.Behaviors.Any(b => b.NpcId == npc.Id && b.Script == null);
+            //Console.WriteLine("Checking for script/NPC flag mismatch...");
+            //using (var ctx = new RealmContext())
+            //{
+            //    // todo: check for multiple flags which should use scripts (i.e: dialogue, merchant, etc)
+            //    var flagsNeedingScript = ctx.NPCs.Where(npc => ((NpcTypeFlags)npc.FlagType).HasFlag(NpcTypeFlags.CanDialogue)).ToList();
+            //    foreach (var npc in flagsNeedingScript)
+            //    {
+            //        bool isMissingScript = ctx.Behaviors.Any(b => b.NpcId == npc.Id && b.Script == null);
 
-                    if (isMissingScript)
-                        Console.WriteLine($"NPC: {npc.Name} has dialogue, but there is no script attached!");
-                }
-            }
+            //        if (isMissingScript)
+            //            Console.WriteLine($"NPC: {npc.Name} has dialogue, but there is no script attached!");
+            //    }
+            //}
 
             Console.WriteLine("Verifying default racial spawn locations...");
             using (var ctx = new RealmContext())

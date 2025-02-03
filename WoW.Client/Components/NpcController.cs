@@ -11,9 +11,9 @@ namespace WoW.Client.Components
 {
     public class NpcController : Component, IUpdatable
     {
-        public RemoteNPC Metadata;
+        public NpcMetadata Metadata;
 
-        public NpcController(RemoteNPC metadata)
+        public NpcController(NpcMetadata metadata)
             => Metadata = metadata;
 
         public override void OnAddedToEntity()

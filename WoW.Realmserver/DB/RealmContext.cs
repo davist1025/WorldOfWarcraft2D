@@ -14,7 +14,7 @@ namespace WoW.Realmserver.DB
     {
         public DbSet<PlayerCharacter> Characters { get; set; }
         public DbSet<NonPlayerCharacter> NPCs { get; set; }
-        public DbSet<NPC_Behavior> Behaviors { get; set; }
+        public DbSet<NonPlayerCharacterBehavior> Behaviors { get; set; }
 
         public DbSet<ChatCommand> Commands { get; set; }
         public DbSet<ChatCommandChild> ChildCommands { get; set; }

@@ -10,11 +10,11 @@ namespace WoW.Client.Shared.Realm
 {
     public class RealmClient_CreateNPC : INetSerializable
     {
-        public RemoteNPC Data;
+        public NpcMetadata Metadata;
 
         public void Deserialize(NetDataReader reader)
         {
-            Data = new RemoteNPC()
+            Metadata = new NpcMetadata()
             {
                 WorldId = reader.GetString(),
                 Name = reader.GetString(),
@@ -29,14 +29,14 @@ namespace WoW.Client.Shared.Realm
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Data.WorldId);
-            writer.Put(Data.Name);
-            writer.Put(Data.ModelId);
-            writer.Put(Data.Flags);
-            writer.Put(Data.Level);
-            writer.Put(Data.MapId);
-            writer.Put(Data.X);
-            writer.Put(Data.Y);
+            writer.Put(Metadata.WorldId);
+            writer.Put(Metadata.Name);
+            writer.Put(Metadata.ModelId);
+            writer.Put(Metadata.Flags);
+            writer.Put(Metadata.Level);
+            writer.Put(Metadata.MapId);
+            writer.Put(Metadata.X);
+            writer.Put(Metadata.Y);
         }
     }
 }

@@ -5,12 +5,14 @@ using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
+using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
 
@@ -52,10 +54,11 @@ namespace WoW.Realmserver.Content
                 if (ctx.NPCs.Any(npc => npc.Id == npcId))
                 {
                     NonPlayerCharacter npc = ctx.NPCs.First(npc => npc.Id == npcId);
+                    NonPlayerCharacterBehavior[] behaviors = ctx.Behaviors.Where(behavior => behavior.NpcId == npc.Id).ToArray();
                     Entity npcEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString(), session.Entity.Transform.Position);
                     npcEntity.Tag = (int)EntityType.NPC;
 
-                    RemoteNPC serializedNpc = new RemoteNPC()
+                    NpcMetadata serializedNpc = new NpcMetadata()
                     {
                         WorldId = npcEntity.Name,
                         Name = npc.Name,
@@ -78,12 +81,43 @@ namespace WoW.Realmserver.Content
                             Metadata = serializedNpc
                         });
 
+                        // TEST CODE //
+                        var behaviorComponent = npcEntity.AddComponent<BehaviorComponent>();
+
+                        // todo: look for external scripts, too!
+                        var behaviorAttributeObjects = Assembly
+                            .GetExecutingAssembly()
+                            .GetTypes()
+                            .Where(t => t.GetCustomAttribute<BehaviorAttribute>() != null)
+                            .ToArray();
+                        List<Type> validBehaviorTypes = new List<Type>();
+
+                        if (behaviorAttributeObjects.Length > 0)
+                        {
+                            for (int i = 0; i < behaviors.Length; i++)
+                            {
+                                var behavior = behaviors[i];
+                                var behaviorScriptName = behavior.Script;
+                                var behaviorTypeWithScriptName
+                                    = behaviorAttributeObjects.First(b => b.GetCustomAttribute<BehaviorAttribute>().Id.ToLower().Equals(behaviorScriptName));
+
+                                if (behaviorTypeWithScriptName != null)
+                                    validBehaviorTypes.Add(behaviorTypeWithScriptName);
+                            }
+                        }
+
+                        for (int i = 0; i < validBehaviorTypes.Count; i++)
+                        {
+                            var behaviorTypeToInit = validBehaviorTypes[i];
+                            behaviorComponent.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
+                        }
+
                         processorOfRecipient.AddCreature(npcEntity, true);
 
                         var allPlayersInProc = processorOfRecipient.Creatures.Where(creature => creature.HasComponent<WorldSessionComponent>()).ToArray();
 
                         foreach (var player in allPlayersInProc)
-                            Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Data = serializedNpc });
+                            Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
                     }
                 }
             }
@@ -190,7 +224,7 @@ namespace WoW.Realmserver.Content
                         Program.SendSerializable(characterToSummon.Entity.Name,
                             new RealmClient_CreateNPC()
                             {
-                                Data = component.Metadata
+                                Metadata = component.Metadata
                             });
                     }
                 }

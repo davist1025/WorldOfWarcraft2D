@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Shared.Data
 {
-    public class RemoteNPC
+    public class NpcMetadata
     {
         public string WorldId { get; set; }
         public string Name { get; set; }
@@ -17,5 +17,13 @@ namespace WoW.Client.Shared.Data
         public string MapId { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
+
+        public NpcTypeFlags FlagBits
+        {
+            get
+            {
+                return (NpcTypeFlags)Flags;
+            }
+        }
     }
 }

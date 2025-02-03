@@ -15,6 +15,7 @@ using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
+using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
@@ -205,7 +206,7 @@ namespace WoW.Realmserver
             {
                 var npcData = npcsOnMap[i];
                 var component = npcData.GetComponent<NpcControllerComponent>();
-                var newNpcPacket = new RealmClient_CreateNPC() { Data = component.Metadata };
+                var newNpcPacket = new RealmClient_CreateNPC() { Metadata = component.Metadata };
 
                 Program.SendSerializable(peer, newNpcPacket);
             }
@@ -344,6 +345,13 @@ namespace WoW.Realmserver
 
                 var newTarget = session.AvailableTargets[session.TargetIndex];
                 var controller = newTarget.GetComponent<NpcControllerComponent>();
+
+                if (newTarget.HasComponent<BehaviorComponent>())
+                {
+                    var behaviors = newTarget.GetComponent<BehaviorComponent>();
+                    for (int i = 0; i < behaviors.Behaviors.Count; i++)
+                        behaviors.Behaviors[i].OnTargeted(session);
+                }
 
                 Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Metadata.WorldId });
             }

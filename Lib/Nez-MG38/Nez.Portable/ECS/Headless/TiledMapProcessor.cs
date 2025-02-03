@@ -57,10 +57,11 @@ namespace Nez.ECS.Headless
 				if (!entity.HasComponent<Collider>() && isNpc)
 					entity.AddComponent(new CircleCollider(64f));
 
+				collider = entity.GetComponent<CircleCollider>();
+
 				if (isNpc)
 					collider.IsTrigger = true;
 
-				collider = entity.GetComponent<CircleCollider>();
 				if (collider != null)
 					collider.CollidesWithLayers = PhysicsLayer;
 			}

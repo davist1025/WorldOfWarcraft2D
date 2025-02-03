@@ -83,7 +83,7 @@ namespace WoW.Client
 
         public static void OnNPC(RealmClient_CreateNPC npc)
         {
-            Game1.NetworkScene.CreateNPC(npc.Data);
+            Game1.NetworkScene.CreateNPC(npc.Metadata);
         }
 
         public static void OnEnterWorld(RealmClient_EnterWorld worldParams)
