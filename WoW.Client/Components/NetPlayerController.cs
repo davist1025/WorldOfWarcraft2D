@@ -81,27 +81,6 @@ namespace WoW.Client.Components
                 var velocity = Game1.MovementSpeed * Time.DeltaTime * movement;
                 velocity.Round();
 
-                if (!_animator.IsRunning)
-                {
-                    string startingAnimation = "";
-                    switch (Direction)
-                    {
-                        case SpriteDirection.North:
-                            startingAnimation = "idle_north";
-                            break;
-                        case SpriteDirection.East:
-                            startingAnimation = "idle_east";
-                            break;
-                        case SpriteDirection.South:
-                            startingAnimation = "idle_south";
-                            break;
-                        case SpriteDirection.West:
-                            startingAnimation = "idle_west";
-                            break;
-                    }
-                    _animator.Play(startingAnimation); // avoids a null-reference exception.
-                }
-
                 if (movement.X < 0f) Direction = SpriteDirection.West;
 
                 if (movement.X > 0f) Direction = SpriteDirection.East;
