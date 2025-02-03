@@ -63,8 +63,6 @@ namespace Nez.ECS.Headless
 				collider = entity.GetComponent<CircleCollider>();
 				if (collider != null)
 					collider.CollidesWithLayers = PhysicsLayer;
-				//var collider = entity.GetComponent<Collider>();
-				//collider.CollidesWithLayers = PhysicsLayer;
 			}
 		}
 	}
