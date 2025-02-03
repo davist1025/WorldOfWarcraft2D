@@ -47,9 +47,6 @@ namespace WoW.Client.Components
             _circleCollider.SetRadius(8f);
 
             Entity.AddComponent(_animator);
-
-            //if (Entity.HasComponent<SpriteAnimator>())
-            //    _animator = Entity.GetComponent<SpriteAnimator>();
         }
 
         public void Update()
@@ -74,10 +71,6 @@ namespace WoW.Client.Components
                 }
                 _animator.Play(startingAnimation); // avoids a null-reference exception.
             }
-
-            // // SEE BELOW COMMENT ON IDLE ANIMATION PLAYING //
-            // Move dequeue out of this big if statement and set a local V2 variable.
-            // if this vector is 0 next frame, play an idle animation, instead of using a 0-count check on the processing queue.
 
             Vector2 serverInputOut = Vector2.Zero;
             MovementDirectionQueue.TryDequeue(out serverInputOut);
@@ -142,8 +135,6 @@ namespace WoW.Client.Components
                 _mover.ApplyMovement(velocity);
             }
 
-            // todo: animation seems to stick at idle during the first few frames of movement, and i think this is why.
-            // movement is processing faster than animations can be played.
             if (serverInputOut == Vector2.Zero)
             {
                 switch (Direction)
