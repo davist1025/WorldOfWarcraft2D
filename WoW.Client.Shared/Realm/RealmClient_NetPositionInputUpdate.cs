@@ -17,6 +17,7 @@ namespace WoW.Client.Shared.Realm
         public float MovementX { get; set; }
 
         public float MovementY { get; set; }
+        public int Direction { get; set; }
 
         public bool IsTeleportUpdate { get; set; }
     }

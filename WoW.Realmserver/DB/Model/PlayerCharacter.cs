@@ -40,5 +40,8 @@ namespace WoW.Realmserver.DB.Model
 
         [Column("map_id")]
         public string MapId { get; set; }
+
+        [Column("animation_direction")]
+        public int Direction { get; set; }
     }
 }

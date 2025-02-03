@@ -39,6 +39,14 @@ namespace WoW.Client.Shared
         CanDialogue = 1 << 2
     }
 
+    public enum SpriteDirection
+    {
+        North = 1,
+        East,
+        South,
+        West
+    }
+
     public static class Utils
     {
         /// <summary>

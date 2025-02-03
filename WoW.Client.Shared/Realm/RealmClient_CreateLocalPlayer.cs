@@ -17,6 +17,7 @@ namespace WoW.Client.Shared.Realm
         public int HairId { get; set; }
         public float ZoneX { get; set; }
         public float ZoneY { get; set; }
+        public int Direction { get; set; }
 
         /// <summary>
         /// Used client-side to load the given TiledMap.

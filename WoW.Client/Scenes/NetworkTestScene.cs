@@ -32,15 +32,11 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
-            // todo: more debug tiled code.
-            //var map = Content.LoadTiledMap("Content/Data/world1.tmx");
-
-            //CreateEntity("testmap").AddComponent(new TiledMapRenderer(map, "collision_layer"));
         }
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
-            _theController = new LocalPlayerController(thePlayer.Name);
+            _theController = new LocalPlayerController(thePlayer.Name, (SpriteDirection)thePlayer.Direction);
             Game1.Player = CreateEntity(thePlayer.WorldId, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
             Game1.CurrentMapId = thePlayer.MapId;
@@ -59,16 +55,21 @@ namespace WoW.Client.Scenes
                     break;
             }
 
-            raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
-            raceRenderer.RenderLayer = 5;
+            var actorSpriteAtlas = aseFile.ToSpriteAtlas();
+            var animator = Game1.Player.AddComponent<SpriteAnimator>();
+            animator.AddAnimationsFromAtlas(actorSpriteAtlas);
+            animator.RenderLayer = 5;
 
-            if (thePlayer.HairId > 1)
-            {
-                var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
+            //raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
+            //raceRenderer.RenderLayer = 5;
 
-                var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
-                hairRenderer.RenderLayer = 0;
-            }
+            //if (thePlayer.HairId > 1)
+            //{
+            //    var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
+
+            //    var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
+            //    hairRenderer.RenderLayer = 0;
+            //}
 
             Game1.Player.AddComponent(_theController);
 
@@ -93,11 +94,11 @@ namespace WoW.Client.Scenes
         {
             var netController = new NetPlayerController(theOtherPlayer);
             var theOtherEntity = CreateEntity(theOtherPlayer.WorldId, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
-
-            theOtherEntity.AddComponent(netController);
             theOtherEntity.Tag = (int)EntityType.NetPlayer;
 
             Debug.Log($"Player: {theOtherEntity.Name} ({netController.Name}) has joined the world!");
+
+            theOtherEntity.AddComponent(netController);
 
             // only create a renderer(s) if we're on the same map as them.
             if (theOtherPlayer.MapId.ToLower().Equals(Game1.CurrentMapId))

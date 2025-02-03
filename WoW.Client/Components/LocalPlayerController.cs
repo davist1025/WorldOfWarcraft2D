@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.ImGuiTools;
+using Nez.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,11 @@ namespace WoW.Client.Components
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
+        private SpriteDirection _direction = SpriteDirection.South;
+
         private Mover _mover;
         private CircleCollider _circleCollder;
+        private SpriteAnimator _animator;
 
         private int _tickCount = 0;
         //private List<InputChangeTick> _inputRecord;
@@ -29,8 +33,11 @@ namespace WoW.Client.Components
         public Vector2 LastServerPosition = Vector2.Zero;
         public string TargetWorldId = "";
 
-        public LocalPlayerController(string name)
-            => Name = name;
+        public LocalPlayerController(string name, SpriteDirection direction)
+        {
+            Name = name;
+            _direction = direction;
+        }
 
         public override void OnAddedToEntity()
         {
@@ -43,12 +50,36 @@ namespace WoW.Client.Components
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
             _circleCollder = Entity.AddComponent(new CircleCollider(8f));
+            _animator = Entity.GetComponent<SpriteAnimator>();
+            _animator.Speed = 0.5f;
             // todo: should collider size be set by the server and transmitted?
         }
 
         public void Update()
         {
             _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
+            _animator.Update();
+
+            if (!_animator.IsRunning)
+            {
+                string startingAnimation = "";
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        startingAnimation = "idle_north";
+                        break;
+                    case SpriteDirection.East:
+                        startingAnimation = "idle_east";
+                        break;
+                    case SpriteDirection.South:
+                        startingAnimation = "idle_south";
+                        break;
+                    case SpriteDirection.West:
+                        startingAnimation = "idle_west";
+                        break;
+                }
+                _animator.Play(startingAnimation); // avoids a null-reference exception.
+            }
 
             if (_movementInput != Vector2.Zero)
             {
@@ -61,6 +92,34 @@ namespace WoW.Client.Components
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
 
+                if (_movementInput.X < 0f) _direction = SpriteDirection.West;
+
+                if (_movementInput.X > 0f) _direction = SpriteDirection.East;
+
+                if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
+
+                if (_movementInput.Y < 0f) _direction = SpriteDirection.North;
+
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        if (!_animator.CurrentAnimationName.Equals("run_north"))
+                            _animator.Play("run_north");
+                        break;
+                    case SpriteDirection.East:
+                        if (!_animator.CurrentAnimationName.Equals("run_east"))
+                            _animator.Play("run_east");
+                        break;
+                    case SpriteDirection.South:
+                        if (!_animator.CurrentAnimationName.Equals("run_south"))
+                            _animator.Play("run_south");
+                        break;
+                    case SpriteDirection.West:
+                        if (!_animator.CurrentAnimationName.Equals("run_west"))
+                            _animator.Play("run_west");
+                        break;
+                }
+
                 _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref moveDirection);
                 _mover.ApplyMovement(moveDirection);
@@ -68,6 +127,29 @@ namespace WoW.Client.Components
 
             if (_movementInput == Vector2.Zero && _tickCount > 0)
                 _tickCount = 0;
+
+            if (_movementInput == Vector2.Zero)
+            {
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                        if (!_animator.CurrentAnimationName.Equals("idle_north"))
+                            _animator.Play("idle_north");
+                        break;
+                    case SpriteDirection.East:
+                        if (!_animator.CurrentAnimationName.Equals("idle_east"))
+                            _animator.Play("idle_east");
+                        break;
+                    case SpriteDirection.South:
+                        if (!_animator.CurrentAnimationName.Equals("idle_south"))
+                            _animator.Play("idle_south");
+                        break;
+                    case SpriteDirection.West:
+                        if (!_animator.CurrentAnimationName.Equals("idle_west"))
+                            _animator.Play("idle_west");
+                        break;
+                }
+            }
         }
 
         public override void DebugRender(Batcher batcher)
