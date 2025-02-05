@@ -42,6 +42,7 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                     _mover.CalculateMovement(ref movement, out CollisionResult collisionResult);
                     _mover.ApplyMovement(movement);
 
+                    // hack: temporary call to update the NPC position to clients while testing the movement code on the server
                     Program.SendToAll(new RealmClient_NetPositionInputUpdate()
                     {
                         Id = Parent.Name,
