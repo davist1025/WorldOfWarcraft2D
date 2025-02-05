@@ -23,3 +23,5 @@
 - Realmserver flag usage (IsRestricted, etc)
 - NPC flag usage (IsAggressive,)
 - Prediction and reconciliation on input updates
+- Functions that form packets in one location
+	- i,e: "PacketManager.SendChat(string message, string fromId, ???)"

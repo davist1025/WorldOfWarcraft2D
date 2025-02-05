@@ -102,12 +102,12 @@ namespace WoW.Client
             if (netPlayer != null)
             {
                 if (netUpdate.IsTeleportUpdate)
-                {
                     netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
-                }
-                else
+
+                if (netPlayer.HasComponent<NpcController>())
+                    netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
+                else if (netPlayer.HasComponent<NetPlayerController>())
                 {
-                    // todo: try setting direction here so we don't need to calculate it for the networked player?
                     var controller = netPlayer.GetComponent<NetPlayerController>();
                     controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
                 }
@@ -150,13 +150,27 @@ namespace WoW.Client
                     {
                         NetPlayerController netController = null;
                         LocalPlayerController localController = null;
+                        NpcController npcController = null;
 
-                        if ((EntityType)playerById.Tag != EntityType.LocalPlayer)
-                            netController = playerById.GetComponent<NetPlayerController>();
-                        else
-                            localController = playerById.GetComponent<LocalPlayerController>();
+                        switch (((EntityType)playerById.Tag))
+                        {
+                            case EntityType.NetPlayer:
+                                netController = playerById.GetComponent<NetPlayerController>();
+                                break;
+                            case EntityType.LocalPlayer:
+                                localController = playerById.GetComponent<LocalPlayerController>();
+                                break;
+                            case EntityType.NPC:
+                                npcController = playerById.GetComponent<NpcController>();
+                                break;
+                        }
 
-                        chatFormat = $"{((netController != null) ? netController.Name : localController.Name)} says: {chat.Message}";
+                        string senderName = 
+                            (netController != null) ? netController.Name 
+                            : (localController != null) ? localController.Name 
+                            : npcController.Entity.Name;
+
+                        chatFormat = $"{senderName} says: {chat.Message}";
                         guiController.Chat.Add(chatFormat);
                     }
                     else

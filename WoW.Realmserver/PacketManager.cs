@@ -346,12 +346,8 @@ namespace WoW.Realmserver
                 var newTarget = session.AvailableTargets[session.TargetIndex];
                 var controller = newTarget.GetComponent<NpcControllerComponent>();
 
-                if (newTarget.HasComponent<BehaviorComponent>())
-                {
-                    var behaviors = newTarget.GetComponent<BehaviorComponent>();
-                    for (int i = 0; i < behaviors.Behaviors.Count; i++)
-                        behaviors.Behaviors[i].OnTargeted(session);
-                }
+                for (int i = 0; i < controller.Behaviors.Count; i++)
+                    controller.Behaviors[i].OnTargeted(session);
 
                 Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Metadata.WorldId });
             }

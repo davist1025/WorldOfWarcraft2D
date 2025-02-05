@@ -76,13 +76,12 @@ namespace WoW.Realmserver.Content
 
                     if (processorOfRecipient != null)
                     {
-                        npcEntity.AddComponent(new NpcControllerComponent()
+                        var npcController = npcEntity.AddComponent(new NpcControllerComponent()
                         {
                             Metadata = serializedNpc
                         });
 
                         // TEST CODE //
-                        var behaviorComponent = npcEntity.AddComponent<BehaviorComponent>();
 
                         // todo: look for external scripts, too!
                         var behaviorAttributeObjects = Assembly
@@ -109,7 +108,7 @@ namespace WoW.Realmserver.Content
                         for (int i = 0; i < validBehaviorTypes.Count; i++)
                         {
                             var behaviorTypeToInit = validBehaviorTypes[i];
-                            behaviorComponent.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
+                            npcController.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
                         }
 
                         processorOfRecipient.AddCreature(npcEntity, true);
