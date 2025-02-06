@@ -3,7 +3,6 @@
 - Account email address (promotions, new releases, surveys, login)
 
 ### Realmserver
-- Character name verification (censored words/phrases, name in-use)
 - Remove Tilesets from map data
 - Proper player logout
 - NPC systems

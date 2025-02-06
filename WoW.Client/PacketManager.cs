@@ -54,8 +54,17 @@ namespace WoW.Client
         #region Characters
         public static void OnCreateCharacter(RealmClient_CreateCharacter response)
         {
-            Game1.Send(new ClientRealm_RequestCharacterList());
-            Game1.NetState = GameNetworkState.Realm;
+            switch (response.CreationResult)
+            {
+                case RealmClient_CreateCharacter.Result.NameBanned:
+                case RealmClient_CreateCharacter.Result.NameInUse:
+                    Game1.NetState = GameNetworkState.Realm_CharacterNameInvalid;
+                    break;
+                case RealmClient_CreateCharacter.Result.Success:
+                    Game1.Send(new ClientRealm_RequestCharacterList());
+                    Game1.NetState = GameNetworkState.Realm;
+                    break;
+            }
         }
 
         public static void OnCharacterList(RealmClient_PlayerCharacters characterList)

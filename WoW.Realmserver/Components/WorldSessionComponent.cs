@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Realm;
-using WoW.Realmserver.DB.Model;
+using WoW.Realmserver.DB.Model.Characters;
 using WoW.Server.Shared.Serializable;
 
 namespace WoW.Realmserver.Components

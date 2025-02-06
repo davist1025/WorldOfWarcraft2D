@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
 
-namespace WoW.Realmserver.DB.Model
+namespace WoW.Realmserver.DB.Model.Characters
 {
     /// <summary>
     /// Contains base information for a player character.

@@ -35,6 +35,7 @@ namespace WoW.Client
         Realm,
         Realm_Characters,
         Realm_CreateCharacter,
+        Realm_CharacterNameInvalid,
         LoadingWorld,
         World
     }

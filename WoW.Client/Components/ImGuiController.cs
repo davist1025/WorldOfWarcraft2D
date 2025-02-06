@@ -236,6 +236,24 @@ namespace WoW.Client.Components
 
                     ImGui.End();
                     break;
+                case GameNetworkState.Realm_CharacterNameInvalid:
+                    var dialogSize2 = new System.Numerics.Vector2(450, 50);
+
+                    ImGui.SetNextWindowPos(new System.Numerics.Vector2(Core.GraphicsDevice.Viewport.Width / 2 - (dialogSize2.X / 2), Core.GraphicsDevice.Viewport.Height / 2 - (dialogSize2.Y / 2)));
+                    ImGui.SetNextWindowSize(dialogSize2);
+
+                    ImGui.Begin("dialog", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
+
+                    ImGui.Text($"This character name is invalid. Please try again.");
+
+                    if (ImGui.Button("Ok"))
+                    {
+                        Game1.Send(new ClientRealm_RequestCharacterList());
+                        Game1.NetState = GameNetworkState.Realm;
+                    }
+
+                    ImGui.End();
+                    break;
                 case GameNetworkState.LoadingWorld:
                     ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, Game1.GraphicsDevice.Viewport.Height - 40));
                     ImGui.SetNextWindowSize(new System.Numerics.Vector2(185, 25));

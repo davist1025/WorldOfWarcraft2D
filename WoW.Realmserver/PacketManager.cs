@@ -19,6 +19,7 @@ using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
+using WoW.Realmserver.DB.Model.Characters;
 using WoW.Server.Shared;
 
 namespace WoW.Realmserver
@@ -34,11 +35,16 @@ namespace WoW.Realmserver
             using (var ctx = new RealmContext())
             {
                 bool characterExists = ctx.Characters.Any(c => c.Name.ToLower().Equals(characterData.Name));
+                bool characterNameIsRestricted = ctx.CharacterNameFilters
+                    .Any(c => c.NameOrPhrase.ToLower().Equals(characterData.Name) || characterData.Name.ToLower().StartsWith(c.NameOrPhrase.ToLower()));
 
                 RealmClient_CreateCharacter.Result creationResult = RealmClient_CreateCharacter.Result.NameInUse;
                 WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
 
-                if (!characterExists)
+                if (characterNameIsRestricted)
+                    creationResult = RealmClient_CreateCharacter.Result.NameBanned;
+
+                if (!characterExists && creationResult != RealmClient_CreateCharacter.Result.NameBanned)
                 {
                     creationResult = RealmClient_CreateCharacter.Result.Success;
                     var dbCharacters = ctx.Characters.Where(x => x.AccountId == session.Account.Id).ToList();
@@ -76,7 +82,8 @@ namespace WoW.Realmserver
 
                 Program.Send(peer, new RealmClient_CreateCharacter() { CreationResult = creationResult });
 
-                SendCharactersTo(session.Account.Id, peer);
+                if (creationResult == RealmClient_CreateCharacter.Result.Success)
+                    SendCharactersTo(session.Account.Id, peer);
             }
         }
 
@@ -435,7 +442,6 @@ namespace WoW.Realmserver
                             .SetProperty(c => c.XPosition, session.Entity.Position.X)
                             .SetProperty(c => c.YPosition, session.Entity.Position.Y)
                             .SetProperty(c => c.MapId, session.Character.MapId));
-                        // todo: set mapid.
                     }
                 }
 

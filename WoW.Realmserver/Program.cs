@@ -16,6 +16,7 @@ using WoW.Realmserver.Components;
 using WoW.Realmserver.Content;
 using WoW.Realmserver.DB;
 using WoW.Realmserver.DB.Model;
+using WoW.Realmserver.DB.Model.Characters;
 using WoW.Server.Shared;
 
 namespace WoW.Realmserver

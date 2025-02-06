@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Realmserver.DB.Model;
+using WoW.Realmserver.DB.Model.Characters;
 using WoW.Realmserver.DB.Model.Chat;
 
 namespace WoW.Realmserver.DB
@@ -13,6 +14,8 @@ namespace WoW.Realmserver.DB
     internal class RealmContext : DbContext
     {
         public DbSet<PlayerCharacter> Characters { get; set; }
+        public DbSet<FilteredCharacterName> CharacterNameFilters { get; set; }
+
         public DbSet<NonPlayerCharacter> NPCs { get; set; }
         public DbSet<NonPlayerCharacterBehavior> Behaviors { get; set; }
 

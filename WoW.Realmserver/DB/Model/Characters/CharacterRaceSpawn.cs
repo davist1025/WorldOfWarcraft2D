@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver.DB.Model
+namespace WoW.Realmserver.DB.Model.Characters
 {
     [Table("character_race_spawn")]
     public class CharacterRaceSpawn

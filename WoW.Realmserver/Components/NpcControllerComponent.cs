@@ -14,13 +14,6 @@ namespace WoW.Realmserver.Components
         public NpcMetadata Metadata { get; init; }
         public List<IBehavior> Behaviors = new List<IBehavior>();
 
-        public override void OnAddedToEntity()
-        {
-            // todo: add Mover to NPC.
-            //var trigger = Entity.AddComponent(new CircleCollider(64f));
-            //trigger.IsTrigger = true;
-        }
-
         public void Update()
         {
             var updateableBehaviors = Behaviors.FindAll(b => b.GetType().IsAssignableTo(typeof(IUpdateableBehavior))).ToArray();

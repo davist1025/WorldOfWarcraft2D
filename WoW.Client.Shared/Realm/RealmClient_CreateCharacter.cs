@@ -17,6 +17,7 @@ namespace WoW.Client.Shared.Realm
         {
             Success = 0,
             NameInUse,
+            NameBanned,
         }
 
         public Result CreationResult { get; set; }
