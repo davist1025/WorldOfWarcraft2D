@@ -424,7 +424,7 @@ namespace WoW.Realmserver
             {
                 var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSessionComponent>();
-                Console.WriteLine($"Account ID: {session.Account.Id} is disconnecting...");
+                Console.WriteLine($"Account w/ ID '{session.Account.Id}' is disconnecting...");
 
                 Program.SendToAuthserver(new RealmAuth_Disconnection() { AccountId = session.Account.Id });
 
@@ -441,7 +441,8 @@ namespace WoW.Realmserver
                         .ExecuteUpdate(setters => setters
                             .SetProperty(c => c.XPosition, session.Entity.Position.X)
                             .SetProperty(c => c.YPosition, session.Entity.Position.Y)
-                            .SetProperty(c => c.MapId, session.Character.MapId));
+                            .SetProperty(c => c.MapId, session.Character.MapId)
+                            .SetProperty(c => c.Direction, session.Character.Direction));
                     }
                 }
 

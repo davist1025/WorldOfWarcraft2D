@@ -16,7 +16,7 @@ namespace WoW.Realmserver.Components.Behavior
         public Entity Parent;
 
         /// <summary>
-        /// Invoked after this behavior is added to an NPCs' <see cref="NpcControllerComponent"/>.
+        /// Invoked after this behavior is added to an NPCs' <see cref="NpcControllerComponent.Behaviors"/>.
         /// </summary>
         public virtual void OnLoad() { }
 
