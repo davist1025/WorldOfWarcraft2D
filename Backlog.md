@@ -1,6 +1,5 @@
 ### Authserver
 - Account ban/suspensions (time expiration, status, action)
-- Account email address (promotions, new releases, surveys, login)
 
 ### Realmserver
 - Proper player logout

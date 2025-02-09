@@ -77,6 +77,8 @@ Use at your own risk.
 
 [Damage/DPS](https://vanilla-wow-archive.fandom.com/wiki/Damage_per_second)
 
+[The WoW Chat System](https://wowwiki-archive.fandom.com/wiki/Chat)
+
 ## Credits
 - [16x16 tileset for testing](https://wildlifestudios.itch.io/free-16x16-tileset-pixel-art) 
 
