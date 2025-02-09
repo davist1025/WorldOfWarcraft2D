@@ -3,7 +3,6 @@
 - Account email address (promotions, new releases, surveys, login)
 
 ### Realmserver
-- Remove Tilesets from map data
 - Proper player logout
 - NPC systems
 	- Targeting players
