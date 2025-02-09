@@ -76,13 +76,16 @@ namespace Nez.Tiled
 			map.MaxTileWidth = map.TileWidth;
 			map.MaxTileHeight = map.TileHeight;
 
-			map.Tilesets = new TmxList<TmxTileset>();
-			foreach (var e in xMap.Elements("tileset"))
+			if (!TiledMapLoader.IsHeadless)
 			{
-				var tileset = ParseTmxTileset(map, e, map.TmxDirectory);
-				map.Tilesets.Add(tileset);
+				map.Tilesets = new TmxList<TmxTileset>();
+				foreach (var e in xMap.Elements("tileset"))
+				{
+					var tileset = ParseTmxTileset(map, e, map.TmxDirectory);
+					map.Tilesets.Add(tileset);
 
-				UpdateMaxTileSizes(tileset);
+					UpdateMaxTileSizes(tileset);
+				}
 			}
 
 			map.Layers = new TmxList<ITmxLayer>();
@@ -277,7 +280,7 @@ namespace Nez.Tiled
 		{
 			foreach (var e in xEle.Elements().Where(x => x.Name == "layer" || x.Name == "objectgroup" || x.Name == "imagelayer" || x.Name == "group"))
 			{
-				ITmxLayer layer;
+				ITmxLayer layer = default(ITmxLayer);
 				switch (e.Name.LocalName)
 				{
 					case "layer":
@@ -299,13 +302,14 @@ namespace Nez.Tiled
 							gg.ObjectGroups.Add(objectgroup);
 						break;
 					case "imagelayer":
-						var imagelayer = new TmxImageLayer().LoadTmxImageLayer(map, e, tmxDirectory);
-						layer = imagelayer;
+						// hack: REMOVE IMAGE LAYER.
+						//var imagelayer = new TmxImageLayer().LoadTmxImageLayer(map, e, tmxDirectory);
+						//layer = imagelayer;
 
-						if (container is TmxMap mmm)
-							mmm.ImageLayers.Add(imagelayer);
-						else if (container is TmxGroup ggg)
-							ggg.ImageLayers.Add(imagelayer);
+						//if (container is TmxMap mmm)
+						//	mmm.ImageLayers.Add(imagelayer);
+						//else if (container is TmxGroup ggg)
+						//	ggg.ImageLayers.Add(imagelayer);
 						break;
 					case "group":
 						var newGroup = new TmxGroup().LoadTmxGroup(map, e, width, height, tmxDirectory);
@@ -320,7 +324,8 @@ namespace Nez.Tiled
 						throw new InvalidOperationException();
 				}
 
-				if (container is TmxMap mmmmm)
+				if (container is TmxMap mmmmm 
+					&& layer != default(ITmxLayer))
 					mmmmm.Layers.Add(layer);
 				else if (container is TmxGroup g)
 					g.Layers.Add(layer);
