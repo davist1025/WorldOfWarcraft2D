@@ -29,6 +29,9 @@ namespace WoW.Authserver.DB.Model
         [Column("password_hash", TypeName = "varchar(128)")]
         public string HashedPassword { get; set; }
 
+        [Column("email", TypeName = "varchar(50)")]
+        public string? Email { get; set; }
+
         [Column("session_id", TypeName = "varchar(32)")]
         public string? SessionId { get; set; }
 
