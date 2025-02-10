@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,13 @@ namespace WoW.Client.Shared
         West
     }
 
+    public enum ChatChannelType
+    {
+        Say,
+        Whisper,
+        Yell
+    }
+
     public static class Utils
     {
         /// <summary>
@@ -66,5 +74,11 @@ namespace WoW.Client.Shared
 
             return shaHash;
         }
+
+        public static Dictionary<ChatChannelType, Vector4> ChatChannelColors = new Dictionary<ChatChannelType, Vector4>()
+        {
+            { ChatChannelType.Say, new Vector4(255f, 255f, 255f, 1f) },
+            { ChatChannelType.Whisper, new Vector4(116f, 0f, 194f, 1f) }
+        };
     }
 }

@@ -19,6 +19,7 @@ namespace WoW.Client.Components
     public class ImGuiController : Component, IUpdatable
     {
         private string _chatInput = "";
+        private bool _shouldCleatChatInput = false;
         private string _accountNameInput = "";
         private string _accountPasswordInput = "";
 
@@ -275,8 +276,8 @@ namespace WoW.Client.Components
 
                         if (ImGui.Begin("information", infoWindowFlags))
                         {
-                            ImGui.Text($"Position: {controller.Entity.Transform.Position.ToString()}");
-                            ImGui.Text($"Server Position: {controller.LastServerPosition}");
+                            ImGui.Text($"{controller.Name}");
+                            ImGui.Text($"{Game1.SessionId}");
 
                             ImGui.End();
                         }
@@ -301,12 +302,50 @@ namespace WoW.Client.Components
 
                     ImGui.Separator();
 
-                    if (ImGui.InputText("Input", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
+                    //ImGui.PushStyleColor(ImGuiCol.Text, WoW.Client.Shared.Utils.ChatChannelColors[_chatChannel]);
+                    //ImGui.Text($"{_chatChannel.ToString()}");
+                    //ImGui.SameLine();
+                    //ImGui.PopStyleColor();
+
+                    //var channels = Enum.GetNames<ChatChannelType>().ToArray();
+
+                    //ImGui.SetNextItemWidth(125);
+                    //int ch = -1;
+                    //ImGui.Combo("", ref ch, channels, channels.Length);
+
+                    //ImGui.SameLine();
+
+                    /**
+                     * Chat channel selection issue:
+                     * 
+                     * A number of implementations wont work because of how ImGui functions (clearing input when we /channel), and some weird combobox issue.
+                     * 
+                     * For now, we will just perform the full input for the channel since ImGui is separate from actual UI.
+                     * For example, to chat in a channel other than Say, type "/channel text".
+                     * 
+                     * i.e: /whisper [name] [message]; /1 [message]; /group [message]
+                     * 
+                     * Text received from the server will be formatted to contain a name, color and the text.
+                     * 
+                     */ 
+                    if (ImGui.InputText("", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
                     {
-                        if (_chatInput.StartsWith("/"))
+                        if (_chatInput.StartsWith("/") && _chatInput.Contains(" "))
                         {
                             var rawInput = _chatInput.Substring(1);
                             var splitInput = rawInput.Split(' ');
+                            var channelName = splitInput[0].ToLower();
+                            var channels = Enum.GetNames<ChatChannelType>().ToArray();
+                            ChatChannelType usingChannel = ChatChannelType.Say;
+
+                            for (int i = 0; i < channels.Length; i++)
+                            {
+                                if (channels[i].ToLower().Equals(channelName))
+                                    usingChannel = (ChatChannelType)i;
+
+                            }
+
+                            Debug.Log(usingChannel);
 
                             if (splitInput[0].ToLower().Equals("whisper"))
                             {
@@ -334,6 +373,30 @@ namespace WoW.Client.Components
                         }
                         _chatInput = "";
                     }
+
+                    // todo: unable to modify the text of an active input widget.
+                    // see: https://github.com/ocornut/imgui/issues/5054
+
+                    //if (_chatInput.StartsWith("/"))
+                    //{
+                    //    if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Space) && _chatInput.Contains(" "))
+                    //    {
+                    //        var split = _chatInput.Split('/');
+                    //        var channelType = split[1].Trim(); // ??
+
+                    //        if (channelType.ToLower().Equals("say"))
+                    //        {
+                    //            _chatChannel = ChatChannelType.Say;
+                    //            _shouldCleatChatInput = true;
+                    //        }
+                    //    }
+                    //}
+
+                    //if (_shouldCleatChatInput)
+                    //{
+                    //    _shouldCleatChatInput = false;
+                    //    _chatInput = "";
+                    //}
 
                     ImGui.End();
 

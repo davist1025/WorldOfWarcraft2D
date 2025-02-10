@@ -79,6 +79,8 @@ Use at your own risk.
 
 [The WoW Chat System](https://wowwiki-archive.fandom.com/wiki/Chat)
 
+[Language](https://wowpedia.fandom.com/wiki/Language)
+
 ## Credits
 - [16x16 tileset for testing](https://wildlifestudios.itch.io/free-16x16-tileset-pixel-art) 
 
