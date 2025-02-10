@@ -52,6 +52,9 @@
     <None Update="Content\Data\valley_of_trials.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Data\window_ninepatch_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Data\world1.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

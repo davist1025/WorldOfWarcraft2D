@@ -12,7 +12,12 @@ namespace WoW.Client.Scenes
     {
         public override void Initialize()
         {
+            AddRenderer(new RenderLayerRenderer(0, 50));
+            AddRenderer(new ScreenSpaceRenderer(1, 100));
+
             CreateEntity("gui").AddComponent<ImGuiController>();
+
+            //CreateEntity("ui").AddComponent<TestUIRendererComponent>();
         }
     }
 }

@@ -111,7 +111,9 @@ namespace Nez.Tiled
 
 			// Save GID remainder to int
 			Gid = (int)rawGid;
-			Tileset = map.GetTilesetForTileGid(Gid);
+
+			if (!TiledMapLoader.IsHeadless)
+				Tileset = map.GetTilesetForTileGid(Gid);
 		}
 	}
 
