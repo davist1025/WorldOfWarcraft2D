@@ -137,12 +137,11 @@ namespace WoW.Realmserver.Content
                     fullMsg += $"{part} ";
             }
 
-            RealmClient_Chat serverMessage = new RealmClient_Chat()
-            {
-                FromWorldId = "server",
-                Message = fullMsg
-            };
-            Program.SendToAll(serverMessage);
+            // todo: re-implement server messages!
+            //RealmClient_Chat serverMessage = new RealmClient_Chat();
+            //serverMessage.Channel = ChatChannelType.Server;
+
+            //Program.SendToAll(serverMessage);
         }
 
         /// <summary>

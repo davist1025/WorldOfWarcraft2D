@@ -55,6 +55,12 @@ namespace WoW.Client.Shared
         Yell
     }
 
+    public enum ChatMessageParameter
+    {
+        WhisperToName,
+        FromId,
+    }
+
     public static class Utils
     {
         /// <summary>

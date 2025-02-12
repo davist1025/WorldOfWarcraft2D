@@ -26,6 +26,7 @@ namespace WoW.Client.Components
         private string _newCharacterNameInput = "";
         private int _newCharacterRaceId = 1;
         private int _newCharacterHairId = 1;
+        private int _ch = -1;
 
         private int _characterSelectIndex = -1;
 
@@ -311,7 +312,7 @@ namespace WoW.Client.Components
 
                     //ImGui.SetNextItemWidth(125);
                     //int ch = -1;
-                    //ImGui.Combo("", ref ch, channels, channels.Length);
+                    //ImGui.Combo("", ref _ch, channels, channels.Length);
 
                     //ImGui.SameLine();
 
@@ -327,50 +328,61 @@ namespace WoW.Client.Components
                      * 
                      * Text received from the server will be formatted to contain a name, color and the text.
                      * 
-                     */ 
+                     */
                     if (ImGui.InputText("", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
                     {
+                        string message = "";
+                        ClientRealm_Chat newChat = new ClientRealm_Chat();
+                        ChatChannelType usingChannel = ChatChannelType.Say;
+
                         if (_chatInput.StartsWith("/") && _chatInput.Contains(" "))
                         {
                             var rawInput = _chatInput.Substring(1);
                             var splitInput = rawInput.Split(' ');
                             var channelName = splitInput[0].ToLower();
-                            var channels = Enum.GetNames<ChatChannelType>().ToArray();
-                            ChatChannelType usingChannel = ChatChannelType.Say;
+                            var channelTypes = Enum.GetNames<ChatChannelType>().ToArray();
 
-                            for (int i = 0; i < channels.Length; i++)
+                            for (int i = 0; i < channelTypes.Length; i++)
                             {
-                                if (channels[i].ToLower().Equals(channelName))
+                                if (channelTypes[i].ToLower().Equals(channelName))
                                     usingChannel = (ChatChannelType)i;
-
                             }
 
-                            Debug.Log(usingChannel);
+                            /** 2/11 - Chat revamp notes
+                             * 
+                             * Data that needs to be sent, no matter the channel:
+                             * 
+                             * - Channel type
+                             * - Message from input
+                             * - Optional argument data (whisper name, etc)
+                             * 
+                             */
 
-                            if (splitInput[0].ToLower().Equals("whisper"))
+                            newChat.Channel = usingChannel;
+
+                            switch (usingChannel)
                             {
-                                string message = "";
-                                for (int i = 2; i < splitInput.Length; i++)
-                                {
-                                    if (i == splitInput.Length - 1)
-                                        message += $"{splitInput[i]}";
-                                    else
-                                        message += $"{splitInput[i]} ";
-                                }
+                                case ChatChannelType.Say:
+                                    for (int i = 2; i < splitInput.Length; i++)
+                                        message += (i == splitInput.Length - 1) ? $"{splitInput[i]}" : $"{splitInput[i]} ";
 
-                                ClientRealm_Chat newChatWhisper = new ClientRealm_Chat()
-                                {
-                                    IsWhisper = true,
-                                    Message = message,
-                                    Name = splitInput[1]
-                                };
-                                Game1.Send(newChatWhisper);
+                                    newChat.Message = message;
+                                    break;
+                                case ChatChannelType.Whisper:
+                                    for (int i = 3; i < splitInput.Length; i++)
+                                        message += (i == splitInput.Length - 1) ? $"{splitInput[i]}" : $"{splitInput[i]} ";
+
+                                    newChat.AddParameter(ChatMessageParameter.WhisperToName, splitInput[2]);
+                                    newChat.Message = message;
+                                    break;
                             }
                         }
                         else
-                        {
-                            Game1.Send(new ClientRealm_Chat() { Message = _chatInput });
-                        }
+                            newChat.Message = _chatInput;
+
+                        // hack: Default channel type is /say.
+
+                        Game1.SendSerializable(newChat);
                         _chatInput = "";
                     }
 

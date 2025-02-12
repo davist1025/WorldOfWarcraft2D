@@ -125,68 +125,69 @@ namespace WoW.Client
 
         public static void OnChat(RealmClient_Chat chat)
         {
-            var guiEntity = Game1.NetworkScene.FindEntity("gui");
-            if (guiEntity == null)
-            {
-                Debug.Error("Client GUI entity is null!");
-                return;
-            }
+            // todo: on chat received!
+            //var guiEntity = Game1.NetworkScene.FindEntity("gui");
+            //if (guiEntity == null)
+            //{
+            //    Debug.Error("Client GUI entity is null!");
+            //    return;
+            //}
 
-            string chatFormat = "";
-            var guiController = guiEntity.GetComponent<ImGuiController>();
+            //string chatFormat = "";
+            //var guiController = guiEntity.GetComponent<ImGuiController>();
 
-            if (chat.IsWhisper) // mostly for formatting purposes.
-            {
-                var fromEntity = Core.Scene.FindEntity(chat.FromWorldId);
-                var controller = fromEntity.GetComponent<NetPlayerController>();
+            //if (chat.IsWhisper) // mostly for formatting purposes.
+            //{
+            //    var fromEntity = Core.Scene.FindEntity(chat.FromWorldId);
+            //    var controller = fromEntity.GetComponent<NetPlayerController>();
 
-                chatFormat = $"{controller.Name} says: {chat.Message}";
-                guiController.Chat.Add(chatFormat);
-            }
+            //    chatFormat = $"{controller.Name} says: {chat.Message}";
+            //    guiController.Chat.Add(chatFormat);
+            //}
 
-            if (!chat.IsWhisper)
-            {
-                if (chat.FromWorldId.ToLower().Equals("server"))
-                {
-                    chatFormat = $"SERVER: {chat.Message}";
-                    guiController.Chat.Add(chatFormat);
-                }
-                else
-                {
-                    Entity playerById = Game1.NetworkScene.FindEntity(chat.FromWorldId);
+            //if (!chat.IsWhisper)
+            //{
+            //    if (chat.FromWorldId.ToLower().Equals("server"))
+            //    {
+            //        chatFormat = $"SERVER: {chat.Message}";
+            //        guiController.Chat.Add(chatFormat);
+            //    }
+            //    else
+            //    {
+            //        Entity playerById = Game1.NetworkScene.FindEntity(chat.FromWorldId);
 
-                    if (playerById != null)
-                    {
-                        NetPlayerController netController = null;
-                        LocalPlayerController localController = null;
-                        NpcController npcController = null;
+            //        if (playerById != null)
+            //        {
+            //            NetPlayerController netController = null;
+            //            LocalPlayerController localController = null;
+            //            NpcController npcController = null;
 
-                        switch (((EntityType)playerById.Tag))
-                        {
-                            case EntityType.NetPlayer:
-                                netController = playerById.GetComponent<NetPlayerController>();
-                                break;
-                            case EntityType.LocalPlayer:
-                                localController = playerById.GetComponent<LocalPlayerController>();
-                                break;
-                            case EntityType.NPC:
-                                npcController = playerById.GetComponent<NpcController>();
-                                break;
-                        }
+            //            switch (((EntityType)playerById.Tag))
+            //            {
+            //                case EntityType.NetPlayer:
+            //                    netController = playerById.GetComponent<NetPlayerController>();
+            //                    break;
+            //                case EntityType.LocalPlayer:
+            //                    localController = playerById.GetComponent<LocalPlayerController>();
+            //                    break;
+            //                case EntityType.NPC:
+            //                    npcController = playerById.GetComponent<NpcController>();
+            //                    break;
+            //            }
 
-                        string senderName = 
-                            (netController != null) ? netController.Name 
-                            : (localController != null) ? localController.Name 
-                            : npcController.Entity.Name;
+            //            string senderName = 
+            //                (netController != null) ? netController.Name 
+            //                : (localController != null) ? localController.Name 
+            //                : npcController.Entity.Name;
 
-                        chatFormat = $"{senderName} says: {chat.Message}";
-                        guiController.Chat.Add(chatFormat);
-                    }
-                    else
-                        guiController.Chat.Add($"{chat.FromWorldId} cannot be found.");
-                }
+            //            chatFormat = $"{senderName} says: {chat.Message}";
+            //            guiController.Chat.Add(chatFormat);
+            //        }
+            //        else
+            //            guiController.Chat.Add($"{chat.FromWorldId} cannot be found.");
+            //    }
                 
-            }
+            //}
         }
 
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)

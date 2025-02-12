@@ -104,7 +104,7 @@ namespace WoW.Realmserver
 
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) => PacketManager.OnPlayerMove(movement, peer));
             
-            _netProcessor.SubscribeReusable<ClientRealm_Chat, NetPeer>((chat, peer) => PacketManager.OnPlayerChat(chat, peer));
+            _netProcessor.SubscribeNetSerializable<ClientRealm_Chat, NetPeer>((chat, peer) => PacketManager.OnPlayerChat(chat, peer));
 
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) => PacketManager.OnPlayerTransferToRealm(transfer, peer));
 
