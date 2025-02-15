@@ -13,6 +13,7 @@ using WoW.Client.Scenes;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 
 namespace WoW.Client
@@ -123,71 +124,25 @@ namespace WoW.Client
             }
         }
 
-        public static void OnChat(RealmClient_Chat chat)
+        public static void OnChat(ChatMessage newChat) 
         {
-            // todo: on chat received!
-            //var guiEntity = Game1.NetworkScene.FindEntity("gui");
-            //if (guiEntity == null)
-            //{
-            //    Debug.Error("Client GUI entity is null!");
-            //    return;
-            //}
+            //var from = (string.IsNullOrEmpty(newChat.FromId)) ? "(server)" : newChat.FromId;
+            //Debug.Log($"{newChat.Message} - {newChat.Flags}");
 
-            //string chatFormat = "";
-            //var guiController = guiEntity.GetComponent<ImGuiController>();
+            var guiController = Game1.Scene.FindEntity("gui").GetComponent<ImGuiController>();
 
-            //if (chat.IsWhisper) // mostly for formatting purposes.
-            //{
-            //    var fromEntity = Core.Scene.FindEntity(chat.FromWorldId);
-            //    var controller = fromEntity.GetComponent<NetPlayerController>();
+            var newChatStorage = new ChatMessage()
+            {
+                Message = newChat.Message,
+                Flags = newChat.Flags
+            };
 
-            //    chatFormat = $"{controller.Name} says: {chat.Message}";
-            //    guiController.Chat.Add(chatFormat);
-            //}
+            Debug.Log($"Flags: {newChatStorage.Flags.ToString()}");
 
-            //if (!chat.IsWhisper)
-            //{
-            //    if (chat.FromWorldId.ToLower().Equals("server"))
-            //    {
-            //        chatFormat = $"SERVER: {chat.Message}";
-            //        guiController.Chat.Add(chatFormat);
-            //    }
-            //    else
-            //    {
-            //        Entity playerById = Game1.NetworkScene.FindEntity(chat.FromWorldId);
+            if (newChat.Flags.HasFlag(ChatMessageFlag.IsGM))
+                Debug.Log("GM is talking!");
 
-            //        if (playerById != null)
-            //        {
-            //            NetPlayerController netController = null;
-            //            LocalPlayerController localController = null;
-            //            NpcController npcController = null;
-
-            //            switch (((EntityType)playerById.Tag))
-            //            {
-            //                case EntityType.NetPlayer:
-            //                    netController = playerById.GetComponent<NetPlayerController>();
-            //                    break;
-            //                case EntityType.LocalPlayer:
-            //                    localController = playerById.GetComponent<LocalPlayerController>();
-            //                    break;
-            //                case EntityType.NPC:
-            //                    npcController = playerById.GetComponent<NpcController>();
-            //                    break;
-            //            }
-
-            //            string senderName = 
-            //                (netController != null) ? netController.Name 
-            //                : (localController != null) ? localController.Name 
-            //                : npcController.Entity.Name;
-
-            //            chatFormat = $"{senderName} says: {chat.Message}";
-            //            guiController.Chat.Add(chatFormat);
-            //        }
-            //        else
-            //            guiController.Chat.Add($"{chat.FromWorldId} cannot be found.");
-            //    }
-                
-            //}
+            guiController.ChatHistory.Add(newChatStorage);
         }
 
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)

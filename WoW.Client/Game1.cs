@@ -95,8 +95,6 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
-            _netProcessor.SubscribeNetSerializable<RealmClient_Chat>((newChat) => PacketManager.OnChat(newChat));
-
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
 
             _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) => PacketManager.OnLogonResponse(logonCode));
@@ -129,6 +127,8 @@ namespace WoW.Client
             _netProcessor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
 
             _netProcessor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
+
+            _netProcessor.SubscribeReusable<ChatMessage>((newChat) => PacketManager.OnChat(newChat));
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
@@ -186,7 +186,7 @@ namespace WoW.Client
         public static void Send<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
             => _netProcessor.Send(ClientNetwork, packet, delivery);
 
-        public static void SendSerializable<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable, new()
+        public static void SendSerializable<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
         {
             _netProcessor.SendNetSerializable(ClientNetwork, packet, delivery);
         }

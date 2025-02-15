@@ -104,8 +104,6 @@ namespace WoW.Realmserver
 
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) => PacketManager.OnPlayerMove(movement, peer));
             
-            _netProcessor.SubscribeNetSerializable<ClientRealm_Chat, NetPeer>((chat, peer) => PacketManager.OnPlayerChat(chat, peer));
-
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) => PacketManager.OnPlayerTransferToRealm(transfer, peer));
 
             _netProcessor.SubscribeNetSerializable<AuthRealm_SessionVerification, NetPeer>((session, peer) => PacketManager.OnAuthSessionVerification(session, peer));
@@ -122,6 +120,8 @@ namespace WoW.Realmserver
             _netProcessor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) => PacketManager.OnPlayerRequestCharacters(req, peer));
 
             _netProcessor.SubscribeReusable<ClientRealm_TabTarget, NetPeer>((req, peer) => PacketManager.OnTabTargetRequest(peer));
+
+            _netProcessor.SubscribeReusable<ChatMessage, NetPeer>((newChat, peer) => PacketManager.OnPlayerChat(newChat, peer));
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 

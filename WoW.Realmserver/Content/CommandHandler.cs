@@ -81,8 +81,6 @@ namespace WoW.Realmserver.Content
                             Metadata = serializedNpc
                         });
 
-                        // TEST CODE //
-
                         // todo: look for external scripts, too!
                         var behaviorAttributeObjects = Assembly
                             .GetExecutingAssembly()

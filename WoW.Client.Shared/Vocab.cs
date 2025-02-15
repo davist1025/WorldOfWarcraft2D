@@ -55,10 +55,12 @@ namespace WoW.Client.Shared
         Yell
     }
 
-    public enum ChatMessageParameter
+    public enum ChatMessageFlag
     {
-        WhisperToName,
-        FromId,
+        IsServerMessage = 1 << 0,
+        IsWhisper = 1 << 1,
+        IsGM = 1 << 2,
+        IsLocal = 1 << 3,
     }
 
     public static class Utils

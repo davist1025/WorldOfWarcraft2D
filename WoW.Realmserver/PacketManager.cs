@@ -244,183 +244,31 @@ namespace WoW.Realmserver
         /// </summary>
         /// <param name="chat"></param>
         /// <param name="peer"></param>
-        public static void OnPlayerChat(ClientRealm_Chat chat, NetPeer peer)
+        public static void OnPlayerChat(ChatMessage newChat, NetPeer peer)
         {
-            // verify the message; check for invalid characters; check for command usage.
-            var entity = peer.Tag as Entity;
-            var session = entity.GetComponent<WorldSessionComponent>();
-            RealmClient_Chat newChat = new RealmClient_Chat();
+            WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
 
-            //if (chat.IsWhisper)
-            //{
-            //    string characterName = chat.Name;
-            //    string message = chat.Message;
+            // todo: [ ] parse out "." commands.
+            // todo: [ ] parse slash commands.
+            // todo: [x] send chat to all players.
 
-            //    var networkPlayers = Program.Scene.FindEntitiesWithTag((int)EntityType.NetPlayer);
-            //    for (int i = 0; i <  networkPlayers.Count; i++)
-            //    {
-            //        var netPlayer = networkPlayers[i];
-            //        var sessionComp = netPlayer.GetComponent<WorldSessionComponent>();
+            string formattedMessage = newChat.Message;
+            formattedMessage = $"{session.Character.Name} says: {formattedMessage}";
 
-            //        if (sessionComp.Character.Name.ToLower().Equals(characterName.ToLower()))
-            //        {
-            //            RealmClient_Chat newWhisper = new RealmClient_Chat()
-            //            {
-            //                IsWhisper = true,
-            //                FromWorldId = entity.Name,
-            //                Message = message
-            //            };
-            //            Program.SendTo(netPlayer.Name, newWhisper);
-            //        }
-            //    }
-            //}
+            ChatMessageFlag flags = ChatMessageFlag.IsLocal;
 
-            if (chat.Channel == ChatChannelType.Whisper)
+            if (session.Account.Security <= Vocab.SecurityLevel.Gamemaster)
             {
-                string playerName = chat.Parameters[ChatMessageParameter.WhisperToName];
-                string message = chat.Message;
-
-                var networkedPlayers = Program.Scene
-                    .FindEntitiesWithTag((int)EntityType.NetPlayer)
-                    .Where(x => !x.Name.ToLower().Equals(entity.Name))
-                    .ToArray();
-
-                for (int i = 0; i < networkedPlayers.Length; i++)
-                {
-                    var netPlayer = networkedPlayers[i];
-                    var netSession = netPlayer.GetComponent<WorldSessionComponent>();
-
-                    if (netSession.Character.Name.ToLower().Equals(playerName))
-                    {
-                        Console.WriteLine($"{session.Character.Name} is whispering: {netSession.Character.Name}");
-
-                        newChat.Channel = chat.Channel;
-                        newChat.Message = chat.Message;
-                        newChat.AddParameter(ChatMessageParameter.FromId, entity.Name);
-                        Program.SendTo(netPlayer.Name, newChat);
-                        // todo: send whisper from this player, to playerName.
-                    }
-                }
+                formattedMessage = $"<GM> {formattedMessage}";
+                flags |= ChatMessageFlag.IsGM;
             }
 
-            if (chat.Channel == ChatChannelType.Say)
+            var chatPacket = new ChatMessage()
             {
-                Console.WriteLine($"{session.Character.Name} has a local message: {chat.Message}");
-
-                if (chat.Message.StartsWith("."))
-                {
-                    Console.WriteLine($"{session.Character.Name} has a command to process: {chat.Message}");
-
-                    var commandText = chat.Message.Substring(1);
-
-                    using (var ctx = new RealmContext())
-                    {
-                        if (commandText.Contains(" "))
-                        {
-                            var commandParts = commandText.Split(" ");
-                            var commandName = commandParts[0];
-
-                            ChatCommand dbCommand = ctx.Commands.First(comand => comand.Name.ToLower().Equals(commandName.ToLower()));
-
-                            if  (dbCommand != null && dbCommand.Security >= (int)session.Account.Security)
-                            {
-                                if (string.IsNullOrEmpty(dbCommand.HandlerId))
-                                {
-                                    var childCommandName = commandParts[1];
-
-                                    ChatCommandChild childDbCommand = ctx.ChildCommands.First(child => child.Name.ToLower().Equals(childCommandName.ToLower()));
-
-                                    if (childDbCommand != null && childDbCommand.Security >= (int)session.Account.Security)
-                                    {
-                                        var handlerFunc = typeof(CommandHandler)
-                                            .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower()
-                                            .Equals(childDbCommand.HandlerId.ToLower())).Single();
-
-                                        handlerFunc?.Invoke(null, new object[] { commandParts.Skip(2).ToArray(), session, peer });
-                                    }   
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ChatCommand dbCommand = ctx.Commands.First(comand => comand.Name.ToLower().Equals(commandText.ToLower()));
-
-                            if (dbCommand != null && dbCommand.Security >= (int)session.Account.Security)
-                            {
-                                if (!string.IsNullOrEmpty(dbCommand.HandlerId))
-                                {
-                                    var handlerFunc = typeof(CommandHandler)
-                                            .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                                            .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower()
-                                            .Equals(dbCommand.HandlerId.ToLower())).Single();
-
-                                    handlerFunc?.Invoke(null, new object[] { new[] { commandText }, session, peer });
-                                }
-                            }
-                        }
-                    }
-
-                    //if (chat.Message.Contains(" "))
-                    //{
-                    //    string[] msgCopy = chat.Message.Substring(1).Split(" ");
-                    //    string commandName = msgCopy[0];
-
-                    //    using (var ctx = new RealmContext())
-                    //    {
-                    //        var existingCommandPrefix = ctx.Commands.First(command => command.Name.ToLower().Equals(commandName.ToLower()));
-
-                    //        if (existingCommandPrefix != null && (existingCommandPrefix.Security >= (int)session.Account.Security))
-                    //        {
-                    //            if (existingCommandPrefix.HandlerId == null)
-                    //            {
-                    //                string childCommandName = msgCopy[1];
-                    //                var existingChildCommandPrefix = ctx.ChildCommands.First(childCmd => childCmd.Name.ToLower().Equals(childCommandName.ToLower()));
-
-                    //                if (existingChildCommandPrefix != null && (existingChildCommandPrefix.Security >= (int)session.Account.Security))
-                    //                {
-                    //                    var childCommand = ctx.ChildCommands.Single(c => c.Name.ToLower().Equals(childCommandName));
-                    //                    var childCommandHandlerId = childCommand.HandlerId;
-
-                    //                    Console.WriteLine($"{session.Character.Name} is invoking command: '{commandName} {childCommandName}'.");
-
-                    //var handlerFunc = typeof(CommandHandler)
-                    //    .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                    //    .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                    //    .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(childCommandHandlerId.ToLower()))
-                    //    .Single();
-
-                    //handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(2).ToArray(), session, peer });
-                    //                }
-                    //            }
-                    //            else
-                    //            {
-                    //                Console.WriteLine($"{session.Character.Name} is invoking command: '{commandName}'.");
-
-                    //                var handlerFunc = typeof(CommandHandler)
-                    //                    .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-                    //                .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
-                    //                    .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(existingCommandPrefix.HandlerId.ToLower()))
-                    //                    .Single();
-
-                    //                handlerFunc?.Invoke(null, new object[] { msgCopy.Skip(1).ToArray(), session, peer });
-
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                }
-                else
-                {
-                    newChat.Channel = chat.Channel;
-                    newChat.Message = chat.Message;
-                    newChat.AddParameter(ChatMessageParameter.FromId, entity.Name);
-
-                    Program.SendSerializableToAll(newChat);
-                }
-            }
+                Flags = flags,
+                Message = formattedMessage
+            };
+            Program.SendToAll(chatPacket);
         }
 
         public static void OnTabTargetRequest(NetPeer peer)

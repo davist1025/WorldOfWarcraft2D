@@ -16,21 +16,36 @@ using WoW.Client.Shared.Data;
 
 namespace WoW.Client.Components
 {
+    //public class ChatMessage
+    //{
+    //    /// <summary>
+    //    /// Used for color and text formatting.
+    //    /// </summary>
+    //    public ChatChannelType Channel { get; init; }
+
+    //    public string Message { get; init; }
+
+    //    public ChatMessage(ChatChannelType channel, string message)
+    //    {
+    //        Channel = channel; 
+    //        Message = message;
+    //    }
+    //}
+
     public class ImGuiController : Component, IUpdatable
     {
         private string _chatInput = "";
-        private bool _shouldCleatChatInput = false;
         private string _accountNameInput = "";
         private string _accountPasswordInput = "";
+        private int _chatChannelIndex = -1;
 
         private string _newCharacterNameInput = "";
         private int _newCharacterRaceId = 1;
         private int _newCharacterHairId = 1;
-        private int _ch = -1;
 
         private int _characterSelectIndex = -1;
 
-        public List<string> Chat = new List<string>();
+        public List<ChatMessage> ChatHistory = new List<ChatMessage>();
         public List<RemoteRealmserver> Realmlist = new List<RemoteRealmserver>();
         public List<RemoteCharacter> Characters = new List<RemoteCharacter>();
 
@@ -294,14 +309,30 @@ namespace WoW.Client.Components
 
                     if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
                     {
-                        for (int i = 0; i < Chat.Count; i++)
-                            ImGui.TextUnformatted(Chat[i]);
+                        for (int i = 0; i < ChatHistory.Count; i++)
+                        {
+                            var chatHistory = ChatHistory[i];
+                            //var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
+
+                            //ImGui.PushStyleColor(ImGuiCol.Text, color);
+                            ImGui.Text(chatHistory.Message);
+                            //ImGui.PopStyleColor();
+                        }
                         ImGui.SetScrollHereY(1f);
 
                         ImGui.EndChild();
                     }
 
                     ImGui.Separator();
+
+                    // process chat input upon pressing enter.
+                    if (ImGui.InputTextWithHint("", "Type message here...", ref _chatInput, 128, ImGuiInputTextFlags.EnterReturnsTrue))
+                    {
+                        Game1.Send(new ChatMessage { Message = _chatInput.Trim() });
+
+                        _chatInput = "";
+                    }
+
 
                     //ImGui.PushStyleColor(ImGuiCol.Text, WoW.Client.Shared.Utils.ChatChannelColors[_chatChannel]);
                     //ImGui.Text($"{_chatChannel.ToString()}");
@@ -329,62 +360,6 @@ namespace WoW.Client.Components
                      * Text received from the server will be formatted to contain a name, color and the text.
                      * 
                      */
-                    if (ImGui.InputText("", ref _chatInput, 125, ImGuiInputTextFlags.EnterReturnsTrue) && !string.IsNullOrWhiteSpace(_chatInput))
-                    {
-                        string message = "";
-                        ClientRealm_Chat newChat = new ClientRealm_Chat();
-                        ChatChannelType usingChannel = ChatChannelType.Say;
-
-                        if (_chatInput.StartsWith("/") && _chatInput.Contains(" "))
-                        {
-                            var rawInput = _chatInput.Substring(1);
-                            var splitInput = rawInput.Split(' ');
-                            var channelName = splitInput[0].ToLower();
-                            var channelTypes = Enum.GetNames<ChatChannelType>().ToArray();
-
-                            for (int i = 0; i < channelTypes.Length; i++)
-                            {
-                                if (channelTypes[i].ToLower().Equals(channelName))
-                                    usingChannel = (ChatChannelType)i;
-                            }
-
-                            /** 2/11 - Chat revamp notes
-                             * 
-                             * Data that needs to be sent, no matter the channel:
-                             * 
-                             * - Channel type
-                             * - Message from input
-                             * - Optional argument data (whisper name, etc)
-                             * 
-                             */
-
-                            newChat.Channel = usingChannel;
-
-                            switch (usingChannel)
-                            {
-                                case ChatChannelType.Say:
-                                    for (int i = 2; i < splitInput.Length; i++)
-                                        message += (i == splitInput.Length - 1) ? $"{splitInput[i]}" : $"{splitInput[i]} ";
-
-                                    newChat.Message = message;
-                                    break;
-                                case ChatChannelType.Whisper:
-                                    for (int i = 3; i < splitInput.Length; i++)
-                                        message += (i == splitInput.Length - 1) ? $"{splitInput[i]}" : $"{splitInput[i]} ";
-
-                                    newChat.AddParameter(ChatMessageParameter.WhisperToName, splitInput[2]);
-                                    newChat.Message = message;
-                                    break;
-                            }
-                        }
-                        else
-                            newChat.Message = _chatInput;
-
-                        // hack: Default channel type is /say.
-
-                        Game1.SendSerializable(newChat);
-                        _chatInput = "";
-                    }
 
                     // todo: unable to modify the text of an active input widget.
                     // see: https://github.com/ocornut/imgui/issues/5054
