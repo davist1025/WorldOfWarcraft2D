@@ -16,22 +16,6 @@ using WoW.Client.Shared.Data;
 
 namespace WoW.Client.Components
 {
-    //public class ChatMessage
-    //{
-    //    /// <summary>
-    //    /// Used for color and text formatting.
-    //    /// </summary>
-    //    public ChatChannelType Channel { get; init; }
-
-    //    public string Message { get; init; }
-
-    //    public ChatMessage(ChatChannelType channel, string message)
-    //    {
-    //        Channel = channel; 
-    //        Message = message;
-    //    }
-    //}
-
     public class ImGuiController : Component, IUpdatable
     {
         private string _chatInput = "";
@@ -46,6 +30,7 @@ namespace WoW.Client.Components
         private int _characterSelectIndex = -1;
 
         public List<ChatMessage> ChatHistory = new List<ChatMessage>();
+        public List<ChatMessage> GMChatHistory = new List<ChatMessage>();
         public List<RemoteRealmserver> Realmlist = new List<RemoteRealmserver>();
         public List<RemoteCharacter> Characters = new List<RemoteCharacter>();
 
@@ -328,6 +313,7 @@ namespace WoW.Client.Components
                     // process chat input upon pressing enter.
                     if (ImGui.InputTextWithHint("", "Type message here...", ref _chatInput, 128, ImGuiInputTextFlags.EnterReturnsTrue))
                     {
+                        // todo: determine a function for using different channels.
                         Game1.Send(new ChatMessage { Message = _chatInput.Trim() });
 
                         _chatInput = "";
@@ -410,6 +396,35 @@ namespace WoW.Client.Components
                             Game1.Exit();
 
                         ImGui.End();
+                    }
+
+                    if (!Game1.ShouldShowEscapeMenu)
+                    {
+                        if (Game1.ShouldShowGMChat)
+                        {
+                            var gmChatSize = new System.Numerics.Vector2(325f, 115f);
+
+                            ImGui.SetNextWindowSize(gmChatSize);
+                            ImGui.Begin("Talking with a GM");
+
+                            if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
+                            {
+                                for (int i = 0; i < GMChatHistory.Count; i++)
+                                {
+                                    var chatHistory = GMChatHistory[i];
+                                    //var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
+
+                                    //ImGui.PushStyleColor(ImGuiCol.Text, color);
+                                    ImGui.Text(chatHistory.Message);
+                                    //ImGui.PopStyleColor();
+                                }
+                                ImGui.SetScrollHereY(1f);
+
+                                ImGui.EndChild();
+                            }
+
+                            ImGui.End();
+                        }
                     }
 
                     break;

@@ -137,12 +137,16 @@ namespace WoW.Client
                 Flags = newChat.Flags
             };
 
-            Debug.Log($"Flags: {newChatStorage.Flags.ToString()}");
+            //if (newChat.Flags.HasFlag(ChatMessageFlag.IsGM))
+            //{
+            //    // todo: invoke GM chat history when we received a whisper.
+            //    guiController.GMChatHistory.Add(newChatStorage);
 
-            if (newChat.Flags.HasFlag(ChatMessageFlag.IsGM))
-                Debug.Log("GM is talking!");
-
-            guiController.ChatHistory.Add(newChatStorage);
+            //    if (!Game1.ShouldShowGMChat)
+            //        Game1.ShouldShowGMChat = true;
+            //}
+            //else
+                guiController.ChatHistory.Add(newChatStorage);
         }
 
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)
