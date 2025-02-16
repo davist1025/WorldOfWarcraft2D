@@ -276,7 +276,7 @@ namespace WoW.Realmserver
             Entity playerEntity = (peer.Tag as Entity);
             WorldSessionComponent session = playerEntity.GetComponent<WorldSessionComponent>();
 
-            // todo: add different target types for tabbing to.
+            // todo: add different target types for tabbing to (player, aggressive NPCs, etc)
             // i.e: check for NPCs which have the "IsAggressive" flag, hostile players, etc.
             // currently, only NPCs have a trigger for this. 
             if (session.AvailableTargets.Count > 0)

@@ -19,7 +19,7 @@ namespace WoW.Client.Shared.Realm
                 WorldId = reader.GetString(),
                 Name = reader.GetString(),
                 ModelId = reader.GetString(),
-                Flags = reader.GetInt(),
+                Flags = (NpcTypeFlags)reader.GetInt(),
                 Level = reader.GetInt(),
                 MapId = reader.GetString(),
                 X = reader.GetFloat(),
@@ -32,7 +32,7 @@ namespace WoW.Client.Shared.Realm
             writer.Put(Metadata.WorldId);
             writer.Put(Metadata.Name);
             writer.Put(Metadata.ModelId);
-            writer.Put(Metadata.Flags);
+            writer.Put((int)Metadata.Flags);
             writer.Put(Metadata.Level);
             writer.Put(Metadata.MapId);
             writer.Put(Metadata.X);

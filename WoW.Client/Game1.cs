@@ -73,7 +73,6 @@ namespace WoW.Client
 
         protected override void Initialize()
         {   
-            // todo: network stuff init'd here.
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
             ClientListener.PeerConnectedEvent += (peer) =>

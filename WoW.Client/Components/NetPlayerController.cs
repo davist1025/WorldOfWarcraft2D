@@ -146,7 +146,6 @@ namespace WoW.Client.Components
         public void AddToMap()
         {
             AsepriteFile aseFile = null;
-            SpriteRenderer renderer; // todo: replace with animator.
             RaceType characterRace = (RaceType)RaceId;
 
             switch (characterRace)

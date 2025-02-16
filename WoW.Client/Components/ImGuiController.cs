@@ -49,8 +49,6 @@ namespace WoW.Client.Components
                     ImGui.Begin("Login");
                     ImGui.InputText("Account Name", ref _accountNameInput, 32);
                     ImGui.InputText("Password", ref _accountPasswordInput, 64, ImGuiInputTextFlags.Password);
-                    // todo: password.
-                    //ImGui.InputText("Passowrd")
 
                     if (ImGui.Button("Connect"))
                     {
@@ -125,7 +123,7 @@ namespace WoW.Client.Components
                     ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, Game1.GraphicsDevice.Viewport.Height - 40));
                     ImGui.SetNextWindowSize(new System.Numerics.Vector2(185, 25));
                     ImGui.Begin("debug_text", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
-                    ImGui.Text("Retrieving characters..."); // todo: fix this not being long enough.
+                    ImGui.Text("Retrieving characters...");
                     ImGui.End();
                     break;
                 case GameNetworkState.Realm_Characters:
@@ -231,7 +229,6 @@ namespace WoW.Client.Components
 
                     if (NezImGui.CenteredButton("Back", 0.5f))
                     {
-                        // todo: the client will need to ask for the character list, again. i dont think a packet exists for that :p
                         Game1.Send(new ClientRealm_RequestCharacterList());
                         Game1.NetState = GameNetworkState.Realm;
                     }
@@ -347,7 +344,6 @@ namespace WoW.Client.Components
                      * 
                      */
 
-                    // todo: unable to modify the text of an active input widget.
                     // see: https://github.com/ocornut/imgui/issues/5054
 
                     //if (_chatInput.StartsWith("/"))

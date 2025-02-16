@@ -22,8 +22,10 @@
 - Prediction and reconciliation on input updates
 - Functions that form packets in one location
 	- i,e: "PacketManager.SendChat(string message, string fromId, ???)"
+	- A single housing function will increase maintainability across versioning
 - Revamp the player chat
 	- Formatting (color, text, etc)
 	- GM interface
 	- Channels (say, whisper, guild, etc)
 - Review all INetSerializable objects to ensure correct implementation
+- Post issues onto GitHub issues

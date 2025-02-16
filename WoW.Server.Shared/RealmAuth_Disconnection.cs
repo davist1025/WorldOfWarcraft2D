@@ -14,7 +14,5 @@ namespace WoW.Server.Shared
     public class RealmAuth_Disconnection
     {
         public int AccountId { get; set; }
-        
-        // todo: disconnect reason
     }
 }

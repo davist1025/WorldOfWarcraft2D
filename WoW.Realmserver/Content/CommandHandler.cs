@@ -39,7 +39,6 @@ namespace WoW.Realmserver.Content
         public static void NpcCommand_Add(string[] commandParams, WorldSessionComponent session, NetPeer peer)
         {
             // X, Y params should be optional.
-            // todo: create NPC.
             /*
              * The server should create an Entity with a unique name that corresponds to the id/name of the given NPC and set it to the position of the entity if X, Y is empty.
              * The server should then create a Controller component for the NPC to run AI routines, etc.
@@ -63,7 +62,7 @@ namespace WoW.Realmserver.Content
                         WorldId = npcEntity.Name,
                         Name = npc.Name,
                         ModelId = npc.ModelId,
-                        Flags = npc.FlagType,
+                        Flags = (NpcTypeFlags)npc.FlagType,
                         Level = npc.Level,
                         MapId = session.Character.MapId,
                         X = session.Entity.Transform.Position.X,

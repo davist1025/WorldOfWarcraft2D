@@ -42,14 +42,11 @@ namespace WoW.Realmserver.Content
             string mapName = map.Properties["id"];
 
             // todo: check for an empty name prop.
-
-            // todo: each map can be loaded and placed at 0,0; collision checks occur for each player independently and only within the map their on.
             // need to add support for this later, so players don't collider with every map.
             // random note: the server could hypothetically only load maps that contains at least one player, and unload them when there are none?
             Entity mapEntity = CoreHeadless.Scene.CreateEntity(mapName);
             TiledMapProcessor processor = new TiledMapProcessor(map, "collision_layer");
 
-            // todo: human collides with both maps, orc only collides with theirs.
             processor.PhysicsLayer = (physicsLayerIndex == 0) ? 1 << 0 : 1 << physicsLayerIndex;
             mapEntity.AddComponent(processor);
 
