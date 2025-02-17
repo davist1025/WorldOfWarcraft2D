@@ -116,6 +116,7 @@ namespace WoW.Realmserver.Content
                             Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
                     }
                 }
+                // todo: send invalid id response.
             }
         }
 

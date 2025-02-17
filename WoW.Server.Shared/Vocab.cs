@@ -10,9 +10,9 @@ namespace WoW.Server.Shared
     {
         public enum SecurityLevel
         {
-            Administrator = 1, // has access to ALL commands and server functionality.
+            Player = 1, // has access to ALL commands and server functionality.
             Gamemaster,
-            Player
+            Administrator
         }
     }
 }

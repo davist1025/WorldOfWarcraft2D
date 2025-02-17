@@ -14,7 +14,6 @@ namespace WoW.Client.Shared
         Orc
     }
 
-    [Obsolete("Deprecated GObject type enum.")]
     public enum EntityType : int
     {
         LocalPlayer,

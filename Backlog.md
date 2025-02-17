@@ -28,4 +28,3 @@
 	- GM interface
 	- Channels (say, whisper, guild, etc)
 - Review all INetSerializable objects to ensure correct implementation
-- Post issues onto GitHub issues

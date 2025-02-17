@@ -252,23 +252,89 @@ namespace WoW.Realmserver
             // todo: [ ] parse slash commands.
             // todo: [x] send chat to all players.
 
-            string formattedMessage = newChat.Message;
-            formattedMessage = $"{session.Character.Name} says: {formattedMessage}";
+            string unformattedMessage = newChat.Message;
 
-            ChatMessageFlag flags = ChatMessageFlag.IsLocal;
-
-            if (session.Account.Security <= Vocab.SecurityLevel.Gamemaster)
+            if (unformattedMessage.StartsWith("."))
             {
-                formattedMessage = $"<GM> {formattedMessage}";
-                flags |= ChatMessageFlag.IsGM;
+                string[] userCommandParts = null;
+                string removedCommandIdentifier = unformattedMessage.Substring(1);
+
+                // handle a command with arguments.
+                if (removedCommandIdentifier.Contains(" "))
+                {
+                    using (RealmContext rctx = new RealmContext())
+                    {
+                        userCommandParts = removedCommandIdentifier.Split(' ');
+                        string commandName = userCommandParts[0];
+
+                        Console.WriteLine($"{session.Character.Name} is attempting to use command: {commandName}");
+
+                        ChatCommand commandInDb = rctx.Commands
+                            .Single(command => 
+                                command.Name.ToLower().Equals(commandName));
+
+                        // todo: fix account security check.
+                        if (commandInDb != null && (int)session.Account.Security >= commandInDb.Security)
+                        {
+                            string commandHandlerId = commandInDb.HandlerId;
+
+                            // handle a child command based on argument 1 and the parent commands' id.
+                            if (string.IsNullOrEmpty(commandHandlerId) && rctx.ChildCommands.Any(child => child.ParentId == commandInDb.Id))
+                            {
+                                ChatCommandChild[] childCommandsForParent = rctx.ChildCommands.Where(
+                                    child =>
+                                        child.ParentId == commandInDb.Id).ToArray();
+                                string childCommandName = userCommandParts[1];
+                                ChatCommandChild thisChild = childCommandsForParent.Single(child => child.Name.ToLower().Equals(childCommandName));
+
+                                // process this child.
+                                if (thisChild != null && (int)session.Account.Security >= thisChild.Security)
+                                    ExecuteCommand(session, peer, thisChild.HandlerId, userCommandParts.Skip(2).ToArray());
+                            }
+                            else if (!string.IsNullOrEmpty(commandHandlerId)) // if there's a handler for the topmost command, process first and ignore any children.
+                                ExecuteCommand(session, peer, commandHandlerId, userCommandParts.Skip(1).ToArray());
+                        }
+                    }
+                }
             }
 
-            var chatPacket = new ChatMessage()
+            if (unformattedMessage.StartsWith("/"))
             {
-                Flags = flags,
-                Message = formattedMessage
-            };
-            Program.SendToAll(chatPacket);
+                // todo: process a slash command!
+            }
+
+            if (!unformattedMessage.StartsWith(".") && !unformattedMessage.StartsWith("/"))
+            {
+                string formattedMessage = $"{session.Character.Name} says: {unformattedMessage}";
+
+                ChatMessageFlag flags = ChatMessageFlag.IsLocal;
+
+                if (session.Account.Security <= Vocab.SecurityLevel.Gamemaster)
+                {
+                    formattedMessage = $"<GM> {formattedMessage}";
+                    flags |= ChatMessageFlag.IsGM;
+                }
+
+                var chatPacket = new ChatMessage()
+                {
+                    Flags = flags,
+                    Message = formattedMessage
+                };
+                Program.SendToAll(chatPacket);
+            }
+        }
+
+
+        private static void ExecuteCommand(WorldSessionComponent bySession, NetPeer peer, string commandHandlerId, string[] args)
+        {
+            Console.WriteLine($"{bySession.Character.Name} is executing commmand handler: {commandHandlerId}.");
+
+            var handlerFunc = typeof(CommandHandler)
+                .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                .Where(func => func.GetAttribute<CommandHandlerAttribute>() != null)
+                .Where(func => func.GetAttribute<CommandHandlerAttribute>().Id.ToLower().Equals(commandHandlerId.ToLower())).Single();
+
+            handlerFunc?.Invoke(null, new object[] { args, bySession, peer });
         }
 
         public static void OnTabTargetRequest(NetPeer peer)
