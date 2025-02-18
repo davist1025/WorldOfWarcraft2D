@@ -135,6 +135,14 @@ namespace WoW.Realmserver.Content
                     fullMsg += $"{part} ";
             }
 
+            ChatMessage newServerMessage = new ChatMessage()
+            {
+                Message = $"[SERVER] {fullMsg}",
+                Flags = ChatMessageFlag.IsServerMessage
+            };
+
+            Program.SendToAll(newServerMessage);
+
             // todo: re-implement server messages!
             //RealmClient_Chat serverMessage = new RealmClient_Chat();
             //serverMessage.Channel = ChatChannelType.Server;

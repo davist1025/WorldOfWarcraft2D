@@ -294,11 +294,11 @@ namespace WoW.Client.Components
                         for (int i = 0; i < ChatHistory.Count; i++)
                         {
                             var chatHistory = ChatHistory[i];
-                            //var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
+                            var color = Shared.Utils.ChatChannelColors[chatHistory.Flags];
 
-                            //ImGui.PushStyleColor(ImGuiCol.Text, color);
+                            ImGui.PushStyleColor(ImGuiCol.Text, color);
                             ImGui.Text(chatHistory.Message);
-                            //ImGui.PopStyleColor();
+                            ImGui.PopStyleColor();
                         }
                         ImGui.SetScrollHereY(1f);
 

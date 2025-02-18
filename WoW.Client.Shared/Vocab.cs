@@ -47,13 +47,6 @@ namespace WoW.Client.Shared
         West
     }
 
-    public enum ChatChannelType
-    {
-        Say,
-        Whisper,
-        Yell
-    }
-
     public enum ChatMessageFlag
     {
         IsServerMessage = 1 << 0,
@@ -82,10 +75,10 @@ namespace WoW.Client.Shared
             return shaHash;
         }
 
-        public static Dictionary<ChatChannelType, Vector4> ChatChannelColors = new Dictionary<ChatChannelType, Vector4>()
+        public static Dictionary<ChatMessageFlag, Vector4> ChatChannelColors = new Dictionary<ChatMessageFlag, Vector4>()
         {
-            { ChatChannelType.Say, new Vector4(255f, 255f, 255f, 1f) },
-            { ChatChannelType.Whisper, new Vector4(116f, 0f, 194f, 1f) }
+            { ChatMessageFlag.IsServerMessage, new Vector4(250f / 255f, 244f / 255f, 125f / 255f, 1f) },
+            { ChatMessageFlag.IsLocal, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 1f) }
         };
     }
 }
