@@ -324,7 +324,15 @@ namespace WoW.Realmserver
             }
         }
 
-
+        /// <summary>
+        /// Execute a handler by string.
+        /// 
+        /// This function will use Reflection to find a static method that implements an attribute.
+        /// </summary>
+        /// <param name="bySession"></param>
+        /// <param name="peer"></param>
+        /// <param name="commandHandlerId"></param>
+        /// <param name="args"></param>
         private static void ExecuteCommand(WorldSessionComponent bySession, NetPeer peer, string commandHandlerId, string[] args)
         {
             Console.WriteLine($"{bySession.Character.Name} is executing commmand handler: {commandHandlerId}.");
