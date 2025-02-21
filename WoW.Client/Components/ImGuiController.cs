@@ -29,6 +29,8 @@ namespace WoW.Client.Components
 
         private int _characterSelectIndex = -1;
 
+        public string[] OnlineCharacters = new[] { "" };
+
         public List<ChatMessage> ChatHistory = new List<ChatMessage>();
         public List<ChatMessage> GMChatHistory = new List<ChatMessage>();
         public List<RemoteRealmserver> Realmlist = new List<RemoteRealmserver>();
@@ -380,6 +382,7 @@ namespace WoW.Client.Components
                         ImGui.Begin("", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize);
 
                         // todo: display game client options.
+
                         // show player/npc names, etc.
                         NezImGui.CenteredButton("Options", 0.75f);
 
@@ -396,6 +399,20 @@ namespace WoW.Client.Components
 
                     if (!Game1.ShouldShowEscapeMenu)
                     {
+                        /// BEGIN WHO MENU CODE
+
+                        var whoWinSize = new System.Numerics.Vector2(275f, 400f);
+
+                        ImGui.SetNextWindowSize(whoWinSize);
+                        ImGui.Begin("Online Players");
+
+                        for (int i = 0; i < OnlineCharacters.Length; i++)
+                            ImGui.Text(OnlineCharacters[i]);
+
+                        ImGui.End();
+
+                        /// END WHO MENU CODE
+
                         if (Game1.ShouldShowGMChat)
                         {
                             var gmChatSize = new System.Numerics.Vector2(325f, 115f);

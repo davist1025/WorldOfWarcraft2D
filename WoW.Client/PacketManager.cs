@@ -152,6 +152,10 @@ namespace WoW.Client
         public static void OnWho(RealmClient_WhoCommand whoList)
         {
             Debug.Log($"Received WHO list with: {whoList.Characters.Length} characters online.");
+
+            // todo: access gui controller
+            var guiController = Game1.Scene.FindEntity("gui").GetComponent<ImGuiController>();
+            guiController.OnlineCharacters = whoList.Characters;
         }
 
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)
