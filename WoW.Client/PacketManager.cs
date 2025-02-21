@@ -149,6 +149,11 @@ namespace WoW.Client
                 guiController.ChatHistory.Add(newChatStorage);
         }
 
+        public static void OnWho(RealmClient_WhoCommand whoList)
+        {
+            Debug.Log($"Received WHO list with: {whoList.Characters.Length} characters online.");
+        }
+
         public static void OnPlayerDisconnect(RealmClient_Disconnect disconnect)
         {
             if (disconnect.Code == DisconnectCode.Timeout)

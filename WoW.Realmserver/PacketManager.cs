@@ -248,7 +248,7 @@ namespace WoW.Realmserver
         {
             WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
 
-            // todo: [ ] parse out "." commands.
+            // todo: [x] parse out "." commands.
             // todo: [ ] parse slash commands.
             // todo: [x] send chat to all players.
 
@@ -300,7 +300,33 @@ namespace WoW.Realmserver
 
             if (unformattedMessage.StartsWith("/"))
             {
-                // todo: process a slash command!
+                var chatCommand = unformattedMessage.Substring(1);
+
+                if (chatCommand.Contains(" ")) { } // todo: process chat commands with arguments (i.e: /afk im away)
+
+                // process a single command.
+                chatCommand = chatCommand.Trim();
+
+                switch (chatCommand.ToLower())
+                {
+                    case "who":
+                        // Sends a list of all online characters.
+                        // Temporarily, GMs are included.
+
+                        // todo: grab level, location, etc
+                        string[] onlineCharacters = Program.Scene.FindComponentsOfType<WorldSessionComponent>().Select(session => session.Character.Name).ToArray();
+
+                        RealmClient_WhoCommand whoPacket = new RealmClient_WhoCommand()
+                        {
+                            Characters = onlineCharacters
+                        };
+
+                        Program.SendTo(session.Entity.Name, whoPacket);
+
+                        // todo: send a packet to the client.
+                        // this packet will tell the client to open the Who gui if it isn't already, the data will be received first.
+                        break;
+                }
             }
 
             if (!unformattedMessage.StartsWith(".") && !unformattedMessage.StartsWith("/"))
@@ -309,8 +335,10 @@ namespace WoW.Realmserver
 
                 ChatMessageFlag flags = ChatMessageFlag.IsLocal;
 
-                if (session.Account.Security <= Vocab.SecurityLevel.Gamemaster)
+                if (session.Account.Security >= Vocab.SecurityLevel.Gamemaster)
                 {
+                    // todo: add GM toggle to the account (document this flag)
+                    // <AFK> is included here, as well, so how should these be set?
                     formattedMessage = $"<GM> {formattedMessage}";
                     flags |= ChatMessageFlag.IsGM;
                 }
@@ -469,6 +497,11 @@ namespace WoW.Realmserver
             }
         }
         #endregion
+
+        private static void SendWhoList(NetPeer accountOwner)
+        {
+
+        }
 
         /// <summary>
         /// Sends the character list to a user.

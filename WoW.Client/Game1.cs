@@ -125,6 +125,8 @@ namespace WoW.Client
 
             _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
 
+            _netProcessor.SubscribeReusable<RealmClient_WhoCommand>((whoList) => PacketManager.OnWho(whoList));
+
             _netProcessor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
 
             _netProcessor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
