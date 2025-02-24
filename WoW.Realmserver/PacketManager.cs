@@ -324,15 +324,7 @@ namespace WoW.Realmserver
                         // Temporarily, GMs are included.
 
                         // todo: grab level, location, etc
-                        string[] onlineCharacters = Program.Scene.FindComponentsOfType<WorldSessionComponent>().Select(session => session.Character.Name).ToArray();
-
-                        RealmClient_WhoCommand whoPacket = new RealmClient_WhoCommand()
-                        {
-                            Characters = onlineCharacters
-                        };
-
-                        Program.SendTo(session.Entity.Name, whoPacket);
-
+                        SendWhoList(peer);
                         // todo: send a packet to the client.
                         // this packet will tell the client to open the Who gui if it isn't already, the data will be received first.
                         break;
@@ -510,8 +502,23 @@ namespace WoW.Realmserver
         }
         #endregion
 
+        /// <summary>
+        /// Central function for sending a who list to a player.
+        /// 
+        /// Players can request this by refreshing their who list, doing /who or /who [name-part]
+        /// </summary>
+        /// <param name="accountOwner"></param>
         private static void SendWhoList(NetPeer accountOwner)
         {
+            var entity = accountOwner.Tag as Entity;
+            string[] onlineCharacters = Program.Scene.FindComponentsOfType<WorldSessionComponent>().Select(session => session.Character.Name).ToArray();
+
+            RealmClient_WhoCommand whoPacket = new RealmClient_WhoCommand()
+            {
+                Characters = onlineCharacters
+            };
+
+            Program.SendTo(entity.Name, whoPacket);
 
         }
 
