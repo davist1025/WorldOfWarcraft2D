@@ -224,6 +224,16 @@ namespace WoW.Realmserver
             {
                 MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"]
             });
+            
+            // todo: sending MOTD doesnt seem to work correctly on the client.
+            // i think the list of messages is getting cleared before it can display?
+            //var motdMessage = new ChatMessage()
+            //{
+            //    Message = "Welcome to the official PTR for the WoW Pixel Project. Enjoy your stay!",
+            //    Flags = ChatMessageFlag.IsServerMessage
+            //};
+
+            //Program.SendTo(thisEntity.Name, motdMessage);
         }
 
         /// <summary>
@@ -342,6 +352,8 @@ namespace WoW.Realmserver
                     formattedMessage = $"<GM> {formattedMessage}";
                     flags |= ChatMessageFlag.IsGM;
                 }
+
+                Console.WriteLine($"Sending chat flags: {flags}");
 
                 var chatPacket = new ChatMessage()
                 {

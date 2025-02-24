@@ -137,7 +137,7 @@ namespace WoW.Realmserver.Content
 
             ChatMessage newServerMessage = new ChatMessage()
             {
-                Message = $"[SERVER] {fullMsg}",
+                Message = $"{fullMsg}",
                 Flags = ChatMessageFlag.IsServerMessage
             };
 

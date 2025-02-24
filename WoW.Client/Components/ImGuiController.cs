@@ -29,7 +29,22 @@ namespace WoW.Client.Components
 
         private int _characterSelectIndex = -1;
 
-        public string[] OnlineCharacters = new[] { "" };
+        private string[] _onlineCharacters = new[] { "" };
+
+        /// <summary>
+        /// Does not automatically update.
+        /// 
+        /// Usually populated upon a /who command.
+        /// </summary>
+        public string[] OnlineCharacters
+        {
+            get => _onlineCharacters;
+            set
+            {
+                Game1.ShouldShowWhoMenu = true;
+                _onlineCharacters = value;
+            }
+        }
 
         public List<ChatMessage> ChatHistory = new List<ChatMessage>();
         public List<ChatMessage> GMChatHistory = new List<ChatMessage>();
@@ -318,20 +333,6 @@ namespace WoW.Client.Components
                         _chatInput = "";
                     }
 
-
-                    //ImGui.PushStyleColor(ImGuiCol.Text, WoW.Client.Shared.Utils.ChatChannelColors[_chatChannel]);
-                    //ImGui.Text($"{_chatChannel.ToString()}");
-                    //ImGui.SameLine();
-                    //ImGui.PopStyleColor();
-
-                    //var channels = Enum.GetNames<ChatChannelType>().ToArray();
-
-                    //ImGui.SetNextItemWidth(125);
-                    //int ch = -1;
-                    //ImGui.Combo("", ref _ch, channels, channels.Length);
-
-                    //ImGui.SameLine();
-
                     /**
                      * Chat channel selection issue:
                      * 
@@ -347,27 +348,6 @@ namespace WoW.Client.Components
                      */
 
                     // see: https://github.com/ocornut/imgui/issues/5054
-
-                    //if (_chatInput.StartsWith("/"))
-                    //{
-                    //    if (Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Space) && _chatInput.Contains(" "))
-                    //    {
-                    //        var split = _chatInput.Split('/');
-                    //        var channelType = split[1].Trim(); // ??
-
-                    //        if (channelType.ToLower().Equals("say"))
-                    //        {
-                    //            _chatChannel = ChatChannelType.Say;
-                    //            _shouldCleatChatInput = true;
-                    //        }
-                    //    }
-                    //}
-
-                    //if (_shouldCleatChatInput)
-                    //{
-                    //    _shouldCleatChatInput = false;
-                    //    _chatInput = "";
-                    //}
 
                     ImGui.End();
 
@@ -399,19 +379,21 @@ namespace WoW.Client.Components
 
                     if (!Game1.ShouldShowEscapeMenu)
                     {
-                        /// BEGIN WHO MENU CODE
+                        if (Game1.ShouldShowWhoMenu)
+                        {
+                            var whoWinSize = new System.Numerics.Vector2(275f, 400f);
 
-                        var whoWinSize = new System.Numerics.Vector2(275f, 400f);
+                            ImGui.SetNextWindowSize(whoWinSize);
+                            ImGui.Begin("Online Players", ref Game1.ShouldShowWhoMenu);
 
-                        ImGui.SetNextWindowSize(whoWinSize);
-                        ImGui.Begin("Online Players");
+                            // todo: add columns for level, race, location (map name) in a future revision.
+                            for (int i = 0; i < OnlineCharacters.Length; i++)
+                                ImGui.Text(OnlineCharacters[i]);
 
-                        for (int i = 0; i < OnlineCharacters.Length; i++)
-                            ImGui.Text(OnlineCharacters[i]);
+                            // todo: buttons for refresh, close?
 
-                        ImGui.End();
-
-                        /// END WHO MENU CODE
+                            ImGui.End();
+                        }
 
                         if (Game1.ShouldShowGMChat)
                         {

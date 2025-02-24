@@ -59,6 +59,7 @@ namespace WoW.Client
 
         public static bool ShouldShowEscapeMenu = false;
         public static bool ShouldShowGMChat = false;
+        public static bool ShouldShowWhoMenu = false;
 
         public static Entity Player;
         private static ClientAuth_Logon _temporaryLogonPacket;

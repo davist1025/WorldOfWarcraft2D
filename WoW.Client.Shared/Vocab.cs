@@ -78,7 +78,8 @@ namespace WoW.Client.Shared
         public static Dictionary<ChatMessageFlag, Vector4> ChatChannelColors = new Dictionary<ChatMessageFlag, Vector4>()
         {
             { ChatMessageFlag.IsServerMessage, new Vector4(250f / 255f, 244f / 255f, 125f / 255f, 1f) },
-            { ChatMessageFlag.IsLocal, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 1f) }
+            { ChatMessageFlag.IsLocal, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 1f) },
+            { ChatMessageFlag.IsGM | ChatMessageFlag.IsLocal, new Vector4(0f, 154f / 255f, 228 / 255f, 1f) }
         };
     }
 }
