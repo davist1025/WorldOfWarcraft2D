@@ -314,7 +314,7 @@ namespace WoW.Client.Components
                             var color = Shared.Utils.ChatChannelColors[chatHistory.Flags];
 
                             ImGui.PushStyleColor(ImGuiCol.Text, color);
-                            ImGui.Text(chatHistory.Message);
+                            ImGui.TextWrapped(chatHistory.Message);
                             ImGui.PopStyleColor();
                         }
                         ImGui.SetScrollHereY(1f);

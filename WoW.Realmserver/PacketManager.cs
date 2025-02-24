@@ -336,8 +336,6 @@ namespace WoW.Realmserver
                     flags |= ChatMessageFlag.IsGM;
                 }
 
-                Console.WriteLine($"Sending chat flags: {flags}");
-
                 var chatPacket = new ChatMessage()
                 {
                     Flags = flags,
