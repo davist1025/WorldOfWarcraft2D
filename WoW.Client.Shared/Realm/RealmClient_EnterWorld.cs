@@ -9,5 +9,6 @@ namespace WoW.Client.Shared.Realm
     public class RealmClient_EnterWorld
     {
         public float MovementSpeed { get; set; }
+        public string MOTD { get; set; }
     }
 }

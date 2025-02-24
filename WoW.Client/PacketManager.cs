@@ -103,6 +103,15 @@ namespace WoW.Client
 
             Game1.NetState = GameNetworkState.World;
             Core.StartSceneTransition(new FadeTransition(() => Game1.NetworkScene));
+
+            var gui = Game1.NetworkScene.FindEntity("gui").GetComponent<ImGuiController>();
+
+            var newChatStorage = new ChatMessage()
+            {
+                Message = worldParams.MOTD,
+                Flags = ChatMessageFlag.IsServerMessage
+            };
+            gui.ChatHistory.Add(newChatStorage);
         }
 
         public static void OnPlayerPositionUpdate(RealmClient_NetPositionInputUpdate netUpdate)
@@ -126,9 +135,6 @@ namespace WoW.Client
 
         public static void OnChat(ChatMessage newChat) 
         {
-            //var from = (string.IsNullOrEmpty(newChat.FromId)) ? "(server)" : newChat.FromId;
-            //Debug.Log($"{newChat.Message} - {newChat.Flags}");
-
             var guiController = Game1.Scene.FindEntity("gui").GetComponent<ImGuiController>();
 
             var newChatStorage = new ChatMessage()
@@ -136,17 +142,8 @@ namespace WoW.Client
                 Message = newChat.Message,
                 Flags = newChat.Flags
             };
-
-            //if (newChat.Flags.HasFlag(ChatMessageFlag.IsGM))
-            //{
-            //    // todo: invoke GM chat history when we received a whisper.
-            //    guiController.GMChatHistory.Add(newChatStorage);
-
-            //    if (!Game1.ShouldShowGMChat)
-            //        Game1.ShouldShowGMChat = true;
-            //}
-            //else
-                guiController.ChatHistory.Add(newChatStorage);
+            
+            guiController.ChatHistory.Add(newChatStorage);
         }
 
         public static void OnWho(RealmClient_WhoCommand whoList)

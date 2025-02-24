@@ -25,13 +25,13 @@ namespace WoW.Client.Scenes
 
             Scene.SetDefaultDesignResolution(800, 600, SceneResolutionPolicy.ShowAllPixelPerfect);
 
-            CreateEntity("gui").AddComponent(new ImGuiController());
             Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
         }
 
         public override void Initialize()
         {
+            CreateEntity("gui").AddComponent(new ImGuiController());
         }
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)

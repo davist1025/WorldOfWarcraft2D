@@ -222,18 +222,9 @@ namespace WoW.Realmserver
             // tells the client they can enter the world.
             Program.SendTo(thisEntity.Name, new RealmClient_EnterWorld()
             {
-                MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"]
+                MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"],
+                MOTD = "Welcome to the official PTR for the WoW Pixel Project. Enjoy your stay!"
             });
-            
-            // todo: sending MOTD doesnt seem to work correctly on the client.
-            // i think the list of messages is getting cleared before it can display?
-            //var motdMessage = new ChatMessage()
-            //{
-            //    Message = "Welcome to the official PTR for the WoW Pixel Project. Enjoy your stay!",
-            //    Flags = ChatMessageFlag.IsServerMessage
-            //};
-
-            //Program.SendTo(thisEntity.Name, motdMessage);
         }
 
         /// <summary>
