@@ -1,5 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using log4net;
+using log4net.Config;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using WoW.Client.Components;
@@ -49,6 +52,7 @@ namespace WoW.Client
 
         public static TmxMap[] Maps;
         public static GameConfiguration Configuration;
+        public static readonly ILog Logger = LogManager.GetLogger("debug");
 
         // todo: store these globally.
         public static string AccountName;
@@ -73,7 +77,13 @@ namespace WoW.Client
         }
 
         protected override void Initialize()
-        {   
+        {
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+            Logger.Debug("This is a test debug message.");
+            Logger.Info("This is another test!");
+
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
             ClientListener.PeerConnectedEvent += (peer) =>
