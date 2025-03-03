@@ -59,13 +59,7 @@ The roadmap above is a best-case scenario final product, but may not make it out
 
 ## Project Status
 
-As of 1/30/25, functional implementation exists for: 
-
-- MySQL w/ EntityFramework
-- Account, character and realmlist support
-- Basic networking infrastructure: authentication, realmlist, character list/creation/deletion, entering the world (player & npc packets, some local character data, movement, and chat/command processing)
-- Headless realmserver environment using Nez (See WoW.Realmserver)
-- Basic character customization
+Please see the [Trello board for WPP](https://trello.com/b/b9pZIlZU/wpp-wow2d) for more information.
 
 ## Disclaimer
 This project is undergoing rapid change in its codebase, data structures, object definitions, and general infrastructure and as such, should be considered *wildly* unstable.

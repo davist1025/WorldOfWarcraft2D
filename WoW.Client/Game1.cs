@@ -52,7 +52,7 @@ namespace WoW.Client
 
         public static TmxMap[] Maps;
         public static GameConfiguration Configuration;
-        public static readonly ILog Logger = LogManager.GetLogger("debug");
+        public static readonly ILog DebugLogger = LogManager.GetLogger("debug");
 
         // todo: store these globally.
         public static string AccountName;
@@ -81,8 +81,8 @@ namespace WoW.Client
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-            Logger.Debug("This is a test debug message.");
-            Logger.Info("This is another test!");
+            DebugLogger.Debug("This is a test debug message.");
+            DebugLogger.Info("This is another test!");
 
             ClientListener = new EventBasedNetListener();
             ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
