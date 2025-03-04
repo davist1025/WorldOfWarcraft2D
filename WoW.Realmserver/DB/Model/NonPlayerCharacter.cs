@@ -30,5 +30,20 @@ namespace WoW.Realmserver.DB.Model
 
         [Column("level")]
         public int Level { get; set; } = 1;
+
+        [Column("strength_amt")]
+        public int? Strength { get; set; }
+
+        [Column("agility_amt")]
+        public int? Agility { get; set; }
+
+        [Column("intellect_amt")]
+        public int? Intellect { get; set; }
+
+        [Column("stamina_amt")]
+        public int? Stamina { get; set; }
+
+        [Column("spirit_amt")]
+        public int? Spirit { get; set; }
     }
 }

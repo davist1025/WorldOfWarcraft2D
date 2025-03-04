@@ -53,7 +53,7 @@ namespace WoW.Realmserver.Content
                 if (ctx.NPCs.Any(npc => npc.Id == npcId))
                 {
                     NonPlayerCharacter npc = ctx.NPCs.First(npc => npc.Id == npcId);
-                    NonPlayerCharacterBehavior[] behaviors = ctx.Behaviors.Where(behavior => behavior.NpcId == npc.Id).ToArray();
+                    NonPlayerCharacterBehavior[] behaviors = ctx.NpcBehaviors.Where(behavior => behavior.NpcId == npc.Id).ToArray();
                     Entity npcEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString(), session.Entity.Transform.Position);
                     npcEntity.Tag = (int)EntityType.NPC;
 

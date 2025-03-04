@@ -10,8 +10,23 @@ namespace WoW.Client.Shared
 {
     public enum RaceType
     {
-        Human = 0,
+        Human = 1,
         Orc
+    }
+
+    public enum ClassType
+    {
+        Warrior = 1,
+        Mage
+    }
+
+    public enum StatisticType
+    {
+        Strength = 1,
+        Agility,
+        Intellect,
+        Stamina,
+        Sprit
     }
 
     public enum EntityType : int

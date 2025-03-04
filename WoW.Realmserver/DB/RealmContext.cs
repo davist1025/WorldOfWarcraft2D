@@ -14,10 +14,12 @@ namespace WoW.Realmserver.DB
     internal class RealmContext : DbContext
     {
         public DbSet<PlayerCharacter> Characters { get; set; }
+        public DbSet<PlayerCharacterStatistic> CharacterStatistics { get; set; }
         public DbSet<FilteredCharacterName> CharacterNameFilters { get; set; }
+        public DbSet<CharacterClassBaseStatistic> BaseClassStatistics { get; set; }
 
         public DbSet<NonPlayerCharacter> NPCs { get; set; }
-        public DbSet<NonPlayerCharacterBehavior> Behaviors { get; set; }
+        public DbSet<NonPlayerCharacterBehavior> NpcBehaviors { get; set; }
 
         public DbSet<ChatCommand> Commands { get; set; }
         public DbSet<ChatCommandChild> ChildCommands { get; set; }
