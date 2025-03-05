@@ -1,4 +1,5 @@
-﻿using Nez;
+﻿using Microsoft.Xna.Framework;
+using Nez;
 using Nez.ECS.Headless;
 using Nez.Tiled;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Realmserver.Components;
 
 namespace WoW.Realmserver.Content
 {
@@ -50,9 +52,37 @@ namespace WoW.Realmserver.Content
             processor.PhysicsLayer = (physicsLayerIndex == 0) ? 1 << 0 : 1 << physicsLayerIndex;
             mapEntity.AddComponent(processor);
 
+            Console.WriteLine($"Creating a Tiled processor for: '{mapName}'....");
+
             _mapProcessors.Add(mapName, new TiledMapProcessor(map, "collision_layer"));
 
-            Console.WriteLine($"Created a Tiled processor for: '{mapName}'; Physics: {processor.PhysicsLayer}");
+            if (map.ObjectGroups.Count > 0)
+            {
+                // process mob/player spawners first
+                var spawners = map.GetObjectGroup("spawner");
+
+                if (spawners != null)
+                {
+                    Console.WriteLine($"Adding {spawners.Objects.Count} spawner(s) to {mapName}...");
+                    for (int i = 0; i < spawners.Objects.Count; i++)
+                    {
+                        var spawnObject = spawners.Objects[i];
+                        var posiiton = new Vector2(spawnObject.X, spawnObject.Y);
+                        var isPlayer = Convert.ToBoolean(spawnObject.Properties["is_player"]);
+                        var npcId = Convert.ToInt32(spawnObject.Properties["npc_id"]);
+                        var maxCount = Convert.ToInt32(spawnObject.Properties["max_count"]);
+                        // todo: get timer from object data.
+
+                        //Console.WriteLine($"{spawnObject.Name} ({posiiton.X}:{posiiton.Y}) [IsPlayer = {isPlayer}]");
+                        // todo: create spawner components.
+
+                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, 0f /* timer */, isPlayer);
+                        mapEntity.AddComponent(spawnerComp);
+                    }
+                }
+            }
+
+            //Console.WriteLine($"Created a Tiled processor for: '{mapName}'; Physics: {processor.PhysicsLayer}");
         }
 
         public TiledMapProcessor GetMap(string name)
