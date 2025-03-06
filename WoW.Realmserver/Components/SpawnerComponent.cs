@@ -20,7 +20,12 @@ namespace WoW.Realmserver.Components
         private int _npcId = -1;
         private int _maxInWorld = 0;
         private float _timerInSeconds = 0f;
+
         private Vector2 _position;
+        public Vector2 Position
+        {
+            get => _position;
+        }
 
         private bool _isPlayerSpawner = false;
         public bool IsPlayerSpawner
@@ -28,9 +33,10 @@ namespace WoW.Realmserver.Components
             get => _isPlayerSpawner;
         }
 
-        public SpawnerComponent(TiledMapProcessor processor, int npcId, int macCount, float timerInSeconds, bool isPlayerSpawner)
+        public SpawnerComponent(TiledMapProcessor processor, int npcId, int macCount, float timerInSeconds, bool isPlayerSpawner, Vector2 position)
         {
             _processor = processor;
+            _position = position;
 
             if (!isPlayerSpawner)
             {

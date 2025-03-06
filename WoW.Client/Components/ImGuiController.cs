@@ -231,14 +231,12 @@ namespace WoW.Client.Components
                             _newCharacterHairId++;
                     }
 
-                    Debug.Log(_newCharacterRaceId);
-
                     if (NezImGui.CenteredButton("Create", 0.5f))
                     {
                         Game1.Send(new ClientRealm_CreateCharacter() 
                         { 
                             Name = _newCharacterNameInput.Trim(),
-                            RaceId = _newCharacterRaceId,
+                            RaceId = _newCharacterRaceId + 1,
                             HairId = _newCharacterHairId
                         });
                         Game1.NetState = GameNetworkState.Realm;

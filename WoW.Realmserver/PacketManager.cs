@@ -59,7 +59,12 @@ namespace WoW.Realmserver
                             .Max();
                     }
 
-                    string racialSpawnMapId = ctx.RaceSpawns.Where(raceSpawn => raceSpawn.RaceId == characterData.RaceId).FirstOrDefault().MapId;
+                    Console.WriteLine(characterData.RaceId);
+                    Console.WriteLine(ctx.RaceSpawns.First().RaceId);
+
+                    var racialSpawnLocation = ctx.RaceSpawns.Where(raceSpawn => raceSpawn.RaceId == characterData.RaceId).FirstOrDefault();
+                    string mapId = racialSpawnLocation.MapId;
+                    Vector2 mapPosition = new Vector2(racialSpawnLocation.X, racialSpawnLocation.Y);
 
                     // todo: check for max character count.
 
@@ -70,9 +75,9 @@ namespace WoW.Realmserver
                         Name = characterData.Name.ToUpper(),
                         RaceId = characterData.RaceId,
                         HairId = characterData.HairId,
-                        MapId = racialSpawnMapId,
-                        XPosition = 50f, // todo: use Tiled for position setting when creating a new char.
-                        YPosition = 50f,
+                        MapId = mapId,
+                        XPosition = mapPosition.X,
+                        YPosition = mapPosition.Y,
                         Direction = 3
                     };
                     ctx.Add(newCharacter);

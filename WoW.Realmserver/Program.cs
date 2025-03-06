@@ -74,12 +74,15 @@ namespace WoW.Realmserver
             {
                 if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Human))
                 {
+                    var humanMapEntity = Scene.FindEntity("elwynn_forest");
+                    var spawnerComponent = humanMapEntity.GetComponents<SpawnerComponent>().Where(spawner => spawner.IsPlayerSpawner).Single();
+
                     ctx.RaceSpawns.Add(new CharacterRaceSpawn()
                     {
                         RaceId = (int)RaceType.Human,
                         MapId = "elwynn_forest",
-                        X = 50f,
-                        Y = 50f,
+                        X = spawnerComponent.Position.X,
+                        Y = spawnerComponent.Position.Y,
                     });
                 }
 

@@ -67,7 +67,7 @@ namespace WoW.Realmserver.Content
                     for (int i = 0; i < spawners.Objects.Count; i++)
                     {
                         var spawnObject = spawners.Objects[i];
-                        var posiiton = new Vector2(spawnObject.X, spawnObject.Y);
+                        var position = new Vector2(spawnObject.X, spawnObject.Y);
                         var isPlayer = Convert.ToBoolean(spawnObject.Properties["is_player"]);
                         var npcId = Convert.ToInt32(spawnObject.Properties["npc_id"]);
                         var maxCount = Convert.ToInt32(spawnObject.Properties["max_count"]);
@@ -76,7 +76,7 @@ namespace WoW.Realmserver.Content
                         //Console.WriteLine($"{spawnObject.Name} ({posiiton.X}:{posiiton.Y}) [IsPlayer = {isPlayer}]");
                         // todo: create spawner components.
 
-                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, 0f /* timer */, isPlayer);
+                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, 0f /* timer */, isPlayer, position);
                         mapEntity.AddComponent(spawnerComp);
                     }
                 }
