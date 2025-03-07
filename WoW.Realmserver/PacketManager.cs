@@ -59,9 +59,6 @@ namespace WoW.Realmserver
                             .Max();
                     }
 
-                    Console.WriteLine(characterData.RaceId);
-                    Console.WriteLine(ctx.RaceSpawns.First().RaceId);
-
                     var racialSpawnLocation = ctx.RaceSpawns.Where(raceSpawn => raceSpawn.RaceId == characterData.RaceId).FirstOrDefault();
                     string mapId = racialSpawnLocation.MapId;
                     Vector2 mapPosition = new Vector2(racialSpawnLocation.X, racialSpawnLocation.Y);
@@ -253,10 +250,6 @@ namespace WoW.Realmserver
         public static void OnPlayerChat(ChatMessage newChat, NetPeer peer)
         {
             WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
-
-            // todo: [x] parse out "." commands.
-            // todo: [ ] parse slash commands.
-            // todo: [x] send chat to all players.
 
             string unformattedMessage = newChat.Message;
 

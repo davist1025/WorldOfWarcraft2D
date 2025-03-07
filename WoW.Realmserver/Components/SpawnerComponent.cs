@@ -19,7 +19,10 @@ namespace WoW.Realmserver.Components
 
         private int _npcId = -1;
         private int _maxInWorld = 0;
+        private int _currentlyInWorld = 0;
         private float _timerInSeconds = 0f;
+        private float _localTimer = 0f;
+        private RectangleF _bounds;
 
         private Vector2 _position;
         public Vector2 Position
@@ -43,6 +46,10 @@ namespace WoW.Realmserver.Components
                 _npcId = npcId;
                 _maxInWorld = macCount;
                 _timerInSeconds = timerInSeconds;
+
+                // arbitrary size for spawn radius.
+                Vector2 sizeOfBounds = new Vector2(200f, 200f);
+                _bounds = new RectangleF(new Vector2(position.X - sizeOfBounds.X / 2f, position.Y - sizeOfBounds.Y / 2f), sizeOfBounds);
             }
 
             _isPlayerSpawner = isPlayerSpawner;
@@ -55,7 +62,20 @@ namespace WoW.Realmserver.Components
 
         public void Update()
         {
+            if (!_isPlayerSpawner && _currentlyInWorld < _maxInWorld)
+            {
+                _localTimer += Time.DeltaTime;
 
+                if (_localTimer >= _timerInSeconds)
+                {
+                    _localTimer = 0f;
+
+                    var newRandomPosition = new Vector2(_bounds.X + Nez.Random.NextFloat(_bounds.X + _bounds.Width), _bounds.Y + Nez.Random.NextFloat(_bounds.Height));
+
+                    EntityFactory.CreateNPC(_npcId, _processor.Map.Properties["id"], newRandomPosition);
+                    _currentlyInWorld++;
+                }
+            }
         }
     }
 }

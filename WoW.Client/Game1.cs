@@ -54,7 +54,6 @@ namespace WoW.Client
         public static GameConfiguration Configuration;
         public static readonly ILog DebugLogger = LogManager.GetLogger("debug");
 
-        // todo: store these globally.
         public static string AccountName;
         public static string SessionId;
         public static RemoteRealmserver LastRealm; // todo: save to disk.

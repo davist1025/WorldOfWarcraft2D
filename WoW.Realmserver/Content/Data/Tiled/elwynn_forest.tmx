@@ -86,6 +86,7 @@
     <property name="is_player" type="bool" value="false"/>
     <property name="max_count" type="int" value="3"/>
     <property name="npc_id" type="int" value="2"/>
+    <property name="timer" type="float" value="12"/>
    </properties>
    <point/>
   </object>

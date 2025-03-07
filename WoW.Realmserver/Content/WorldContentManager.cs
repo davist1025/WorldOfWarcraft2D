@@ -71,18 +71,19 @@ namespace WoW.Realmserver.Content
                         var isPlayer = Convert.ToBoolean(spawnObject.Properties["is_player"]);
                         var npcId = Convert.ToInt32(spawnObject.Properties["npc_id"]);
                         var maxCount = Convert.ToInt32(spawnObject.Properties["max_count"]);
-                        // todo: get timer from object data.
 
-                        //Console.WriteLine($"{spawnObject.Name} ({posiiton.X}:{posiiton.Y}) [IsPlayer = {isPlayer}]");
-                        // todo: create spawner components.
+                        float timer = 0.0f;
 
-                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, 0f /* timer */, isPlayer, position);
+                        if (!isPlayer)
+                        {
+                            timer = Convert.ToSingle(spawnObject.Properties["timer"]);
+                        }
+
+                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, timer, isPlayer, position);
                         mapEntity.AddComponent(spawnerComp);
                     }
                 }
             }
-
-            //Console.WriteLine($"Created a Tiled processor for: '{mapName}'; Physics: {processor.PhysicsLayer}");
         }
 
         public TiledMapProcessor GetMap(string name)

@@ -48,76 +48,9 @@ namespace WoW.Realmserver.Content
              */
             int npcId = Convert.ToInt32(commandParams[0]);
 
-            using (var ctx = new RealmContext())
-            {
-                if (ctx.NPCs.Any(npc => npc.Id == npcId))
-                {
-                    NonPlayerCharacter npc = ctx.NPCs.First(npc => npc.Id == npcId);
-                    NonPlayerCharacterBehavior[] behaviors = ctx.NpcBehaviors.Where(behavior => behavior.NpcId == npc.Id).ToArray();
-                    Entity npcEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString(), session.Entity.Transform.Position);
-                    npcEntity.Tag = (int)EntityType.NPC;
+            EntityFactory.CreateNPC(npcId, session.Character.MapId, session.Entity.Transform.Position);
 
-                    NpcMetadata serializedNpc = new NpcMetadata()
-                    {
-                        WorldId = npcEntity.Name,
-                        Name = npc.Name,
-                        ModelId = npc.ModelId,
-                        Flags = (NpcTypeFlags)npc.FlagType,
-                        Level = npc.Level,
-                        MapId = session.Character.MapId,
-                        X = session.Entity.Transform.Position.X,
-                        Y = session.Entity.Transform.Position.Y
-                    };
-
-                    var processorOfRecipient = Program.Scene
-                        .FindComponentsOfType<TiledMapProcessor>()
-                        .Single(proc => proc.Map.Properties["id"].ToLower().Equals(session.Character.MapId.ToLower()));
-
-                    if (processorOfRecipient != null)
-                    {
-                        var npcController = npcEntity.AddComponent(new NpcControllerComponent()
-                        {
-                            Metadata = serializedNpc
-                        });
-
-                        // todo: look for external scripts, too!
-                        var behaviorAttributeObjects = Assembly
-                            .GetExecutingAssembly()
-                            .GetTypes()
-                            .Where(t => t.GetCustomAttribute<BehaviorAttribute>() != null)
-                            .ToArray();
-                        List<Type> validBehaviorTypes = new List<Type>();
-
-                        if (behaviorAttributeObjects.Length > 0)
-                        {
-                            for (int i = 0; i < behaviors.Length; i++)
-                            {
-                                var behavior = behaviors[i];
-                                var behaviorScriptName = behavior.Script;
-                                var behaviorTypeWithScriptName
-                                    = behaviorAttributeObjects.First(b => b.GetCustomAttribute<BehaviorAttribute>().Id.ToLower().Equals(behaviorScriptName));
-
-                                if (behaviorTypeWithScriptName != null)
-                                    validBehaviorTypes.Add(behaviorTypeWithScriptName);
-                            }
-                        }
-
-                        for (int i = 0; i < validBehaviorTypes.Count; i++)
-                        {
-                            var behaviorTypeToInit = validBehaviorTypes[i];
-                            npcController.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
-                        }
-
-                        processorOfRecipient.AddCreature(npcEntity, true);
-
-                        var allPlayersInProc = processorOfRecipient.Creatures.Where(creature => creature.HasComponent<WorldSessionComponent>()).ToArray();
-
-                        foreach (var player in allPlayersInProc)
-                            Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
-                    }
-                }
                 // todo: send invalid id response.
-            }
         }
 
         [CommandHandler("ServerCommand_SendMessage")]

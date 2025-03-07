@@ -33,6 +33,7 @@ namespace WoW.Realmserver
         public static WorldContentManager Content;
 
         public static float DeltaTime = 0f;
+        private float _counter = 0f;
 
         public static Dictionary<string, NetPeer> TransferSessions = new Dictionary<string, NetPeer>();
 
@@ -72,10 +73,12 @@ namespace WoW.Realmserver
             Console.WriteLine("Verifying default racial spawn locations...");
             using (var ctx = new RealmContext())
             {
+                Entity mapEntity = null;
+
                 if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Human))
                 {
-                    var humanMapEntity = Scene.FindEntity("elwynn_forest");
-                    var spawnerComponent = humanMapEntity.GetComponents<SpawnerComponent>().Where(spawner => spawner.IsPlayerSpawner).Single();
+                    mapEntity = Scene.FindEntity("elwynn_forest");
+                    var spawnerComponent = mapEntity.GetComponents<SpawnerComponent>().Where(spawner => spawner.IsPlayerSpawner).Single();
 
                     ctx.RaceSpawns.Add(new CharacterRaceSpawn()
                     {
