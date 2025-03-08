@@ -22,7 +22,12 @@ namespace WoW.Realmserver.Components
         private int _currentlyInWorld = 0;
         private float _timerInSeconds = 0f;
         private float _localTimer = 0f;
+
         private RectangleF _bounds;
+        public RectangleF Bounds
+        {
+            get => _bounds;
+        }
 
         private Vector2 _position;
         public Vector2 Position
@@ -66,13 +71,15 @@ namespace WoW.Realmserver.Components
             {
                 _localTimer += Time.DeltaTime;
 
-                if (_localTimer >= _timerInSeconds)
+                if (_localTimer >= _timerInSeconds + Nez.Random.NextFloat(5f))
                 {
                     _localTimer = 0f;
 
                     var newRandomPosition = new Vector2(_bounds.X + Nez.Random.NextFloat(_bounds.X + _bounds.Width), _bounds.Y + Nez.Random.NextFloat(_bounds.Height));
 
-                    EntityFactory.CreateNPC(_npcId, _processor.Map.Properties["id"], newRandomPosition);
+                    var npc = EntityFactory.CreateNPC(_npcId, _processor.Map.Properties["id"], newRandomPosition);
+                    npc.GetComponent<NpcControllerComponent>().SetHome(this);
+
                     _currentlyInWorld++;
                 }
             }

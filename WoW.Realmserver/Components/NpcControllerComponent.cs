@@ -13,6 +13,7 @@ namespace WoW.Realmserver.Components
     {
         public NpcMetadata Metadata { get; init; }
         public List<IBehavior> Behaviors = new List<IBehavior>();
+        public SpawnerComponent Spawner;
 
         public void Update()
         {
@@ -28,5 +29,8 @@ namespace WoW.Realmserver.Components
 
             Behaviors.Add(behavior);
         }
+
+        public void SetHome(SpawnerComponent component)
+            => Spawner = component;
     }
 }

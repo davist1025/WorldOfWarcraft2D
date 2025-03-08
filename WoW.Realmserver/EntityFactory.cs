@@ -29,7 +29,7 @@ namespace WoW.Realmserver
         /// <param name="id"></param>
         /// <param name="mapId"></param>
         /// <param name="spawnPosition"></param>
-        public static void CreateNPC(int id, string mapId, Vector2 spawnPosition)
+        public static Entity CreateNPC(int id, string mapId, Vector2 spawnPosition)
         {
             using (var realmContext = new RealmContext())
             {
@@ -40,7 +40,7 @@ namespace WoW.Realmserver
                 {
                     Console.WriteLine($"Unable to find existing NPC metadata with the id: {id}!");
 
-                    return;
+                    return null;
                 }
 
                 NonPlayerCharacterBehavior[] thisNpcBehaviors = realmContext.NpcBehaviors.Where(behavior => behavior.NpcId == npcMetadata.Id).ToArray();
@@ -108,7 +108,10 @@ namespace WoW.Realmserver
 
                     foreach (var player in allPlayersInProc)
                         Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
+
+                    return newNpcEntity;
                 }
+                return null;
             }
         }
     }
