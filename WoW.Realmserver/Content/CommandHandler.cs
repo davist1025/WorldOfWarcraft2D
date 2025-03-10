@@ -48,7 +48,7 @@ namespace WoW.Realmserver.Content
              */
             int npcId = Convert.ToInt32(commandParams[0]);
 
-            EntityFactory.CreateNPC(npcId, session.Character.MapId, session.Entity.Transform.Position);
+            EntityFactory.CreateNPC(npcId, session.Character.MapId, session.Entity.Transform.Position, true);
 
                 // todo: send invalid id response.
         }

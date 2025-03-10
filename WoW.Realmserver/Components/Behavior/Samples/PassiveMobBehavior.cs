@@ -61,7 +61,22 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                 if (_currentTime >= _idleTimer)
                 {
                     _isIdle = false;
-                    _travelToPoint = new Vector2(_controller.Spawner.Bounds.X + Nez.Random.NextFloat(_controller.Spawner.Bounds.Width), _controller.Spawner.Bounds.Y + Nez.Random.NextFloat(_controller.Spawner.Bounds.Height));
+
+                    // spawner component could be null if this NPC was created by a command.
+                    // in this case, we can use the npcs' spawn point.
+                    if (_controller.SpawnPosition != Vector2.Zero)
+                    {
+                        // hack: 200 values from the spawn position of the NPC.
+                        // this is just bad debug code ignore it for now
+                        _travelToPoint = new Vector2(
+                            _controller.SpawnPosition.X + Nez.Random.NextFloat(200f),
+                            _controller.SpawnPosition.Y + Nez.Random.NextFloat(200));
+
+                    }
+                    else
+                    {
+                        _travelToPoint = new Vector2(_controller.Spawner.Bounds.X + Nez.Random.NextFloat(_controller.Spawner.Bounds.Width), _controller.Spawner.Bounds.Y + Nez.Random.NextFloat(_controller.Spawner.Bounds.Height));
+                    }
                     _currentTime = 0f;
                 }
             }

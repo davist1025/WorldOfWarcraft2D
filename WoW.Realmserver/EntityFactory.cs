@@ -29,7 +29,7 @@ namespace WoW.Realmserver
         /// <param name="id"></param>
         /// <param name="mapId"></param>
         /// <param name="spawnPosition"></param>
-        public static Entity CreateNPC(int id, string mapId, Vector2 spawnPosition)
+        public static Entity CreateNPC(int id, string mapId, Vector2 spawnPosition, bool isCommand = false)
         {
             using (var realmContext = new RealmContext())
             {
@@ -71,8 +71,11 @@ namespace WoW.Realmserver
                 {
                     var controllerForNpc = newNpcEntity.AddComponent(new NpcControllerComponent
                     {
-                        Metadata = serializedNpc
+                        Metadata = serializedNpc,
                     });
+
+                    if (isCommand)
+                        controllerForNpc.SpawnPosition = spawnPosition;
 
                     var behaviorsInThisAssmebly = Assembly
                         .GetExecutingAssembly()

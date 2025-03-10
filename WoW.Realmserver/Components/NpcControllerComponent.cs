@@ -1,4 +1,5 @@
-﻿using Nez;
+﻿using Microsoft.Xna.Framework;
+using Nez;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace WoW.Realmserver.Components
         public NpcMetadata Metadata { get; init; }
         public List<IBehavior> Behaviors = new List<IBehavior>();
         public SpawnerComponent Spawner;
+        public Vector2 SpawnPosition = Vector2.Zero;
 
         public void Update()
         {
