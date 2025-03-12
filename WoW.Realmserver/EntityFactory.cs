@@ -99,13 +99,13 @@ namespace WoW.Realmserver
                         }
                     }
 
+                    tiledProcessorForMapId.AddCreature(newNpcEntity, true);
+
                     for (int i = 0; i < validBehaviorTypes.Count; i++)
                     {
                         var behaviorTypeToInit = validBehaviorTypes[i];
                         controllerForNpc.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
                     }
-
-                    tiledProcessorForMapId.AddCreature(newNpcEntity, true);
 
                     var allPlayersInProc = tiledProcessorForMapId.Creatures.Where(creature => creature.HasComponent<WorldSessionComponent>()).ToArray();
 

@@ -30,15 +30,18 @@ namespace WoW.Realmserver.Components.Behavior.Samples
             _controller = Parent.GetComponent<NpcControllerComponent>();
 
             // Processor will give us TiledMap data, namely the collision layer for pathfinding.
-            // todo: sequence contains no elements!
-            //_processor = Program.Scene
-            //    .FindComponentsOfType<TiledMapProcessor>()
-            //    .Single(processor => processor.Creatures.Contains(Parent));
+
+            var allProcessors = Program.Scene.FindComponentsOfType<TiledMapProcessor>();
+            var processor = allProcessors.Single(processor => processor.Creatures.Any(entity => entity.Id == Parent.Id));
+
+            if (processor != null)
+            {
+                Console.WriteLine($"Found processor which contains this enetity: {processor.Map.Properties["id"]}");
+            }
         }
 
         public override void Update()
         {
-            // todo: create roam behavior!
             /*
              * Roaming
              * 
@@ -61,7 +64,7 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                 if (_currentTime >= _idleTimer)
                 {
                     _isIdle = false;
-
+                    
                     // spawner component could be null if this NPC was created by a command.
                     // in this case, we can use the npcs' spawn point.
                     if (_controller.SpawnPosition != Vector2.Zero)
