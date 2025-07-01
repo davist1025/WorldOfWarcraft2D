@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Nez;
+using Nez.AI.Pathfinding;
 using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,15 @@ namespace WoW.Realmserver.Components.Behavior.Samples
         private TiledMapProcessor _processor;
 
         private bool _isIdle = true;
+        private bool _isMoving = false;
         private float _idleTimer = 4.5f;
         private float _currentTime = 0f;
         private Vector2 _travelToPoint = Vector2.Zero;
         private Mover _mover;
+
+        private AstarGridGraph _aStarGrid;
+        private List<Point> _graphTravelPoints;
+        private Vector2 _travelToSpace = Vector2.Zero;
 
         public override void OnLoad()
         {
@@ -37,6 +43,9 @@ namespace WoW.Realmserver.Components.Behavior.Samples
             if (processor != null)
             {
                 Console.WriteLine($"Found processor which contains this enetity: {processor.Map.Properties["id"]}");
+                _aStarGrid = new AstarGridGraph(processor.CollisionLayer);
+
+                _processor = processor;
             }
         }
 
@@ -64,35 +73,54 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                 if (_currentTime >= _idleTimer)
                 {
                     _isIdle = false;
-                    
-                    // spawner component could be null if this NPC was created by a command.
-                    // in this case, we can use the npcs' spawn point.
-                    if (_controller.SpawnPosition != Vector2.Zero)
-                    {
-                        // hack: 200 values from the spawn position of the NPC.
-                        // this is just bad debug code ignore it for now
-                        _travelToPoint = new Vector2(
-                            _controller.SpawnPosition.X + Nez.Random.NextFloat(200f),
-                            _controller.SpawnPosition.Y + Nez.Random.NextFloat(200));
 
-                    }
-                    else
-                    {
-                        _travelToPoint = new Vector2(_controller.Spawner.Bounds.X + Nez.Random.NextFloat(_controller.Spawner.Bounds.Width), _controller.Spawner.Bounds.Y + Nez.Random.NextFloat(_controller.Spawner.Bounds.Height));
-                    }
+                    /*
+                     * A complete path from the parent's position, to a randomly generated position within their spawn radius needs to be calculated using AStar.
+                     * 
+                     * We'll need:
+                     * - The parent's position
+                     * - A randomly generated end goal
+                     * 
+                     */
+
+                    var worldToTiles = _processor.Map.WorldToTilePosition(_controller.Spawner.Position);
+                    var generatedX = Nez.Random.Range(worldToTiles.X - 20f, worldToTiles.X + 20f);
+                    var generatedY = Nez.Random.Range(worldToTiles.Y - 20f, worldToTiles.Y + 20f);
+
+                    _graphTravelPoints = _aStarGrid
+                        .Search(
+                            _processor.Map.WorldToTilePosition(_controller.Entity.Position), new Point((int)generatedX, (int)generatedY));
+
+                    if (_graphTravelPoints != null)
+                        Debug.Log("Generated movement points for NPC...");
+
                     _currentTime = 0f;
                 }
             }
 
-            if (_travelToPoint != Vector2.Zero)
+            // select the next point in the node graph.
+            if (_graphTravelPoints != null)
             {
-                var distance = _travelToPoint - Parent.Position;
-                distance.Normalize();
+                if (_graphTravelPoints.Count > 0 && !_isMoving)
+                {
+                    _isMoving = true;
 
-                bool _shouldFollow = (Vector2.Distance(Parent.Position, _travelToPoint) < 1f) ? false : true;
+                    var point = _graphTravelPoints.First();
+                    _graphTravelPoints.Remove(point);
+                    _travelToSpace = _processor.Map.TileToWorldPosition(point);
+                }
+            }
+
+            // travel to the next tile's world position in the node graph.
+            if (_travelToSpace != Vector2.Zero)
+            {
+                bool _shouldFollow = (Vector2.Distance(Parent.Position, _travelToSpace) < 1f) ? false : true;
 
                 if (_shouldFollow)
                 {
+                    var distance = _travelToSpace - Parent.Position;
+                    distance.Normalize();
+
                     // - 15f for a slower NPC movement.
                     var movement = distance * Time.DeltaTime * (Program.Configuration.WorldParameters["global_movement_speed"] - 15f);
 
@@ -112,9 +140,16 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                 }
                 else
                 {
-                    _travelToPoint = Vector2.Zero;
-                    _isIdle = true;
+                    _isMoving = false;
+                    _travelToSpace = Vector2.Zero;
                 }
+            }
+
+            // reset the idle and node graph if we've reached the end of the path.
+            if (_graphTravelPoints != null && _graphTravelPoints.Count == 0)
+            {
+                _graphTravelPoints = null;
+                _isIdle = true;
             }
         }
     }

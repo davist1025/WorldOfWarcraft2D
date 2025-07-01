@@ -77,7 +77,7 @@ namespace WoW.Realmserver.Components
 
                     var newRandomPosition = new Vector2(_bounds.X + Nez.Random.NextFloat(_bounds.X + _bounds.Width), _bounds.Y + Nez.Random.NextFloat(_bounds.Height));
 
-                    var npc = EntityFactory.CreateNPC(_npcId, _processor.Map.Properties["id"], newRandomPosition);
+                    var npc = EntityFactory.CreateNPC(_npcId, _processor.Map.Properties["id"], _position);
                     npc.GetComponent<NpcControllerComponent>().SetHome(this);
 
                     _currentlyInWorld++;
