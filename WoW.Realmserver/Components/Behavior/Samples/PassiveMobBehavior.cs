@@ -84,12 +84,13 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                      */
 
                     var worldToTiles = _processor.Map.WorldToTilePosition(_controller.Spawner.Position);
-                    var generatedX = Nez.Random.Range(worldToTiles.X - 20f, worldToTiles.X + 20f);
-                    var generatedY = Nez.Random.Range(worldToTiles.Y - 20f, worldToTiles.Y + 20f);
+                    var generatedX = Nez.Random.Range(worldToTiles.X - 5f, worldToTiles.X + 5f);
+                    var generatedY = Nez.Random.Range(worldToTiles.Y - 5f, worldToTiles.Y + 5f);
 
                     _graphTravelPoints = _aStarGrid
                         .Search(
                             _processor.Map.WorldToTilePosition(_controller.Entity.Position), new Point((int)generatedX, (int)generatedY));
+
 
                     if (_graphTravelPoints != null)
                         Debug.Log("Generated movement points for NPC...");
@@ -151,6 +152,9 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                 _graphTravelPoints = null;
                 _isIdle = true;
             }
+
+            if (_graphTravelPoints == null && !_isIdle)
+                _isIdle = true;
         }
     }
 }
