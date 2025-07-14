@@ -148,10 +148,7 @@ namespace WoW.Realmserver.Components.Behavior.Samples
 
             // reset the idle and node graph if we've reached the end of the path.
             if (_graphTravelPoints != null && _graphTravelPoints.Count == 0)
-            {
                 _graphTravelPoints = null;
-                _isIdle = true;
-            }
 
             if (_graphTravelPoints == null && !_isIdle)
                 _isIdle = true;
