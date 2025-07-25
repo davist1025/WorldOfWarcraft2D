@@ -13,7 +13,52 @@ In no way does this project intend to infringe on Blizzard, their affiliated tea
 ### Public Test Release #1
 This release should capture the core gameplay loop of vanilla. Players should have the ability to communicate with one-another and NPC's, as well as perform basic combat.
 
-*TBD.*
+- Gamemaster functionality
+	- [ ] GN tag (game chat, player names)
+	- [ ] Ticket support system
+	- [ ] Commands (teleport, summon, kick, additem, completequest)
+
+- Two character races: Human, Orc
+	- [ ] Starting area
+	- [ ] Racial bonuses
+	- [ ] Game art
+	
+- "Demo" gameplay, player progression
+	- [ ] Players can level to 10
+	- [ ] Players can unlock abilities and skills to level 10
+	- [ ] Questing
+		- [ ] Rewards
+		- [ ] Gossip scripts (dialogue)
+		- [ ] Requirements (level, etc)
+		- [ ] Chains
+	- [ ] Combat
+		- [ ] Melee
+		- [ ] Ranged/Spells
+
+- Two character classes: Warrior, Mage
+	- Warrior
+		- [ ] Game art
+		- [ ] Abilities
+		- [ ] Race-lock
+	- Mage
+		- [ ] Game art
+		- [ ] Abilities
+		- [ ] Race-lock
+
+- Game chat
+	- [ ] Chat channels
+		- [ ] Whisper
+		- [ ] General/Trade/World
+		- [ ] GM
+		- [ ] Say
+	- [ ] Colored messages for easy viewing (i.e whisper is purple/pink, say is white, world/city channels are a soft pink)
+	- [ ] Item linking
+
+- Game mail
+	- [ ] Game art
+	- [ ] Attachments
+		- [ ] Items
+		- [ ] Money
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
