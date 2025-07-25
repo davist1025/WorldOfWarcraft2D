@@ -13,46 +13,7 @@ In no way does this project intend to infringe on Blizzard, their affiliated tea
 ### Public Test Release #1
 This release should capture the core gameplay loop of vanilla. Players should have the ability to communicate with one-another and NPC's, as well as perform basic combat.
 
-- [ ] Character creation with basic customization
-	- [x] Race
-	- [x] Hair
-	- [ ] Skin
-	- [x] Name
-	- [ ] Character visual on creation screen
-- [x] Hashed password
-- [x] Chat command processing
-- [ ] 2 playable classes to level 10
-	- [ ] Warrior
-	- [ ] Mage
-- [ ] 2 zones for the starting areas of the two available races
-- [x] 2 playable races
-	- [x] Human
-	- [x] Orc
-- [x] Tab-targeting
-- [ ] Spellcasting
-- [ ] Melee
-- [ ] Inventory
-- [ ] NPC looting
-- [ ] Character equipment
-	- [ ] Armor pieces
-	- [ ] Equipment
-	- [ ] Weapon(s)
-	- [ ] Shield
-	- [ ] Off-hand
-- [ ] Character stats
-	- [ ] Health
-	- [ ] Mana
-	- [ ] Strength
-	- [ ] Agility
-	- [ ] Intellect
-	- [ ] Stamina
-	- [ ] Spirit
-- [ ] Gamemaster ticket support system
-- [ ] NPC behaviors
-	- [ ] Dialogue
-	- [ ] Pathfinding
-	- [ ] Attacking
-- [ ] Questing in the starting zones for each of the two races
+*TBD.*
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
