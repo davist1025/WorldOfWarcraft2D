@@ -9,63 +9,21 @@ A passion project with the goal of emulating Vanilla World of Warcraft.
 
 In no way does this project intend to infringe on Blizzard, their affiliated teams, their products or their rights, and is not affiliated with Blizzard in anyway. This project is intended to be educational and for entertainment purposes only.
 
+*8/12/25 Update: This project has been moved into a 'proof-of-concept' status. The only focus is getting a functional, visually appealing product as quickly as possible to outline the possibilities of a project like this. The future roadmap will reflect updated priorities and characteristics of PTR #1.* 
+
 ## Roadmap
-### Public Test Release #1
+### Public Test Release #1 (Proof of Concept release)
 This release should capture the core gameplay loop of vanilla. Players should have the ability to communicate with one-another and NPC's, as well as perform basic combat.
 
-- Gamemaster functionality
-	- [ ] GN tag (game chat, player names)
-	- [ ] Ticket support system
-	- [ ] Commands (teleport, summon, kick, additem, completequest)
-
-- Two character races: Human, Orc
-	- [ ] Starting area
-	- [ ] Racial bonuses
-	- [ ] Game art
-	
-- "Demo" gameplay, player progression
-	- [ ] Players can level to 10
-	- [ ] Players can unlock abilities and skills to level 10
-	- [ ] Questing
-		- [ ] Rewards
-		- [ ] Gossip scripts (dialogue)
-		- [ ] Requirements (level, etc)
-		- [ ] Chains
-	- [ ] Combat
-		- [ ] Melee
-		- [ ] Ranged/Spells
-
-- Two character classes: Warrior, Mage
-	- Warrior
-		- [ ] Game art
-		- [ ] Abilities
-		- [ ] Race-lock
-	- Mage
-		- [ ] Game art
-		- [ ] Abilities
-		- [ ] Race-lock
-
-- Game chat
-	- [ ] Chat channels
-		- [ ] Whisper
-		- [ ] General/Trade/World
-		- [ ] GM
-		- [ ] Say
-	- [ ] Colored messages for easy viewing (i.e whisper is purple/pink, say is white, world/city channels are a soft pink)
-	- [ ] Item linking
-
-- Game mail
-	- [ ] Game art
-	- [ ] Attachments
-		- [ ] Items
-		- [ ] Money
+*Roadmap TBD.*
 
 In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
 The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
 
 ## Project Status
+Regular project status and progress updates will be viewable on GitHub through issues, discussions and more.
 
-Please see the [Trello board for WPP](https://trello.com/b/b9pZIlZU/wpp-wow2d) for more information.
+*TBD.*
 
 ## Disclaimer
 This project is undergoing rapid change in its codebase, data structures, object definitions, and general infrastructure and as such, should be considered *wildly* unstable.
