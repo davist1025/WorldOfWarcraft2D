@@ -48,7 +48,6 @@ namespace WoW.Authserver
                 else if (account == null)
                 {
                     loginCode.Code = LogonCode.NoRecord;
-                    Console.WriteLine("Invalid login.");
                 }
                 else
                 {
