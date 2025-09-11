@@ -16,6 +16,12 @@ namespace WoW.Realmserver.Components
         public List<IBehavior> Behaviors = new List<IBehavior>();
         public SpawnerComponent Spawner;
         public Vector2 SpawnPosition = Vector2.Zero;
+        public Mover Mover;
+
+        public override void OnAddedToEntity()
+        {
+            Mover = Entity.AddComponent<Mover>();
+        }
 
         public void Update()
         {

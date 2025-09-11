@@ -9,21 +9,7 @@ A passion project with the goal of emulating Vanilla World of Warcraft.
 
 In no way does this project intend to infringe on Blizzard, their affiliated teams, their products or their rights, and is not affiliated with Blizzard in anyway. This project is intended to be educational and for entertainment purposes only.
 
-*8/12/25 Update: This project has been moved into a 'proof-of-concept' status. The only focus is getting a functional, visually appealing product as quickly as possible to outline the possibilities of a project like this. The future roadmap will reflect updated priorities and characteristics of PTR #1.* 
-
-## Roadmap
-### Public Test Release #1 (Proof of Concept release)
-This release should capture the core gameplay loop of vanilla. Players should have the ability to communicate with one-another and NPC's, as well as perform basic combat.
-
-*Roadmap TBD.*
-
-In no way, shape or form is this project intended to become a full-fledged product. I work on this in my free-time, which is very limited, and for fun. 
-The roadmap above is a best-case scenario final product, but may not make it out of prototyping. Any length I can go with this project will be considered a feat in and of itself.
-
-## Project Status
-Regular project status and progress updates will be viewable on GitHub through issues, discussions and more.
-
-*TBD.*
+Please view the Wiki for more information on the project.
 
 ## Disclaimer
 This project is undergoing rapid change in its codebase, data structures, object definitions, and general infrastructure and as such, should be considered *wildly* unstable.
