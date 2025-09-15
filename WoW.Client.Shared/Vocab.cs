@@ -50,8 +50,6 @@ namespace WoW.Client.Shared
     public enum NpcTypeFlags
     {
         IsMerchant = 1 << 0,
-        IsQuestGiver = 1 << 1,
-        CanDialogue = 1 << 2
     }
 
     public enum SpriteDirection
