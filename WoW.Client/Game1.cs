@@ -50,6 +50,7 @@ namespace WoW.Client
 
         public static TmxMap[] Maps;
         public static GameConfiguration Configuration;
+        public static Dictionary<string, Texture2D> InterfaceTextures;
 
         public static string AccountName;
         public static string SessionId;
@@ -165,6 +166,11 @@ namespace WoW.Client
                 ShowStyleEditor = false,
             };
             Core.RegisterGlobalManager(guiManager);
+
+            InterfaceTextures = new Dictionary<string, Texture2D>()
+            {
+                { "gear_icon", Core.Content.LoadTexture("Content/Data/UI/gear_img.png") }
+            };
 
             Scene = new LogonScene();
         }

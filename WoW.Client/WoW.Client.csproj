@@ -52,6 +52,12 @@
     <None Update="Content\Data\Tileset\basic_grass_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Data\UI\gear_img.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Data\UI\merchant_loot_bag_img.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Data\valley_of_trials.tmx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

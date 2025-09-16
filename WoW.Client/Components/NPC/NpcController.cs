@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared.Data;
 
-namespace WoW.Client.Components
+namespace WoW.Client.Components.NPC
 {
     public class NpcController : Component, IUpdatable
     {
@@ -21,7 +21,9 @@ namespace WoW.Client.Components
             var model = Metadata.ModelId;
             // todo: load model from Content.
 
+            Debug.Log($"#### New NPC ####");
             Debug.Log($"{Metadata.Name} has a model of: {model}");
+            Debug.Log($"{Metadata.WorldId} flags: {Metadata.Flags}");
 
             // Create renderers, mover, etc.
             var renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
@@ -56,6 +58,8 @@ namespace WoW.Client.Components
                 Entity.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
             }
             */
+
+            Entity.AddComponent<NpcFlagRenderer>();
         }
 
         public void Update()

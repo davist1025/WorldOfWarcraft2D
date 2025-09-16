@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Components.NPC;
 using WoW.Client.Scenes;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
