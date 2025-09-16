@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Components.NPC
 {
-    public class NpcFlagRenderer : RenderableComponent, IUpdatable
+    public class NpcFlagHandler : RenderableComponent, IUpdatable
     {
         public override float Width => 32f;
         public override float Height => 32f;
@@ -20,7 +20,6 @@ namespace WoW.Client.Components.NPC
             // todo: check for flag type (merchant, gossip, etc)
             if (_shouldRenderIcon)
             {
-                var mousePos = Input.MousePosition;
                 batcher.Draw(Game1.InterfaceTextures["gear_icon"], (Entity.Scene.Camera.MouseToWorldPoint() - new Microsoft.Xna.Framework.Vector2(-5, 15)));
             }
         }
@@ -41,6 +40,8 @@ namespace WoW.Client.Components.NPC
                 _shouldRenderIcon = true;
             else
                 _shouldRenderIcon = false;
+
+            // todo: check for action taken with this npc, using the flag (send packets, open UI, etc)
         }
     }
 }

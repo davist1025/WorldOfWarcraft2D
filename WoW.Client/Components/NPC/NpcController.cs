@@ -59,7 +59,7 @@ namespace WoW.Client.Components.NPC
             }
             */
 
-            Entity.AddComponent<NpcFlagRenderer>();
+            Entity.AddComponent<NpcFlagHandler>();
         }
 
         public void Update()
