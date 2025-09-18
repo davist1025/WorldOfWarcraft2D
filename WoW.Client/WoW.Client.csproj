@@ -55,6 +55,9 @@
     <None Update="Content\Data\UI\gear_img.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Data\UI\hand1_mouse.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Data\UI\merchant_loot_bag_img.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

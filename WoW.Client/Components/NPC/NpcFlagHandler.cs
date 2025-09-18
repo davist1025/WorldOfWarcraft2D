@@ -1,4 +1,5 @@
-﻿using Nez;
+﻿using Microsoft.Xna.Framework.Input;
+using Nez;
 using Nez.Sprites;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,8 @@ namespace WoW.Client.Components.NPC
             // todo: check for flag type (merchant, gossip, etc)
             if (_shouldRenderIcon)
             {
-                batcher.Draw(Game1.InterfaceTextures["gear_icon"], (Entity.Scene.Camera.MouseToWorldPoint() - new Microsoft.Xna.Framework.Vector2(-5, 15)));
+                //batcher.Draw(Game1.InterfaceTextures["merchant_bag_icon"], (Entity.Scene.Camera.MouseToWorldPoint() - new Microsoft.Xna.Framework.Vector2(-5, 15)));
+                Mouse.SetCursor(MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0));
             }
         }
 
@@ -40,6 +42,7 @@ namespace WoW.Client.Components.NPC
                 _shouldRenderIcon = true;
             else
                 _shouldRenderIcon = false;
+            // todo: event handler for hovering enter/exit?
 
             // todo: check for action taken with this npc, using the flag (send packets, open UI, etc)
         }

@@ -169,8 +169,11 @@ namespace WoW.Client
 
             InterfaceTextures = new Dictionary<string, Texture2D>()
             {
-                { "gear_icon", Core.Content.LoadTexture("Content/Data/UI/gear_img.png") }
+                { "gear_icon", Core.Content.LoadTexture("Content/Data/UI/gear_img.png") },
+                { "hand1_mouse", Core.Content.LoadTexture("Content/Data/UI/hand1_mouse.png") },
+                { "merchant_bag_icon", Core.Content.LoadTexture("Content/Data/UI/merchant_loot_bag_img.png") }
             };
+            Mouse.SetCursor(MouseCursor.FromTexture2D(InterfaceTextures["hand1_mouse"], 0, 0));
 
             Scene = new LogonScene();
         }
