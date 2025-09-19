@@ -61,17 +61,6 @@ namespace WoW.Client.Scenes
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
             animator.RenderLayer = 5;
 
-            //raceRenderer = Game1.Player.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
-            //raceRenderer.RenderLayer = 5;
-
-            //if (thePlayer.HairId > 1)
-            //{
-            //    var hairSprite = Content.LoadAsepriteFile($"Content/Data/Characters/hair_{thePlayer.HairId}_spritesheet.ase");
-
-            //    var hairRenderer = Game1.Player.AddComponent(new SpriteRenderer(hairSprite.Frames[0].ToSprite()));
-            //    hairRenderer.RenderLayer = 0;
-            //}
-
             Game1.Player.AddComponent(_theController);
 
             TmxMap tmxMapByMapId;

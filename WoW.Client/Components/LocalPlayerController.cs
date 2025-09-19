@@ -66,16 +66,16 @@ namespace WoW.Client.Components
                 switch (_direction)
                 {
                     case SpriteDirection.North:
-                        startingAnimation = "idle_north";
+                        startingAnimation = "idle";
                         break;
                     case SpriteDirection.East:
-                        startingAnimation = "idle_east";
+                        startingAnimation = "idle";
                         break;
                     case SpriteDirection.South:
-                        startingAnimation = "idle_south";
+                        startingAnimation = "idle";
                         break;
                     case SpriteDirection.West:
-                        startingAnimation = "idle_west";
+                        startingAnimation = "idle";
                         break;
                 }
                 _animator.Play(startingAnimation); // avoids a null-reference exception.
@@ -92,9 +92,17 @@ namespace WoW.Client.Components
                 var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
 
-                if (_movementInput.X < 0f) _direction = SpriteDirection.West;
+                if (_movementInput.X < 0f)
+                {
+                    _direction = SpriteDirection.West;
+                    _animator.FlipX = true;
+                }
 
-                if (_movementInput.X > 0f) _direction = SpriteDirection.East;
+                if (_movementInput.X > 0f)
+                {
+                    _direction = SpriteDirection.East;
+                    _animator.FlipX = false;
+                }
 
                 if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
 
@@ -103,20 +111,20 @@ namespace WoW.Client.Components
                 switch (_direction)
                 {
                     case SpriteDirection.North:
-                        if (!_animator.CurrentAnimationName.Equals("run_north"))
-                            _animator.Play("run_north");
+                        if (!_animator.CurrentAnimationName.Equals("walk"))
+                            _animator.Play("walk");
                         break;
                     case SpriteDirection.East:
-                        if (!_animator.CurrentAnimationName.Equals("run_east"))
-                            _animator.Play("run_east");
+                        if (!_animator.CurrentAnimationName.Equals("walk"))
+                            _animator.Play("walk");
                         break;
                     case SpriteDirection.South:
-                        if (!_animator.CurrentAnimationName.Equals("run_south"))
-                            _animator.Play("run_south");
+                        if (!_animator.CurrentAnimationName.Equals("walk"))
+                            _animator.Play("walk");
                         break;
                     case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("run_west"))
-                            _animator.Play("run_west");
+                        if (!_animator.CurrentAnimationName.Equals("walk"))
+                            _animator.Play("walk");
                         break;
                 }
 
@@ -133,20 +141,20 @@ namespace WoW.Client.Components
                 switch (_direction)
                 {
                     case SpriteDirection.North:
-                        if (!_animator.CurrentAnimationName.Equals("idle_north"))
-                            _animator.Play("idle_north");
+                        if (!_animator.CurrentAnimationName.Equals("idle"))
+                            _animator.Play("idle");
                         break;
                     case SpriteDirection.East:
-                        if (!_animator.CurrentAnimationName.Equals("idle_east"))
-                            _animator.Play("idle_east");
+                        if (!_animator.CurrentAnimationName.Equals("idle"))
+                            _animator.Play("idle");
                         break;
                     case SpriteDirection.South:
-                        if (!_animator.CurrentAnimationName.Equals("idle_south"))
-                            _animator.Play("idle_south");
+                        if (!_animator.CurrentAnimationName.Equals("idle"))
+                            _animator.Play("idle");
                         break;
                     case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("idle_west"))
-                            _animator.Play("idle_west");
+                        if (!_animator.CurrentAnimationName.Equals("idle"))
+                            _animator.Play("idle");
                         break;
                 }
             }
