@@ -40,6 +40,9 @@
     <None Update="Content\Data\Characters\hair_2_spritesheet.ase">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Content\Data\Characters\human_male_spritesheet.ase">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Data\Characters\human_spritesheet.ase">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

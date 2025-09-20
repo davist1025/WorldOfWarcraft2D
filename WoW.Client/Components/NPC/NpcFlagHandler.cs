@@ -9,26 +9,19 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Components.NPC
 {
-    public class NpcFlagHandler : RenderableComponent, IUpdatable
+    public class NpcFlagHandler : Component, IUpdatable
     {
-        public override float Width => 32f;
-        public override float Height => 32f;
+        private NpcController _npcParent;
+        private MouseCursor _renderingCursor = null;
 
-        private bool _shouldRenderIcon = false;
-
-        public override void Render(Batcher batcher, Camera camera)
+        public override void OnAddedToEntity()
         {
-            // todo: check for flag type (merchant, gossip, etc)
-            if (_shouldRenderIcon)
-            {
-                //batcher.Draw(Game1.InterfaceTextures["merchant_bag_icon"], (Entity.Scene.Camera.MouseToWorldPoint() - new Microsoft.Xna.Framework.Vector2(-5, 15)));
-                Mouse.SetCursor(MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0));
-            }
+            _npcParent = Entity.GetComponent<NpcController>();
         }
 
         public void Update()
         {
-            var worldTilePos = Entity.Scene.Camera.MouseToWorldPoint();
+            var mouseToWorldPos = Entity.Scene.Camera.MouseToWorldPoint();
             var entityRenderer = Entity.GetComponent<SpriteRenderer>();
 
             if (entityRenderer == null)
@@ -38,13 +31,23 @@ namespace WoW.Client.Components.NPC
                 return;
             }
 
-            if (entityRenderer.Bounds.Contains(worldTilePos))
-                _shouldRenderIcon = true;
-            else
-                _shouldRenderIcon = false;
-            // todo: event handler for hovering enter/exit?
+            OnHover(entityRenderer.Bounds.Contains(mouseToWorldPos));
+            Mouse.SetCursor(_renderingCursor);
 
             // todo: check for action taken with this npc, using the flag (send packets, open UI, etc)
+        }
+
+        private void OnHover(bool isEnter)
+        {
+            if (isEnter)
+            {
+                var flags = _npcParent.Metadata.Flags;
+
+                if (flags.HasFlag(Shared.NpcTypeFlags.IsMerchant))
+                    _renderingCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0);
+            }
+            else
+                _renderingCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["hand1_mouse"], 0, 0);
         }
     }
 }
