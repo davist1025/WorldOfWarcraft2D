@@ -43,7 +43,6 @@ namespace WoW.Client.Scenes
             Game1.CurrentMapId = thePlayer.MapId;
 
             AsepriteFile aseFile = null;
-            SpriteRenderer raceRenderer; // todo: replace with animator.
             RaceType characterRace = (RaceType)thePlayer.RaceId;
 
             switch (characterRace)
@@ -59,6 +58,8 @@ namespace WoW.Client.Scenes
             var actorSpriteAtlas = aseFile.ToSpriteAtlas();
             var animator = Game1.Player.AddComponent<SpriteAnimator>();
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
+
+            // todo: how should we apply the shadow? unsure how to detach it from the rest of the animation and render it separately.
             animator.RenderLayer = 5;
 
             Game1.Player.AddComponent(_theController);
