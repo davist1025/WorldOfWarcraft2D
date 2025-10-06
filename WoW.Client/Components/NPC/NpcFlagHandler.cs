@@ -12,11 +12,17 @@ namespace WoW.Client.Components.NPC
     public class NpcFlagHandler : Component, IUpdatable
     {
         private NpcController _npcParent;
-        private MouseCursor _renderingCursor = null;
+
+        private MouseCursor _defaultCursor;
+        private MouseCursor _bagCursor;
+        private bool _hasBeenSet = false;
 
         public override void OnAddedToEntity()
         {
             _npcParent = Entity.GetComponent<NpcController>();
+
+            _defaultCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["hand1_mouse"], 0, 0);
+            _bagCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0);
         }
 
         public void Update()
@@ -32,22 +38,25 @@ namespace WoW.Client.Components.NPC
             }
 
             OnHover(entityRenderer.Bounds.Contains(mouseToWorldPos));
-            Mouse.SetCursor(_renderingCursor);
 
             // todo: check for action taken with this npc, using the flag (send packets, open UI, etc)
         }
 
         private void OnHover(bool isEnter)
         {
-            if (isEnter)
+            if (isEnter && !_hasBeenSet)
             {
                 var flags = _npcParent.Metadata.Flags;
 
                 if (flags.HasFlag(Shared.NpcTypeFlags.IsMerchant))
-                    _renderingCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0);
+                    Mouse.SetCursor(_bagCursor);
+                _hasBeenSet = true;
             }
-            else
-                _renderingCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["hand1_mouse"], 0, 0);
+            else if (!isEnter && _hasBeenSet)
+            {
+                Mouse.SetCursor(_defaultCursor);
+                _hasBeenSet = false;
+            }
         }
     }
 }

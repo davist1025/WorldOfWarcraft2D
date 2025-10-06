@@ -1,4 +1,4 @@
-@WoW.Web_HostAddress = http://localhost:5107
+@WoW.Web_HostAddress = http://localhost:5294
 
 GET {{WoW.Web_HostAddress}}/weatherforecast/
 Accept: application/json
