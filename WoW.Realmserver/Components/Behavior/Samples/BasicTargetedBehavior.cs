@@ -45,7 +45,7 @@ namespace WoW.Realmserver.Components.Behavior.Samples
                     _mover.ApplyMovement(movement);
 
                     // hack: temporary call to update the NPC position to clients while testing the movement code on the server
-                    Program.SendToAll(new RealmClient_NetPositionInputUpdate()
+                    Program.SendToAll(new RealmClient_MovementStateChange()
                     {
                         Id = Parent.Name,
                         ResultX = Parent.Position.X,

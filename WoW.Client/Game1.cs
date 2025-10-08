@@ -98,6 +98,7 @@ namespace WoW.Client
 
             _netProcessor = new NetPacketProcessor();
 
+            _netProcessor.RegisterNestedType<Vector2Serializable>();
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
 
             _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) => PacketManager.OnLogonResponse(logonCode));
@@ -112,10 +113,14 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) => PacketManager.OnLocalPlayer(thePlayer));
 
-            _netProcessor.SubscribeReusable<RealmClient_Debug_ServerPosition>((result) =>
+            _netProcessor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
             {
                 var controller = Scene.FindComponentOfType<LocalPlayerController>();
-                controller.LastServerPosition = new Vector2(result.X, result.Y);
+                controller.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
+                controller.LastServerCalculation = new Vector2(controller.LastServerCalculation.X - 32f, controller.LastServerCalculation.Y - 16f);
+
+                controller.ProcessInputValidation(result);
+                // todo: correction from server.
             });
 
             _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
@@ -123,7 +128,7 @@ namespace WoW.Client
             // mostly an empty packet. open to suggestions or later implementation :P
             _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) => PacketManager.OnEnterWorld(worldParams));
 
-            _netProcessor.SubscribeReusable<RealmClient_NetPositionInputUpdate>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
+            _netProcessor.SubscribeReusable<RealmClient_MovementStateChange>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
 
             _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
 

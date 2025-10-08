@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lib\LiteNetLib-0.9.5.2\LiteNetLib\LiteNetLib.csproj" />
+    <ProjectReference Include="..\Lib\Nez-MG38\Nez.Portable\Nez.MG38.csproj" />
   </ItemGroup>
 
 </Project>

@@ -115,7 +115,7 @@ namespace WoW.Client
             gui.ChatHistory.Add(newChatStorage);
         }
 
-        public static void OnPlayerPositionUpdate(RealmClient_NetPositionInputUpdate netUpdate)
+        public static void OnPlayerPositionUpdate(RealmClient_MovementStateChange netUpdate)
         {
             var netPlayer = Core.Scene.FindEntity(netUpdate.Id);
 

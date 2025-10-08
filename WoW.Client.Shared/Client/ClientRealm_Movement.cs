@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LiteNetLib.Utils;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,8 +15,9 @@ namespace WoW.Client.Shared.Client
     /// </summary>
     public class ClientRealm_Movement
     {
-        public float X { get; set; }
-        public float Y { get; set; }
-        public int Tick { get; set; }
+        public float VelocityX { get; set; }
+        public float VelocityY { get; set; }
+        public long Sequence { get; set; }
+        public float DeltaTime { get; set; }
     }
 }

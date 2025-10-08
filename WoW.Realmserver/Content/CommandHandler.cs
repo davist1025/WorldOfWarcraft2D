@@ -140,7 +140,7 @@ namespace WoW.Realmserver.Content
                     foreach (var player in playersInNewProcessor)
                     {
                         Program.SendTo(characterToSummon.Entity.Name,
-                            new RealmClient_NetPositionInputUpdate()
+                            new RealmClient_MovementStateChange()
                             {
                                 Id = player.Name,
                                 ResultX = player.Transform.Position.X,

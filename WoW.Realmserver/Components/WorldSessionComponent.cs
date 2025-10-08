@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
+using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.DB.Model.Characters;
 using WoW.Server.Shared.Serializable;
@@ -25,7 +27,9 @@ namespace WoW.Realmserver.Components
 
         private Vector2 _moveDirection = Vector2.Zero;
 
-        public Queue<Vector2> InputUpdates = new Queue<Vector2>();
+        private float _tickAccumulator = 0f;
+        private long _lastProcessedSequence = 0;
+        private Queue<ClientRealm_Movement> _movementStateChanges = new Queue<ClientRealm_Movement>();
 
         public List<Entity> AvailableTargets = new List<Entity>();
         public int TargetIndex = -1;
@@ -35,37 +39,46 @@ namespace WoW.Realmserver.Components
 
         public void Update()
         {
-            if (InputUpdates.TryDequeue(out var input))
+            if (_movementStateChanges.TryDequeue(out var inputStateChange))
             {
-                _moveDirection = Program.Configuration.WorldParameters["global_movement_speed"] * Time.DeltaTime * input;
+                _tickAccumulator += inputStateChange.DeltaTime;
+                _lastProcessedSequence = inputStateChange.Sequence;
+
+                var vector = new Vector2(inputStateChange.VelocityX, inputStateChange.VelocityY);
+
+                _moveDirection = Program.Configuration.WorldParameters["global_movement_speed"] * Program.DeltaTime * vector;
                 _moveDirection.Round();
 
                 _mover.CalculateMovementExcluding(ref _moveDirection, Entity.Scene.FindComponentsOfType<WorldSessionComponent>().Select(x => x.Entity).ToArray(), out var res);
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
 
-                if (input.X < 0f) Character.Direction = (int)SpriteDirection.West;
+                if (_tickAccumulator >= Program.TickRate)
+                {
+                    _tickAccumulator = 0f;
+                    Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation() { ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
+                    Console.WriteLine($"Validated client input: {_lastProcessedSequence}");
+                }
 
-                if (input.X > 0f) Character.Direction = (int)SpriteDirection.East;
+                if (vector.X < 0f) Character.Direction = (int)SpriteDirection.West;
 
-                if (input.Y > 0f) Character.Direction = (int)SpriteDirection.South;
+                if (vector.X > 0f) Character.Direction = (int)SpriteDirection.East;
 
-                if (input.Y < 0f) Character.Direction = (int)SpriteDirection.North;
+                if (vector.Y > 0f) Character.Direction = (int)SpriteDirection.South;
+
+                if (vector.Y < 0f) Character.Direction = (int)SpriteDirection.North;
 
                 Program.SendToMapFromPlayer(Entity.Name,
-                    new RealmClient_NetPositionInputUpdate()
+                    new RealmClient_MovementStateChange()
                     {
                         Id = Entity.Name,
                         ResultX = Entity.Transform.Position.X,
                         ResultY = Entity.Transform.Position.Y,
-                        MovementX = input.X,
-                        MovementY = input.Y,
+                        MovementX = vector.X,
+                        MovementY = vector.Y,
                         Direction = Character.Direction,
                         IsTeleportUpdate = false
                     }, DeliveryMethod.Unreliable);
-
-                // show the player the server's resulting calculation.
-                Program.SendTo(Entity.Name, new RealmClient_Debug_ServerPosition() { X = Entity.Transform.Position.X, Y = Entity.Transform.Position.Y });
             }
         }
 
@@ -88,5 +101,8 @@ namespace WoW.Realmserver.Components
             if (TargetIndex > AvailableTargets.Count)
                 TargetIndex = AvailableTargets.Count - 1;
         }
+
+        public void AddMovementStateChange(ClientRealm_Movement stateChange)
+            => _movementStateChanges.Enqueue(stateChange);
     }
 }

@@ -11,10 +11,11 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
+using WoW.Client.Shared.Data;
+using WoW.Client.Shared.Realm;
 
 namespace WoW.Client.Components
 {
-
     public class LocalPlayerController : Component, IUpdatable
     {
         private VirtualIntegerAxis _xAxis, _yAxis;
@@ -26,12 +27,15 @@ namespace WoW.Client.Components
         private CircleCollider _circleCollder;
         private SpriteAnimator _animator;
 
-        private int _tickCount = 0;
-        //private List<InputChangeTick> _inputRecord;
+        private long _sequenceCounter = 0;
+        private List<ClientRealm_Movement> _unprocessedInput = new List<ClientRealm_Movement>();
+        private Queue<RealmClient_MovementStateValidation> _validatedInput = new Queue<RealmClient_MovementStateValidation>();
 
         public string Name;
-        public Vector2 LastServerPosition = Vector2.Zero;
         public string TargetWorldId = "";
+
+        /** Debug variables **/
+        public Vector2 LastServerCalculation = Vector2.Zero;
 
         public LocalPlayerController(string name, SpriteDirection direction)
         {
@@ -53,6 +57,7 @@ namespace WoW.Client.Components
             _animator = Entity.GetComponent<SpriteAnimator>();
             _animator.Speed = 0.5f;
             // todo: should collider size be set by the server and transmitted?
+            // yes :3
         }
 
         public void Update()
@@ -77,49 +82,18 @@ namespace WoW.Client.Components
 
             if (_movementInput != Vector2.Zero)
             {
-                ++_tickCount; // todo: unused client tick.
-                // todo: are more generalized state updates needed (i.e sending all inputs that matter; movement, attack, etc)?
-                // for instance: we could send new input changes such as "started moving left" once, and then once more when we release the button.
-                //_inputRecord.Add(new InputChangeTick(_tickCount, _movementInput));
-                Game1.Send(new ClientRealm_Movement() { X = _movementInput.X, Y = _movementInput.Y, Tick = _tickCount }, LiteNetLib.DeliveryMethod.Unreliable);
-                
-                var moveDirection = Game1.MovementSpeed * Time.DeltaTime * _movementInput;
-                moveDirection.Round();
+                ApplyInput(_movementInput);
 
-                if (_movementInput.X < 0f)
+                var movementUpdatePacket = new ClientRealm_Movement()
                 {
-                    _direction = SpriteDirection.West;
-                    _animator.FlipX = true;
-                }
-
-                if (_movementInput.X > 0f)
-                {
-                    _direction = SpriteDirection.East;
-                    _animator.FlipX = false;
-                }
-
-                if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
-
-                if (_movementInput.Y < 0f) _direction = SpriteDirection.North;
-
-                switch (_direction)
-                {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("walk"))
-                            _animator.Play("walk");
-                        break;
-                }
-
-                _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
-                _subPixelMovement.Update(ref moveDirection);
-                _mover.ApplyMovement(moveDirection);
+                    VelocityX = _movementInput.X,
+                    VelocityY = _movementInput.Y,
+                    Sequence = _sequenceCounter++,
+                    DeltaTime = Time.DeltaTime
+                };
+                _unprocessedInput.Add(movementUpdatePacket);
+                Game1.Send(movementUpdatePacket);
             }
-
-            if (_movementInput == Vector2.Zero && _tickCount > 0)
-                _tickCount = 0;
 
             if (_movementInput == Vector2.Zero)
             {
@@ -133,23 +107,76 @@ namespace WoW.Client.Components
                             _animator.Play("idle");
                         break;
                 }
+
+                if (_sequenceCounter > 0)
+                    _sequenceCounter = 0;
             }
+
+            if (_validatedInput.TryDequeue(out var result))
+            {
+                Entity.Transform.Position = result.ServerCalculation.ToVector2XNA();
+                _unprocessedInput.RemoveAll(x => x.Sequence <= result.Sequence);
+
+                foreach (var unproccessedInput in _unprocessedInput)
+                    ApplyInput(new Vector2(unproccessedInput.VelocityX, unproccessedInput.VelocityY));
+            }
+        }
+
+        public void ProcessInputValidation(RealmClient_MovementStateValidation validation)
+            => _validatedInput.Enqueue(validation);
+
+        private void ApplyInput(Vector2 input)
+        {
+            var moveDirection = Game1.MovementSpeed * Time.DeltaTime * input;
+            moveDirection.Round();
+
+            if (input.X < 0f)
+            {
+                _direction = SpriteDirection.West;
+                _animator.FlipX = true;
+            }
+
+            if (input.X > 0f)
+            {
+                _direction = SpriteDirection.East;
+                _animator.FlipX = false;
+            }
+
+            if (input.Y > 0f) _direction = SpriteDirection.South;
+
+            if (input.Y < 0f) _direction = SpriteDirection.North;
+
+            switch (_direction)
+            {
+                case SpriteDirection.North:
+                case SpriteDirection.East:
+                case SpriteDirection.South:
+                case SpriteDirection.West:
+                    if (!_animator.CurrentAnimationName.Equals("walk"))
+                        _animator.Play("walk");
+                    break;
+            }
+
+            _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
+            _subPixelMovement.Update(ref moveDirection);
+            _mover.ApplyMovement(moveDirection);
         }
 
         public override void DebugRender(Batcher batcher)
         {
+            batcher.DrawHollowRect(LastServerCalculation, 16f, 16f, Color.CornflowerBlue);
             // todo: need to set an "Origin" value server-side so this is automatically calculated and the position matches what the client would expect.
-            batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
+            //batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
 
-            if (!string.IsNullOrEmpty(TargetWorldId))
-            {
-                var entity = Entity.Scene.FindEntity(TargetWorldId);
+            //if (!string.IsNullOrEmpty(TargetWorldId))
+            //{
+            //    var entity = Entity.Scene.FindEntity(TargetWorldId);
 
-                if (entity != null)
-                {
-                    batcher.DrawLine(Entity.Position, entity.Position, Color.Yellow);
-                }
-            }
+            //    if (entity != null)
+            //    {
+            //        batcher.DrawLine(Entity.Position, entity.Position, Color.Yellow);
+            //    }
+            //}
         }
     }
 }

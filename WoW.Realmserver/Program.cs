@@ -35,6 +35,8 @@ namespace WoW.Realmserver
         public static float DeltaTime = 0f;
         private float _counter = 0f;
 
+        public const float TickRate = 0.1f;
+
         public static Dictionary<string, NetPeer> TransferSessions = new Dictionary<string, NetPeer>();
 
         public Program()
@@ -108,6 +110,7 @@ namespace WoW.Realmserver
             _netEventListener.PeerConnectedEvent += (peer) => { };
             _netEventListener.PeerDisconnectedEvent += (peer, reason) => PacketManager.OnClientDisconnected(peer, reason);
 
+            _netProcessor.RegisterNestedType<Vector2Serializable>();
             _netProcessor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) => PacketManager.OnPlayerMove(movement, peer));
             
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) => PacketManager.OnPlayerTransferToRealm(transfer, peer));
@@ -137,8 +140,10 @@ namespace WoW.Realmserver
             // todo: implement prediction/reconciliation with packet loss and latency simulation.
             //_netManager.SimulatePacketLoss = true;
             //_netManager.SimulationPacketLossChance = 20;
-            _netManager.SimulationMinLatency = 400;
-            _netManager.SimulationMaxLatency = 600;
+            _netManager.SimulatePacketLoss = true;
+            _netManager.SimulationPacketLossChance = 5;
+            _netManager.SimulationMinLatency = 50;
+            _netManager.SimulationMaxLatency = 150;
 
             _authListener = new EventBasedNetListener();
             _authListener.PeerConnectedEvent += (peer) =>

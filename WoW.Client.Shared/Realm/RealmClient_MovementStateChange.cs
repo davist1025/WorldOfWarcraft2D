@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Shared.Realm
 {
-    public class RealmClient_NetPositionInputUpdate
+    public class RealmClient_MovementStateChange
     {
         public string Id { get; set; }
+        public int TickId { get; set; }
 
         public float ResultX { get; set; }
 

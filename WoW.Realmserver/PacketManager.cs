@@ -238,8 +238,8 @@ namespace WoW.Realmserver
         {
             var entity = peer.Tag as Entity;
             var session = entity.GetComponent<WorldSessionComponent>();
+            session.AddMovementStateChange(movement);
 
-            session.InputUpdates.Enqueue(new Vector2(movement.X, movement.Y));
         }
 
         /// <summary>
