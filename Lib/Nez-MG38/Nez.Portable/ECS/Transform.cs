@@ -94,6 +94,13 @@ namespace Nez
 			set => SetLocalPosition(value);
 		}
 
+		private Vector2 _lerpedPosition = Vector2.Zero;
+		public Vector2 LerpedPosition
+		{
+			get => _lerpedPosition;
+			set => _lerpedPosition = value;
+		}
+
 
 		/// <summary>
 		/// rotation of the transform in world space in radians

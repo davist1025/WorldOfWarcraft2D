@@ -140,10 +140,8 @@ namespace WoW.Realmserver
             // todo: implement prediction/reconciliation with packet loss and latency simulation.
             //_netManager.SimulatePacketLoss = true;
             //_netManager.SimulationPacketLossChance = 20;
-            _netManager.SimulatePacketLoss = true;
-            _netManager.SimulationPacketLossChance = 5;
             _netManager.SimulationMinLatency = 50;
-            _netManager.SimulationMaxLatency = 150;
+            _netManager.SimulationMaxLatency = 75;
 
             _authListener = new EventBasedNetListener();
             _authListener.PeerConnectedEvent += (peer) =>

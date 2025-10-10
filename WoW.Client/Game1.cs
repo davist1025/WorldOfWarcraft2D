@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.ImGuiTools;
+using Nez.Sprites;
 using Nez.Tiled;
 using System;
 using System.Collections;
@@ -117,7 +118,10 @@ namespace WoW.Client
             {
                 var controller = Scene.FindComponentOfType<LocalPlayerController>();
                 controller.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
-                controller.LastServerCalculation = new Vector2(controller.LastServerCalculation.X - 32f, controller.LastServerCalculation.Y - 16f);
+                //controller.LastServerCalculation = new Vector2(controller.LastServerCalculation.X - 32f, controller.LastServerCalculation.Y - 16f);
+
+                var animator = controller.GetComponent<SpriteAnimator>();
+                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
 
                 controller.ProcessInputValidation(result);
                 // todo: correction from server.

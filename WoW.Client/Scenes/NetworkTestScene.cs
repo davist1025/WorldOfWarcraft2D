@@ -26,8 +26,9 @@ namespace WoW.Client.Scenes
 
             Scene.SetDefaultDesignResolution(800, 600, SceneResolutionPolicy.ShowAllPixelPerfect);
 
-            Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
+            var followCam = Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
+            //followCam.FollowLerp = 0.5f;
         }
 
         public override void Initialize()
@@ -39,6 +40,7 @@ namespace WoW.Client.Scenes
         {
             _theController = new LocalPlayerController(thePlayer.Name, (SpriteDirection)thePlayer.Direction);
             Game1.Player = CreateEntity(thePlayer.WorldId, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            Game1.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
             Game1.CurrentMapId = thePlayer.MapId;
 
@@ -58,6 +60,7 @@ namespace WoW.Client.Scenes
             var actorSpriteAtlas = aseFile.ToSpriteAtlas();
             var animator = Game1.Player.AddComponent<SpriteAnimator>();
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
+            animator.IsNetworked = true;
 
             // todo: how should we apply the shadow? unsure how to detach it from the rest of the animation and render it separately.
             animator.RenderLayer = 5;

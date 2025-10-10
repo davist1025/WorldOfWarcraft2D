@@ -33,6 +33,7 @@ namespace WoW.Client.Components
 
         public string Name;
         public string TargetWorldId = "";
+        private Vector2 _renderPos = Vector2.Zero;
 
         /** Debug variables **/
         public Vector2 LastServerCalculation = Vector2.Zero;
@@ -164,7 +165,6 @@ namespace WoW.Client.Components
 
         public override void DebugRender(Batcher batcher)
         {
-            batcher.DrawHollowRect(LastServerCalculation, 16f, 16f, Color.CornflowerBlue);
             // todo: need to set an "Origin" value server-side so this is automatically calculated and the position matches what the client would expect.
             //batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
 

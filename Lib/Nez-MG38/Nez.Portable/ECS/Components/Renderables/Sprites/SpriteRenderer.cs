@@ -10,6 +10,9 @@ namespace Nez.Sprites
 	/// </summary>
 	public class SpriteRenderer : RenderableComponent
 	{
+		public bool IsNetworked = false;
+		public Vector2 LastNetworkPosition = Vector2.Zero;
+
 		public override RectangleF Bounds
 		{
 			get
@@ -187,7 +190,8 @@ namespace Nez.Sprites
 
 		public override void Render(Batcher batcher, Camera camera)
 		{
-			batcher.Draw(Sprite, Entity.Transform.Position + LocalOffset, Color,
+			Entity.Transform.LerpedPosition = Vector2.Lerp(Entity.Transform.LerpedPosition, LastNetworkPosition, 1 - Mathf.Exp(-10f * Time.DeltaTime));
+			batcher.Draw(Sprite, (IsNetworked) ? (Entity.Transform.LerpedPosition + LocalOffset) : (Entity.Transform.Position + LocalOffset), Color,
 				Entity.Transform.Rotation, Origin, Entity.Transform.Scale, SpriteEffects, _layerDepth);
 		}
 	}

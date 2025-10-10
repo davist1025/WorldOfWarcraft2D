@@ -57,7 +57,6 @@ namespace WoW.Realmserver.Components
                 {
                     _tickAccumulator = 0f;
                     Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation() { ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
-                    Console.WriteLine($"Validated client input: {_lastProcessedSequence}");
                 }
 
                 if (vector.X < 0f) Character.Direction = (int)SpriteDirection.West;

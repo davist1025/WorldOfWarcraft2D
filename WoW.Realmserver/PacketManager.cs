@@ -151,6 +151,7 @@ namespace WoW.Realmserver
 
                 thisSession.Character = activeCharacter;
             }
+            thisEntity.SetPosition(thisSession.Character.XPosition, thisSession.Character.YPosition);
             thisSession.InitializeGameComponents();
             var collider = thisEntity.GetComponent<CircleCollider>();
 
