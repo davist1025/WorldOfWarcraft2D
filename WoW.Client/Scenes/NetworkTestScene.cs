@@ -40,6 +40,7 @@ namespace WoW.Client.Scenes
         {
             _theController = new LocalPlayerController(thePlayer.Name, (SpriteDirection)thePlayer.Direction);
             Game1.Player = CreateEntity(thePlayer.WorldId, new Vector2(thePlayer.ZoneX, thePlayer.ZoneY));
+            Game1.Player.Transform.Position = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Tag = (int)EntityType.LocalPlayer;
             Game1.CurrentMapId = thePlayer.MapId;

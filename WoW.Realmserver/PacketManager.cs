@@ -197,6 +197,7 @@ namespace WoW.Realmserver
             for (int i = 0; i < allSessionsExceptThis.Count; i++)
             {
                 var otherSession = allSessionsExceptThis[i];
+                // todo: crash if two players are on the login/realm screen together.
                 Program.SendTo(thisEntity.Name, new RealmClient_CreateNetPlayer()
                 {
                     WorldId = otherSession.Entity.Name,

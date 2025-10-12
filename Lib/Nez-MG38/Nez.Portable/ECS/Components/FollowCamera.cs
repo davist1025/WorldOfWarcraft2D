@@ -178,6 +178,8 @@ namespace Nez
 
 			if (_cameraStyle == CameraStyle.LockOn)
 			{
+				// todo: LerpedPosition doesn't work here if the game is just booting up.
+				// Setting it to "Transform.Position", moving, and then changing to LerpedPosition makes it work.
 				var targetX = _targetEntity.Transform.Position.X;
 				var targetY = _targetEntity.Transform.Position.Y;
 

@@ -190,9 +190,16 @@ namespace Nez.Sprites
 
 		public override void Render(Batcher batcher, Camera camera)
 		{
-			Entity.Transform.LerpedPosition = Vector2.Lerp(Entity.Transform.LerpedPosition, LastNetworkPosition, 1 - Mathf.Exp(-10f * Time.DeltaTime));
+			if (IsNetworked)
+			{
+				if (Vector2.Distance(Entity.Transform.LerpedPosition, LastNetworkPosition) <= 0.5f)
+					Entity.Transform.LerpedPosition = LastNetworkPosition;
+				else
+					Entity.Transform.LerpedPosition = Vector2.Lerp(Entity.Transform.LerpedPosition, LastNetworkPosition, 1 - Mathf.Exp(-10f * Time.DeltaTime));
+			}
+
 			batcher.Draw(Sprite, (IsNetworked) ? (Entity.Transform.LerpedPosition + LocalOffset) : (Entity.Transform.Position + LocalOffset), Color,
-				Entity.Transform.Rotation, Origin, Entity.Transform.Scale, SpriteEffects, _layerDepth);
+					Entity.Transform.Rotation, Origin, Entity.Transform.Scale, SpriteEffects, _layerDepth);
 		}
 	}
 }

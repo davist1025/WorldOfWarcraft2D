@@ -165,6 +165,7 @@ namespace WoW.Client.Components
 
         public override void DebugRender(Batcher batcher)
         {
+            batcher.DrawHollowRect(_animator.LastNetworkPosition, 32f, 32f, Color.Yellow);
             // todo: need to set an "Origin" value server-side so this is automatically calculated and the position matches what the client would expect.
             //batcher.DrawHollowRect(LastServerPosition - new Vector2(16f / 2f), 16f, 16f, Color.Red);
 
