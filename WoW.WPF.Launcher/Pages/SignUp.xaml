@@ -32,9 +32,9 @@
                     
                 </StackPanel>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                    <TextBox Width="125" Margin="10 15 10 0"/>
-                    <TextBox Width="125" Margin="10 15 10 0"/>
-                    <Button Content="Sign Up" Width="75" Height="20" Margin="0 10 10 0" HorizontalAlignment="Right"/>
+                    <TextBox x:Name="textBoxUsername"  Width="125" Margin="10 15 10 0"/>
+                    <TextBox x:Name="textBoxPassword" Width="125" Margin="10 15 10 0"/>
+                    <Button x:Name="btnRegister" Content="Sign Up" Width="75" Height="20" Margin="0 10 10 0" HorizontalAlignment="Right" Click="OnRegisterClicked"/>
                 </StackPanel>
             </Grid>
         </Border>

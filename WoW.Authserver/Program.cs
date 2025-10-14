@@ -21,6 +21,14 @@ using static WoW.Server.Shared.Vocab;
 
 namespace WoW.Authserver
 {
+    /** Password hashing **/
+    /* 10-13-25
+     *  
+     * (Client) - Hash a plaintext password w/ Sha-256.
+     * (Server) - Hash a sha-256 hashed password with Argon2. This (encoded) value gets written to the database, and verified using Argon2.Verify(x,y).
+     * 
+     */ 
+
     internal class Program
     {
         private NetManager _netManager;
@@ -34,6 +42,7 @@ namespace WoW.Authserver
             using (var ctx = new AuthContext())
             {
                 Console.WriteLine("Deleting all sessions...");
+                // hack: probably not a proper way of resetting the session.
                 ctx.Accounts.Where(a => a.SessionId != string.Empty)
                     .ExecuteUpdate(setters => setters
                         .SetProperty(p => p.SessionId, default(string)));
