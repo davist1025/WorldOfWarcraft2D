@@ -34,7 +34,7 @@ namespace WoW.WPF.Launcher.Pages
             _webClient = new HttpClient();
         }
 
-        public void OnRegisterClicked(object sender, EventArgs e)
+        public async void OnRegisterClicked(object sender, EventArgs e)
         {
             var newAccountRegistration = new AccountRegistration()
             {
@@ -45,8 +45,8 @@ namespace WoW.WPF.Launcher.Pages
 
             // todo: obviously add async work here.
             var content = new StringContent(JsonConvert.SerializeObject(newAccountRegistration), Encoding.UTF8, "application/json");
-            var resp = _webClient.PostAsync("https://localhost:7159/api/authentication", content);
-            var str = resp.Result.Content.ReadAsStringAsync().Result;
+            var resp = await _webClient.PostAsync("https://localhost:7159/api/authentication", content);
+            var str = await resp.Content.ReadAsStringAsync();
 
             Debug.WriteLine(str);
         }
