@@ -192,7 +192,7 @@ namespace Nez.Sprites
 		{
 			if (IsNetworked)
 			{
-				if (Vector2.Distance(Entity.Transform.LerpedPosition, LastNetworkPosition) <= 0.5f)
+				if (Vector2.Distance(Entity.Transform.LerpedPosition, LastNetworkPosition) <= 1.5f)
 					Entity.Transform.LerpedPosition = LastNetworkPosition;
 				else
 					Entity.Transform.LerpedPosition = Vector2.Lerp(Entity.Transform.LerpedPosition, LastNetworkPosition, 1 - Mathf.Exp(-10f * Time.DeltaTime));
