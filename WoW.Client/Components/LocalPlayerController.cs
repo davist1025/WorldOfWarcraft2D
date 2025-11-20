@@ -83,6 +83,33 @@ namespace WoW.Client.Components
 
             if (_movementInput != Vector2.Zero)
             {
+                if (_movementInput.X < 0f)
+                {
+                    _direction = SpriteDirection.West;
+                    _animator.FlipX = true;
+                }
+
+                if (_movementInput.X > 0f)
+                {
+                    _direction = SpriteDirection.East;
+                    _animator.FlipX = false;
+                }
+
+                if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
+
+                if (_movementInput.Y < 0f) _direction = SpriteDirection.North;
+
+                switch (_direction)
+                {
+                    case SpriteDirection.North:
+                    case SpriteDirection.East:
+                    case SpriteDirection.South:
+                    case SpriteDirection.West:
+                        if (!_animator.CurrentAnimationName.Equals("walk"))
+                            _animator.Play("walk");
+                        break;
+                }
+
                 ApplyInput(_movementInput);
 
                 var movementUpdatePacket = new ClientRealm_Movement()
@@ -130,33 +157,6 @@ namespace WoW.Client.Components
         {
             var moveDirection = Game1.MovementSpeed * Time.DeltaTime * input;
             moveDirection.Round();
-
-            if (input.X < 0f)
-            {
-                _direction = SpriteDirection.West;
-                _animator.FlipX = true;
-            }
-
-            if (input.X > 0f)
-            {
-                _direction = SpriteDirection.East;
-                _animator.FlipX = false;
-            }
-
-            if (input.Y > 0f) _direction = SpriteDirection.South;
-
-            if (input.Y < 0f) _direction = SpriteDirection.North;
-
-            switch (_direction)
-            {
-                case SpriteDirection.North:
-                case SpriteDirection.East:
-                case SpriteDirection.South:
-                case SpriteDirection.West:
-                    if (!_animator.CurrentAnimationName.Equals("walk"))
-                        _animator.Play("walk");
-                    break;
-            }
 
             _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
             _subPixelMovement.Update(ref moveDirection);

@@ -68,7 +68,7 @@ namespace WoW.Client
 
         public static float MovementSpeed = 1f;
 
-        public Game1() : base(windowTitle: "WoW Pixel Project", width: 800, height: 600)
+        public Game1() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
         {
             IsMouseVisible = true;
             PauseOnFocusLost = false;
@@ -123,7 +123,6 @@ namespace WoW.Client
                 animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
 
                 controller.ProcessInputValidation(result);
-                // todo: correction from server.
             });
 
             _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
