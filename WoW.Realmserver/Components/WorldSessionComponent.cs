@@ -25,6 +25,7 @@ namespace WoW.Realmserver.Components
         private CircleCollider _collider;
         private Mover _mover;
 
+        private bool _isColliding = false;
         private Vector2 _moveDirection = Vector2.Zero;
 
         private float _tickAccumulator = 0f;
@@ -53,10 +54,16 @@ namespace WoW.Realmserver.Components
                 _subPixelMovement.Update(ref _moveDirection);
                 _mover.ApplyMovement(_moveDirection);
 
+                _isColliding = (res.Collider != null) ? true : false;
+
                 if (_tickAccumulator >= Program.TickRate)
                 {
                     _tickAccumulator = 0f;
-                    Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation() { ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
+
+                    Program.SendToAll(
+                        new RealmClient_MovementStateValidation() { PlayerName = Entity.Name, ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
+
+                    //Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation() { ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
                 }
 
                 if (vector.X < 0f) Character.Direction = (int)SpriteDirection.West;
@@ -73,6 +80,8 @@ namespace WoW.Realmserver.Components
                         Id = Entity.Name,
                         ResultX = Entity.Transform.Position.X,
                         ResultY = Entity.Transform.Position.Y,
+                        IsColliding = _isColliding,
+                        ColliderNormal = (_isColliding) ? new Vector2Serializable(res.Normal.X, res.Normal.Y) : new Vector2Serializable(0f, 0f),
                         MovementX = vector.X,
                         MovementY = vector.Y,
                         Direction = Character.Direction,

@@ -116,13 +116,26 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
             {
-                var controller = Scene.FindComponentOfType<LocalPlayerController>();
-                controller.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
+                // todo: search for networked player first, then local player if not found.
+                var playerForValidation = Scene.FindEntity(result.PlayerName);
+                if (playerForValidation != null)
+                {
+                    if (playerForValidation.HasComponent<LocalPlayerController>())
+                    {
+                        var localController = playerForValidation.GetComponent<LocalPlayerController>();
+                        localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
 
-                var animator = controller.GetComponent<SpriteAnimator>();
-                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
+                        var animator = localController.GetComponent<SpriteAnimator>();
+                        animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
 
-                controller.ProcessInputValidation(result);
+                        localController.ProcessInputValidation(result);
+                    }
+                    else if (playerForValidation.HasComponent<NetPlayerController>())
+                    {
+                        var netController = playerForValidation.GetComponent<NetPlayerController>();
+                        netController.Entity.SetPosition(result.ServerCalculation.ToVector2XNA());
+                    }
+                }
             });
 
             _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));

@@ -129,6 +129,18 @@ namespace WoW.Client
                 else if (netPlayer.HasComponent<NetPlayerController>())
                 {
                     var controller = netPlayer.GetComponent<NetPlayerController>();
+
+                    if (netUpdate.IsColliding)
+                    {
+                        var normal = netUpdate.ColliderNormal.ToVector2XNA();
+
+                        if (normal.Y != 0f)
+                            netUpdate.MovementY = 0f;
+
+                        if (normal.X != 0f)
+                            netUpdate.MovementX = 0f;
+                    }
+
                     controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
                 }
             }

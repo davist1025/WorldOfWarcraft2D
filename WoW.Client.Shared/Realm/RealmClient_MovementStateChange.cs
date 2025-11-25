@@ -9,12 +9,16 @@ namespace WoW.Client.Shared.Realm
     public class RealmClient_MovementStateChange
     {
         public string Id { get; set; }
+
+        [Obsolete("TickId is unused.")]
         public int TickId { get; set; }
 
         public float ResultX { get; set; }
 
         public float ResultY { get; set; }
 
+        public bool IsColliding { get; set; }
+        public Vector2Serializable ColliderNormal { get; set; }
         public float MovementX { get; set; }
 
         public float MovementY { get; set; }
