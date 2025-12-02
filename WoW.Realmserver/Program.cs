@@ -137,7 +137,14 @@ namespace WoW.Realmserver
             _netManager = new NetManager(_netEventListener);
             _netManager.Start(Configuration.Port);
 
-            // todo: implement prediction/reconciliation with packet loss and latency simulation.
+            /**
+             * Some simulated packet/latency loss has been tested against the current netcode.
+             * The important note is that all clients are currently synced well enough.
+             * 
+             * 12/2/25: Test/implement analytics when the server is running on a dedi.
+             * 
+             */ 
+
             //_netManager.SimulatePacketLoss = true;
             //_netManager.SimulationPacketLossChance = 5;
             _netManager.SimulationMinLatency = 50;

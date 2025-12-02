@@ -48,8 +48,10 @@ namespace WoW.Client.Components
         {
             _xAxis = new VirtualIntegerAxis();
             _xAxis.AddKeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.A, Keys.D);
+            _xAxis.AddGamePadLeftStickX();
             _yAxis = new VirtualIntegerAxis();
             _yAxis.AddKeyboardKeys(VirtualInput.OverlapBehavior.TakeNewer, Keys.W, Keys.S);
+            _yAxis.AddGamePadLeftStickY();
             _subPixelMovement = new SubpixelVector2();
 
             _movementInput = Vector2.Zero;
