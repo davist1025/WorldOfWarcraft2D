@@ -74,7 +74,13 @@ namespace WoW.Client.Scenes
             TiledMapRenderer mapRenderer = null;
 
             if (tmxMapByMapId != null)
+            {
                 mapRenderer = CreateEntity("map").AddComponent(new TiledMapRenderer(tmxMapByMapId, "collision_layer"));
+                Camera.AddComponent(new CameraLockController(new Vector2(tmxMapByMapId.TileWidth, tmxMapByMapId.TileWidth), 
+                    new Vector2(
+                        tmxMapByMapId.TileWidth * (tmxMapByMapId.Width - 1), 
+                        tmxMapByMapId.TileWidth * (tmxMapByMapId.Height - 1))));
+            }
 
             if (mapRenderer != null)
                 mapRenderer.RenderLayer = 10;
