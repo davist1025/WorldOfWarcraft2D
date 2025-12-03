@@ -79,7 +79,7 @@ namespace WoW.Realmserver.Content
                             timer = Convert.ToSingle(spawnObject.Properties["timer"]);
                         }
 
-                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, timer, isPlayer, position);
+                        var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, timer, isPlayer, position, new Vector2(spawnObject.Width, spawnObject.Height));
                         mapEntity.AddComponent(spawnerComp);
                     }
                 }

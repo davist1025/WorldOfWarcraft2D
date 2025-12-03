@@ -13,15 +13,15 @@ namespace WoW.Realmserver.Components.Behavior
     /// </summary>
     public class IBehavior
     {
-        public Entity Parent;
+        public NpcControllerComponent Controller;
 
         /// <summary>
         /// Invoked after this behavior is added to an NPCs' <see cref="NpcControllerComponent.Behaviors"/>.
         /// </summary>
         public virtual void OnLoad() { }
 
-        public void SetParent(Entity parent)
-            => Parent = parent;
+        public void SetParent(NpcControllerComponent parent)
+            => Controller = parent;
 
         public virtual void OnTargeted(WorldSessionComponent session) { }
     }

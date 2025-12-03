@@ -49,7 +49,8 @@ namespace WoW.Client.Shared
     [Flags]
     public enum NpcTypeFlags
     {
-        IsMerchant = 1 << 0,
+        IsRoamer = 1 << 0,
+        IsMerchant = 1 << 1
     }
 
     public enum SpriteDirection

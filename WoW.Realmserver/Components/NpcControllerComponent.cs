@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Nez;
+using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,15 @@ namespace WoW.Realmserver.Components
 {
     public class NpcControllerComponent : Component, IUpdatable
     {
+        /// <summary>
+        /// The database Metadata for the NPC.
+        /// </summary>
         public NpcMetadata Metadata { get; init; }
+
+        /// <summary>
+        /// The TiledMap this NPC is on.
+        /// </summary>
+        public TiledMapProcessor Processor { get; init; }
         public List<IBehavior> Behaviors = new List<IBehavior>();
         public SpawnerComponent Spawner;
         public Vector2 SpawnPosition = Vector2.Zero;
@@ -32,7 +41,7 @@ namespace WoW.Realmserver.Components
 
         public void AddBehavior(IBehavior behavior)
         {
-            behavior.SetParent(Entity);
+            behavior.SetParent(this);
             behavior.OnLoad();
 
             Behaviors.Add(behavior);

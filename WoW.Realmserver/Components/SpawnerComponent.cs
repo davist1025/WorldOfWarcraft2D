@@ -41,7 +41,7 @@ namespace WoW.Realmserver.Components
             get => _isPlayerSpawner;
         }
 
-        public SpawnerComponent(TiledMapProcessor processor, int npcId, int macCount, float timerInSeconds, bool isPlayerSpawner, Vector2 position)
+        public SpawnerComponent(TiledMapProcessor processor, int npcId, int macCount, float timerInSeconds, bool isPlayerSpawner, Vector2 position, Vector2 size)
         {
             _processor = processor;
             _position = position;
@@ -51,10 +51,7 @@ namespace WoW.Realmserver.Components
                 _npcId = npcId;
                 _maxInWorld = macCount;
                 _timerInSeconds = timerInSeconds;
-
-                // arbitrary size for spawn radius.
-                Vector2 sizeOfBounds = new Vector2(200f, 200f);
-                _bounds = new RectangleF(new Vector2(position.X - sizeOfBounds.X / 2f, position.Y - sizeOfBounds.Y / 2f), sizeOfBounds);
+                _bounds = new RectangleF(new Vector2(position.X - size.X / 2f, position.Y - size.Y / 2f), size);
             }
 
             _isPlayerSpawner = isPlayerSpawner;

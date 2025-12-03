@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="4">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="5">
  <properties>
   <property name="id" value="elwynn_forest"/>
  </properties>
@@ -81,15 +81,6 @@
 </data>
  </layer>
  <objectgroup id="3" name="spawner">
-  <object id="2" name="debug_wolf" x="210.667" y="237.333">
-   <properties>
-    <property name="is_player" type="bool" value="false"/>
-    <property name="max_count" type="int" value="1"/>
-    <property name="npc_id" type="int" value="1"/>
-    <property name="timer" type="float" value="12"/>
-   </properties>
-   <point/>
-  </object>
   <object id="3" name="player" x="601.333" y="538">
    <properties>
     <property name="is_player" type="bool" value="true"/>
@@ -97,6 +88,14 @@
     <property name="npc_id" type="int" value="-1"/>
    </properties>
    <point/>
+  </object>
+  <object id="4" name="mob1_spawner" x="201.333" y="236.667" width="229.333" height="112.667">
+   <properties>
+    <property name="is_player" type="bool" value="false"/>
+    <property name="max_count" type="int" value="1"/>
+    <property name="npc_id" type="int" value="1"/>
+    <property name="timer" type="float" value="12"/>
+   </properties>
   </object>
  </objectgroup>
  <layer id="2" name="collision_layer" width="50" height="50" opacity="0.51">

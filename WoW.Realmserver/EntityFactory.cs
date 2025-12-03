@@ -71,6 +71,7 @@ namespace WoW.Realmserver
                 {
                     var controllerForNpc = newNpcEntity.AddComponent(new NpcControllerComponent
                     {
+                        Processor = tiledProcessorForMapId,
                         Metadata = serializedNpc,
                     });
 
