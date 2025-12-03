@@ -59,7 +59,6 @@ namespace WoW.Realmserver.Components
 
         public override void OnAddedToEntity()
         {
-            // todo: get npc metadata from DB.
         }
 
         public void Update()

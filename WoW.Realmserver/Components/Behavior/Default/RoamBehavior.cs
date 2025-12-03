@@ -66,9 +66,9 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 Console.WriteLine($"Generated path with {_pathCount} points.");
             }
 
-            if (_pathPoints.Count > 0 && !_isMovingToPoint)
+            if (!_isMovingToPoint)
             {
-                if (_nextPointIndex == _pathCount - 1)
+                if (_nextPointIndex == _pathCount - 1 || _pathPoints.Count == 0)
                 {
                     _isRoaming = false;
                     _randomPosition = Vector2.Zero;
@@ -79,9 +79,9 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 {
                     _isMovingToPoint = true;
                     _nextPointIndex++;
-                    _targetPointInPath = _pathPoints[_nextPointIndex];
+                    //_targetPointInPath = _pathPoints[_nextPointIndex];
 
-                    Console.WriteLine($"Moving to point in graph: {_targetPointInPath.X}:{_targetPointInPath.Y}");
+                    Console.WriteLine($"Moving to point in graph: {_pathPoints[_nextPointIndex].X}:{_pathPoints[_nextPointIndex]}");
                 }
             }
 
