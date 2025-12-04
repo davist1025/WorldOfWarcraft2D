@@ -60,7 +60,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 var targetPosition = Controller.Processor.Map.WorldToTilePosition(_randomPosition);
 
                 _pathPoints = _graph.Search(_myTilePos, targetPosition);
-                _pathCount = _pathPoints.Count;
+                _pathCount = _pathPoints.Count; // todo: Crash here due to "_pathPoints" being null. This came after the function ran a number of times successfully.
 
                 Console.WriteLine($"Generating path for point: {targetPosition.X}:{targetPosition.Y}");
                 Console.WriteLine($"Generated path with {_pathCount} points.");
@@ -87,8 +87,12 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
             if (_isMovingToPoint)
             {
-                var direction = Controller.Processor.Map.TileToWorldPosition(_pathPoints[_nextPointIndex]) - Controller.Entity.Position;
-                direction.Normalize();
+                var nextPoint = Controller.Processor.Map.TileToWorldPosition(_pathPoints[_nextPointIndex]);
+                
+                var direction = nextPoint - Controller.Entity.Position;
+                var dist = direction.Length();
+                direction = (dist > 0.000001f) ? (direction /= dist) : Vector2.Zero;
+                // credits: https://stackoverflow.com/questions/60932940/vector2-normalizeendposition-startposition-is-nan-what-can-i-do
 
                 Controller.Mover.Move(new Vector2(1f) * direction, out var _);
 
