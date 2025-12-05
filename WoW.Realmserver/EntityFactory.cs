@@ -38,8 +38,7 @@ namespace WoW.Realmserver
 
                 if (npcMetadata == null)
                 {
-                    Console.WriteLine($"Unable to find existing NPC metadata with the id: {id}!");
-
+                    Log.Print($"NPC (id={id}) does not exist.", LogType.Warning);
                     return null;
                 }
 

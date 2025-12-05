@@ -72,7 +72,7 @@ namespace WoW.Realmserver
             //    }
             //}
 
-            Console.WriteLine("Verifying default racial spawn locations...");
+            Log.Print("Verifying default racial spawn locations...", LogType.Process);
             using (var ctx = new RealmContext())
             {
                 Entity mapEntity = null;
@@ -205,14 +205,15 @@ namespace WoW.Realmserver
 
         public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
-            // todo: log stuff like this to file/console output.
-            //if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
-            //    Console.WriteLine("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.");
+            if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
+                Log.Print("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogType.Error);
+            else
+            {
+                var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
 
-            var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
-
-            if (peer != null)
-                Send(peer, packet, delivery);
+                if (peer != null)
+                    Send(peer, packet, delivery);
+            }
         }
 
         public static void SendToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()

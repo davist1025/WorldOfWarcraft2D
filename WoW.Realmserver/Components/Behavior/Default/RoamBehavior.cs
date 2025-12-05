@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 using WoW.Client.Shared.Realm;
 
 namespace WoW.Realmserver.Components.Behavior.Default
@@ -23,7 +24,6 @@ namespace WoW.Realmserver.Components.Behavior.Default
         private int _pathCount = 0;
         private bool _isMovingToPoint = false;
         private int _nextPointIndex = -1;
-        private Point _targetPointInPath;
 
         private Point _myTilePos;
 
@@ -34,7 +34,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
             _graph = new AstarGridGraph(Controller.Processor.CollisionLayer);
             _timerInSeconds = 5f;
 
-            Console.WriteLine($"Added Roam behavior to {Controller.Metadata.Name}");
+            Log.Print($"Added Roaming to creature ({Controller.Metadata.Name}:{Controller.Metadata.WorldId})", LogType.Debug);
         }
 
         public override void Update()
@@ -44,8 +44,6 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
             if (_lastTime >= _timerInSeconds)
             {
-                Console.WriteLine($"Generating new random position.,,");
-
                 _lastTime = 0f;
                 _isRoaming = true;
 
@@ -61,9 +59,6 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
                 _pathPoints = _graph.Search(_myTilePos, targetPosition);
                 _pathCount = _pathPoints.Count; // todo: Crash here due to "_pathPoints" being null. This came after the function ran a number of times successfully.
-
-                Console.WriteLine($"Generating path for point: {targetPosition.X}:{targetPosition.Y}");
-                Console.WriteLine($"Generated path with {_pathCount} points.");
             }
 
             if (!_isMovingToPoint)
@@ -79,9 +74,6 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 {
                     _isMovingToPoint = true;
                     _nextPointIndex++;
-                    //_targetPointInPath = _pathPoints[_nextPointIndex];
-
-                    Console.WriteLine($"Moving to point in graph: {_pathPoints[_nextPointIndex].X}:{_pathPoints[_nextPointIndex]}");
                 }
             }
 
@@ -103,10 +95,9 @@ namespace WoW.Realmserver.Components.Behavior.Default
                     ResultY = Controller.Entity.Position.Y
                 });
 
-                if (Vector2.Distance(Controller.Entity.Position, Controller.Processor.Map.TileToWorldPosition(_pathPoints[_nextPointIndex])) <= 1.0f)
+                if (Vector2.Distance(Controller.Entity.Position, nextPoint) <= 1.0f)
                 {
                     _isMovingToPoint = false;
-                    Console.WriteLine($"Reached point!");
                 }
             }
         }

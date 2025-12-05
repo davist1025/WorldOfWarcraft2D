@@ -96,7 +96,7 @@ namespace WoW.Realmserver.Content
 
             if (data.Length > 1)
             {
-                Console.WriteLine($"This command accepts a single argument!");
+                // todo: send bad packet message to player.
                 return;
             }
 
@@ -166,12 +166,6 @@ namespace WoW.Realmserver.Content
                     }
                 }
             }
-        }
-
-        [CommandHandler("PlayerActionCommand_TestSec")]
-        public static void PlayerActionCommand_TestSecurity(string[] data, WorldSessionComponent session, NetPeer peer)
-        {
-            Console.WriteLine($"{session.Character.Name} has valid security for this command!");
         }
     }
 }

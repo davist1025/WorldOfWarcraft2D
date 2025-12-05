@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Shared;
 
 namespace WoW.Realmserver.Content
 {
@@ -22,12 +23,12 @@ namespace WoW.Realmserver.Content
         {
             if (File.Exists("./realmserver.config"))
             {
-                Console.WriteLine("Loading realmserver configuration...");
+                Log.Print("Loading Realmserver configuration...", LogType.Process);
                 var objData = JsonConvert.DeserializeObject<RealmConfiguration>(File.ReadAllText("./realmserver.config"));
                 return objData;
             }
 
-            Console.WriteLine("Failed to load realmserver.config; creating a new one...");
+            Log.Print("Failed to load realmserver.config; creating a new configuration...", LogType.Process);
             var newConfig = new RealmConfiguration()
             {
                 IpAddress = "127.0.0.1",
