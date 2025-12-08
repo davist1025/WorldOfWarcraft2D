@@ -110,7 +110,7 @@ namespace WoW.Client
             var newChatStorage = new ChatMessage()
             {
                 Message = worldParams.MOTD,
-                Flags = ChatMessageFlag.IsServerMessage
+                Channel = ChatChannel.Server
             };
             gui.ChatHistory.Add(newChatStorage);
         }
@@ -153,7 +153,7 @@ namespace WoW.Client
             var newChatStorage = new ChatMessage()
             {
                 Message = newChat.Message,
-                Flags = newChat.Flags
+                Channel = newChat.Channel
             };
             
             guiController.ChatHistory.Add(newChatStorage);

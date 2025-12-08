@@ -21,7 +21,8 @@ namespace WoW.Client.Components
         private string _chatInput = "";
         private string _accountNameInput = "";
         private string _accountPasswordInput = "";
-        private int _chatChannelIndex = -1;
+        private int _chatChannelIndex = 0;
+        private string[] _chatChannels;
 
         private string _newCharacterNameInput = "";
         private int _newCharacterRaceId = 1;
@@ -54,6 +55,8 @@ namespace WoW.Client.Components
         public override void OnAddedToEntity()
         {
             Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(DrawGUI);
+
+            _chatChannels = Enum.GetNames<ChatChannel>();
         }
 
         private void DrawGUI()
@@ -309,7 +312,7 @@ namespace WoW.Client.Components
                         for (int i = 0; i < ChatHistory.Count; i++)
                         {
                             var chatHistory = ChatHistory[i];
-                            var color = Shared.Utils.ChatChannelColors[chatHistory.Flags];
+                            var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
 
                             ImGui.PushStyleColor(ImGuiCol.Text, color);
                             ImGui.TextWrapped(chatHistory.Message);
@@ -322,30 +325,40 @@ namespace WoW.Client.Components
 
                     ImGui.Separator();
 
+                    ImGui.SetNextItemWidth(75f);
+                    if (ImGui.BeginCombo("##combo", _chatChannels[_chatChannelIndex]))
+                    {
+                        // todo: remove "Server," "Support" from gui.
+                        for (int i = 0; i < _chatChannels.Length; i++)
+                        {
+                            if (ImGui.Selectable(_chatChannels[i]))
+                            {
+                                _chatChannelIndex = i;
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
+
+                    ImGui.SameLine();
+
                     // process chat input upon pressing enter.
                     if (ImGui.InputTextWithHint("", "Type message here...", ref _chatInput, 128, ImGuiInputTextFlags.EnterReturnsTrue))
                     {
-                        // todo: determine a function for using different channels.
-                        Game1.Send(new ChatMessage { Message = _chatInput.Trim() });
-
+                        var sanitizedInput = _chatInput.Trim();
                         _chatInput = "";
+
+                        if (!string.IsNullOrEmpty(sanitizedInput))
+                        {
+                            // todo: determine a function for using different channels.
+                            Game1.Send(new ChatMessage
+                            {
+                                Message = sanitizedInput,
+                                Channel = (ChatChannel)_chatChannelIndex
+                            });
+
+                            sanitizedInput = "";
+                        }
                     }
-
-                    /**
-                     * Chat channel selection issue:
-                     * 
-                     * A number of implementations wont work because of how ImGui functions (clearing input when we /channel), and some weird combobox issue.
-                     * 
-                     * For now, we will just perform the full input for the channel since ImGui is separate from actual UI.
-                     * For example, to chat in a channel other than Say, type "/channel text".
-                     * 
-                     * i.e: /whisper [name] [message]; /1 [message]; /group [message]
-                     * 
-                     * Text received from the server will be formatted to contain a name, color and the text.
-                     * 
-                     */
-
-                    // see: https://github.com/ocornut/imgui/issues/5054
 
                     ImGui.End();
 

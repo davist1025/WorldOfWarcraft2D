@@ -255,6 +255,7 @@ namespace WoW.Realmserver
             WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
 
             string unformattedMessage = newChat.Message;
+            ChatChannel channel = newChat.Channel;
 
             if (unformattedMessage.StartsWith("."))
             {
@@ -325,21 +326,26 @@ namespace WoW.Realmserver
 
             if (!unformattedMessage.StartsWith(".") && !unformattedMessage.StartsWith("/"))
             {
-                string formattedMessage = $"{session.Character.Name} says: {unformattedMessage}";
+                string verbage =
+                    (channel == ChatChannel.Say) ? "says:" :
+                    (channel == ChatChannel.Yell) ? "yells:" :
+                    (channel == ChatChannel.World) ? "[world]" :
+                    $"{session.Character.Name} says: {unformattedMessage}";
+                    // todo: whispers, support (gm chat), etc.
+                    // todo: add range for certain channels (ex: say, yell)
 
-                ChatMessageFlag flags = ChatMessageFlag.IsLocal;
+                string formattedMessage = "";
 
-                if (session.Account.Security >= Vocab.SecurityLevel.Gamemaster)
-                {
-                    // todo: add GM toggle to the account (document this flag)
-                    // <AFK> is included here, as well, so how should these be set?
-                    formattedMessage = $"<GM> {formattedMessage}";
-                    flags |= ChatMessageFlag.IsGM;
-                }
+                if (verbage.Contains("["))
+                    formattedMessage = $"{verbage} {session.Character.Name}: {unformattedMessage}";
+                else
+                    formattedMessage = $"{session.Character.Name} {verbage} {unformattedMessage}";
+
+                ChatChannel flags = ChatChannel.Say;
 
                 var chatPacket = new ChatMessage()
                 {
-                    Flags = flags,
+                    Channel = flags,
                     Message = formattedMessage
                 };
                 Program.SendToAll(chatPacket);

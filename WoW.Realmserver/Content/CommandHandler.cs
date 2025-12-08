@@ -71,7 +71,7 @@ namespace WoW.Realmserver.Content
             ChatMessage newServerMessage = new ChatMessage()
             {
                 Message = $"{fullMsg}",
-                Flags = ChatMessageFlag.IsServerMessage
+                Channel = ChatChannel.Server
             };
 
             Program.SendToAll(newServerMessage);

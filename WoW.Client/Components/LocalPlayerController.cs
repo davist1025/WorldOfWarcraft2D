@@ -65,7 +65,8 @@ namespace WoW.Client.Components
 
         public void Update()
         {
-            _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
+            if (!ImGui.IsAnyItemActive())
+                _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
             _animator.Update();
 
             if (!_animator.IsRunning)

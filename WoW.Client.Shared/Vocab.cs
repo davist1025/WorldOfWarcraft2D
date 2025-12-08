@@ -61,12 +61,24 @@ namespace WoW.Client.Shared
         West
     }
 
-    public enum ChatMessageFlag
+    //public enum ChatMessageFlag
+    //{
+    //    IsServerMessage = 1 << 0,
+    //    IsWhisper = 1 << 1,
+    //    IsGM = 1 << 2,
+    //    IsLocal = 1 << 3,
+    //}
+
+    public enum ChatChannel
     {
-        IsServerMessage = 1 << 0,
-        IsWhisper = 1 << 1,
-        IsGM = 1 << 2,
-        IsLocal = 1 << 3,
+        Say,
+        Yell,
+        Whisper,
+        World,
+
+        Server, // yellow messages.
+        Support, // gm chat window.
+        // todo: custom channels created by users?
     }
 
     public static class Utils
@@ -89,11 +101,10 @@ namespace WoW.Client.Shared
             return shaHash;
         }
 
-        public static Dictionary<ChatMessageFlag, Vector4> ChatChannelColors = new Dictionary<ChatMessageFlag, Vector4>()
+        public static Dictionary<ChatChannel, Vector4> ChatChannelColors = new Dictionary<ChatChannel, Vector4>()
         {
-            { ChatMessageFlag.IsServerMessage, new Vector4(250f / 255f, 244f / 255f, 125f / 255f, 1f) },
-            { ChatMessageFlag.IsLocal, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 1f) },
-            { ChatMessageFlag.IsGM | ChatMessageFlag.IsLocal, new Vector4(0f, 154f / 255f, 228 / 255f, 1f) }
+            { ChatChannel.Server, new Vector4(250f / 255f, 244f / 255f, 125f / 255f, 1f) },
+            { ChatChannel.Say, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 1f) },
         };
     }
 }

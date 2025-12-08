@@ -11,6 +11,6 @@ namespace WoW.Client.Shared.Data
     {
         public string Message { get; set; }
 
-        public ChatMessageFlag Flags { get; set; }
+        public ChatChannel Channel { get; set; }
     }
 }
