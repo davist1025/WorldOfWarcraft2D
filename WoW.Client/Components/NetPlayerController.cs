@@ -28,6 +28,8 @@ namespace WoW.Client.Components
 
         public Queue<Vector2> MovementDirectionQueue = new Queue<Vector2>();
 
+        private bool _isInMap = false;
+
         public NetPlayerController(RealmClient_CreateNetPlayer networkPlayer)
         {
             // todo: can 'RemoteCharacter' be used here?
@@ -45,83 +47,84 @@ namespace WoW.Client.Components
             _mover = Entity.AddComponent<Mover>();
             _circleCollider = Entity.AddComponent<CircleCollider>();
             _circleCollider.SetRadius(8f);
-
-            Entity.AddComponent(_animator);
         }
 
         public void Update()
         {
-            if (!_animator.IsRunning)
+            if (_isInMap)
             {
-                string startingAnimation = "";
-                switch (Direction)
+                if (!_animator.IsRunning)
                 {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
-                        startingAnimation = "idle";
-                        break;
+                    string startingAnimation = "";
+                    switch (Direction)
+                    {
+                        case SpriteDirection.North:
+                        case SpriteDirection.East:
+                        case SpriteDirection.South:
+                        case SpriteDirection.West:
+                            startingAnimation = "idle";
+                            break;
+                    }
+                    _animator.Play(startingAnimation); // avoids a null-reference exception.
                 }
-                _animator.Play(startingAnimation); // avoids a null-reference exception.
+
+                Vector2 serverInputOut = Vector2.Zero;
+                MovementDirectionQueue.TryDequeue(out serverInputOut);
+
+                if (serverInputOut != Vector2.Zero)
+                {
+                    Vector2 movement = new Vector2(serverInputOut.X, serverInputOut.Y);
+                    var velocity = Game1.MovementSpeed * Time.DeltaTime * movement;
+                    velocity.Round();
+
+                    if (movement.X < 0f)
+                    {
+                        Direction = SpriteDirection.West;
+                        _animator.FlipX = true;
+                    }
+
+                    if (movement.X > 0f)
+                    {
+                        Direction = SpriteDirection.East;
+                        _animator.FlipX = false;
+                    }
+
+                    if (movement.Y > 0f) Direction = SpriteDirection.South;
+
+                    if (movement.Y < 0f) Direction = SpriteDirection.North;
+
+                    switch (Direction)
+                    {
+                        case SpriteDirection.North:
+                        case SpriteDirection.East:
+                        case SpriteDirection.South:
+                        case SpriteDirection.West:
+                            if (!_animator.CurrentAnimationName.Equals("walk"))
+                                _animator.Play("walk");
+                            break;
+                    }
+
+                    _mover.CalculateMovementExcluding(ref velocity, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
+                    _subPixelMovement.Update(ref velocity);
+                    _mover.ApplyMovement(velocity);
+                }
+
+                if (serverInputOut == Vector2.Zero)
+                {
+                    switch (Direction)
+                    {
+                        case SpriteDirection.North:
+                        case SpriteDirection.East:
+                        case SpriteDirection.South:
+                        case SpriteDirection.West:
+                            if (!_animator.CurrentAnimationName.Equals("idle"))
+                                _animator.Play("idle");
+                            break;
+                    }
+                }
+
+                _animator.Update();
             }
-
-            Vector2 serverInputOut = Vector2.Zero;
-            MovementDirectionQueue.TryDequeue(out serverInputOut);
-
-            if (serverInputOut != Vector2.Zero)
-            {
-                Vector2 movement = new Vector2(serverInputOut.X, serverInputOut.Y);
-                var velocity = Game1.MovementSpeed * Time.DeltaTime * movement;
-                velocity.Round();
-
-                if (movement.X < 0f)
-                {
-                    Direction = SpriteDirection.West;
-                    _animator.FlipX = true;
-                }
-
-                if (movement.X > 0f)
-                {
-                    Direction = SpriteDirection.East;
-                    _animator.FlipX = false;
-                }
-
-                if (movement.Y > 0f) Direction = SpriteDirection.South;
-
-                if (movement.Y < 0f) Direction = SpriteDirection.North;
-
-                switch (Direction)
-                {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("walk"))
-                            _animator.Play("walk");
-                        break;
-                }
-
-                _mover.CalculateMovementExcluding(ref velocity, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
-                _subPixelMovement.Update(ref velocity);
-                _mover.ApplyMovement(velocity);
-            }
-
-            if (serverInputOut == Vector2.Zero)
-            {
-                switch (Direction)
-                {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
-                        if (!_animator.CurrentAnimationName.Equals("idle"))
-                            _animator.Play("idle");
-                        break;
-                }
-            }
-
-            _animator.Update();
         }
 
         /// <summary>
@@ -147,6 +150,7 @@ namespace WoW.Client.Components
             _animator.AddAnimationsFromAtlas(actorSpriteAtlas);
             _animator.RenderLayer = 5;
             _animator.Speed = 0.5f;
+            Entity.AddComponent(_animator);
 
             //renderer = Entity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
 
