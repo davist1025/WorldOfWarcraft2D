@@ -41,13 +41,14 @@ namespace WoW.Authserver
 
             using (var ctx = new AuthContext())
             {
-                Console.WriteLine("Deleting all sessions...");
+                Log.Print("Resetting session keys...", LogType.Process);
                 // hack: probably not a proper way of resetting the session.
                 ctx.Accounts.Where(a => a.SessionId != string.Empty)
                     .ExecuteUpdate(setters => setters
                         .SetProperty(p => p.SessionId, default(string)));
 
-                Console.WriteLine("Verifying default account integrity...");
+                // todo: add flag in config for debug account usage.
+                Log.Print("Verifying debug account integrity...", LogType.Process);
                 if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
                 {
                     ctx.Accounts.Add(new Account()
@@ -80,8 +81,8 @@ namespace WoW.Authserver
 
                 ctx.SaveChanges();
 
-                // todo: set a configuration setting for using default realms.
-                Console.WriteLine("Verifying default realmlist integrity...");
+                // todo: add flag in config for debug realmlist usage.
+                Log.Print("Verifying debug realmist integrity...", LogType.Process);
                 if (ctx.Realmlist.Count() == 0)
                 {
                     ctx.Add(new Realmserver()
@@ -94,7 +95,7 @@ namespace WoW.Authserver
                     ctx.SaveChanges();
                 }
 
-                Console.WriteLine($"Registered {ctx.Realmlist.Count()} realm(s).");
+                Log.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogType.Process);
             }
             _netProcessor = new NetPacketProcessor();
 

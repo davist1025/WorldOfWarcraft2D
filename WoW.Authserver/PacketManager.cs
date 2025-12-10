@@ -23,7 +23,7 @@ namespace WoW.Authserver
     {
         public static void OnUserLogin(ClientAuth_Logon logon, NetPeer peer) 
         {
-            Console.WriteLine($"{logon.AccountName} is trying to log in...");
+            Log.Print($"{logon.AccountName} is attempting to log-in...", LogType.Network);
 
             using (var ctx = new AuthContext())
             {
@@ -33,11 +33,9 @@ namespace WoW.Authserver
 
                 if (account != null && account.SessionId == default(string))
                 {
-                    Console.WriteLine($"Verifying password of {logon.AccountName}...");
-
                     if (Argon2.Verify(account.HashedPassword, logon.Password))
                     {
-                        Console.WriteLine($"Generating session for {logon.AccountName}...");
+                        Log.Print($"{logon.AccountName} logged in successfully; generating a new session key...", LogType.Network);
                         accountSessionId = Guid.NewGuid().ToString().Replace("-", "");
                         account.SessionId = accountSessionId;
                         loginCode.Code = LogonCode.Success;
@@ -78,7 +76,7 @@ namespace WoW.Authserver
                 Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.ToLower().Equals(verification.SessionId));
                 if (account != null)
                 {
-                    Console.WriteLine("Sending user verification to realm...");
+                    Log.Print($"Transferring {account.Username} to realm...", LogType.Network);
                     Program.SendSerializable(peer, new AuthRealm_SessionVerification()
                     {
                         User = new PlayerAccount()
@@ -97,7 +95,6 @@ namespace WoW.Authserver
             using (var ctx = new AuthContext())
             {
                 ctx.Accounts.Where(a => a.Id == disconnection.AccountId).ExecuteUpdate(setters => setters.SetProperty(p => p.SessionId, default(string)));
-                Console.WriteLine($"Account ID: {disconnection.AccountId} has disconnected.");
             }
         }
 
@@ -110,14 +107,11 @@ namespace WoW.Authserver
 
                 if (storedRealm != null)
                 {
-                    Console.WriteLine($"Realmserver ({storedRealm.StoredEndPoint}) has come online.");
+                    Log.Print($"{storedRealm.Name} has come online.", LogType.Network);
                     // does this need additional security?
                 }
                 else
-                {
-                    Console.WriteLine("An unregistered realm is attempting to connect to this authentication server.");
-                    peer.Disconnect(); // what happens to the realmserver at this point?
-                }
+                    peer.Disconnect();
             }
         }
     }
