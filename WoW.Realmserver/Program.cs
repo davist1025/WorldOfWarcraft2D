@@ -33,11 +33,9 @@ namespace WoW.Realmserver
         public static WorldContentManager Content;
 
         public static float DeltaTime = 0f;
-        private float _counter = 0f;
-
         public const float TickRate = 0.1f;
 
-        public static Dictionary<string, NetPeer> TransferSessions = new Dictionary<string, NetPeer>();
+        public static Dictionary<string, NetPeer> AuthTransfers = new Dictionary<string, NetPeer>();
 
         public Program()
         {
@@ -145,11 +143,6 @@ namespace WoW.Realmserver
              * 
              */ 
 
-            //_netManager.SimulatePacketLoss = true;
-            //_netManager.SimulationPacketLossChance = 5;
-            _netManager.SimulationMinLatency = 50;
-            _netManager.SimulationMaxLatency = 75;
-
             _authListener = new EventBasedNetListener();
             _authListener.PeerConnectedEvent += (peer) =>
             {
@@ -206,7 +199,7 @@ namespace WoW.Realmserver
         public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
             if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
-                Log.Print("Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogType.Error);
+                Log.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogType.Error);
             else
             {
                 var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();

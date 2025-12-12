@@ -407,7 +407,7 @@ namespace WoW.Realmserver
         {
             Log.Print($"Session ({transfer.SessionId}) is transferring from the authserver.", LogType.Network);
 
-            Program.TransferSessions.Add(transfer.SessionId, peer);
+            Program.AuthTransfers.Add(transfer.SessionId, peer);
             Program.SendToAuthserver(new RealmAuth_SessionVerification() { SessionId = transfer.SessionId });
         }
 
@@ -420,10 +420,10 @@ namespace WoW.Realmserver
         /// <param name="peer"></param>
         public static void OnAuthSessionVerification(AuthRealm_SessionVerification verification, NetPeer peer)
         {
-            if (verification.User != null && Program.TransferSessions.ContainsKey(verification.User.SessionId))
+            if (verification.User != null && Program.AuthTransfers.ContainsKey(verification.User.SessionId))
             {
-                NetPeer sessionPeer = Program.TransferSessions[verification.User.SessionId];
-                Program.TransferSessions.Remove(verification.User.SessionId);
+                NetPeer sessionPeer = Program.AuthTransfers[verification.User.SessionId];
+                Program.AuthTransfers.Remove(verification.User.SessionId);
 
                 WorldSessionComponent newSession = new WorldSessionComponent(verification.User);
                 Entity newEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString());

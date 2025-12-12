@@ -90,6 +90,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
                 Program.SendToAll(new RealmClient_MovementStateChange()
                 {
+                    // todo: send simulated direction so the client can replicate animations?
                     Id = Controller.Metadata.WorldId,
                     ResultX = Controller.Entity.Position.X,
                     ResultY = Controller.Entity.Position.Y
