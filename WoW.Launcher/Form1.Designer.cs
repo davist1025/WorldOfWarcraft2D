@@ -195,7 +195,7 @@
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "Form1";
-            Text = "Form1";
+            Text = "WPP Launcher";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             splitContainer1.Panel1.ResumeLayout(false);
