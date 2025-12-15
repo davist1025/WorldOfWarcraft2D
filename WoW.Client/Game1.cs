@@ -54,7 +54,7 @@ namespace WoW.Client
         public static Dictionary<string, Texture2D> InterfaceTextures;
 
         public static string AccountName;
-        public static string SessionId;
+        public static string SessionId; // todo: move this global data to another class object?
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
         public static string CurrentMapId = "";

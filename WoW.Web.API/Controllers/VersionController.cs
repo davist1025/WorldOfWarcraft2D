@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace WoW.Web.API.Controllers
 {
@@ -7,17 +8,14 @@ namespace WoW.Web.API.Controllers
     public class VersionController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<string> Get([FromQuery] string application)
+        public ActionResult<string> Get()
         {
-            application = application.Trim().ToLower();
-
-            switch (application)
-            {
-                case "client": return new OkObjectResult("0.1.0");
-                case "launcher": return new OkObjectResult("0.2.0"); ;
-            }
-
-            return new OkObjectResult(application);
+            return new OkObjectResult(JsonConvert.SerializeObject(
+                new Dictionary<string, string>()
+                {
+                    { "client", "0.1.0" },
+                    { "launcher", "0.2.0" }
+                }));
         }
     }
 }

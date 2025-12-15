@@ -1,8 +1,14 @@
+using Newtonsoft.Json;
+using System.Net.Http.Json;
+
 namespace WoW.Launcher
 {
     public partial class Form1 : Form
     {
         private bool _isLoginState = false;
+
+        public static string GameVersion = "";
+        public static string LauncherVersion = "";
 
         public Form1()
         {
@@ -36,15 +42,34 @@ namespace WoW.Launcher
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
             checkBoxOfflineMode.Hide();
+
+            // fetch the current game, launcher version.
+            var value = await HttpService.GetVersionAsync();
+            dynamic dynamicResponse = JsonConvert.DeserializeObject(value); // this is icky.
+
+            GameVersion = dynamicResponse["client"];
+            LauncherVersion = dynamicResponse["launcher"];
+
+            labelGameVer.Text = string.Format(labelGameVer.Text, GameVersion);
+            labelLauncherVer.Text = string.Format(labelLauncherVer.Text, LauncherVersion);
         }
 
         private void OnOfflineModeChanged(object sender, EventArgs e)
         {
             textBoxAccountName.Enabled = !checkBoxOfflineMode.Checked;
             textBoxPassword.Enabled = !checkBoxOfflineMode.Checked;
+        }
+
+        private void buttonRegister_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void linkLabelNews_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            MessageBox.Show("Coming soon!\n\nRefer to the GitHub, Trello or BlueSky pages for more information.", "WoW Pixel Project", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
