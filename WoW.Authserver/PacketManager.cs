@@ -6,16 +6,16 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Authserver.DB;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Server.Shared;
 using Org.BouncyCastle.Asn1.Ocsp;
-using WoW.Authserver.DB.Model;
 using WoW.Server.Shared.Serializable;
 using Isopoh.Cryptography.Argon2;
+using WoW.Server.Shared.Database.Model;
+using WoW.Server.Shared.Database.Model.Auth;
 
 namespace WoW.Authserver
 {

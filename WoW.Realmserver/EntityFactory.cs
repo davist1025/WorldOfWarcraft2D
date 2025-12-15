@@ -13,8 +13,9 @@ using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
-using WoW.Realmserver.DB;
-using WoW.Realmserver.DB.Model;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
+using WoW.Server.Shared.Database.Model.Realm;
 
 namespace WoW.Realmserver
 {

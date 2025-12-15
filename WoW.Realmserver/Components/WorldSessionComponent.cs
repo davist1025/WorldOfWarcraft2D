@@ -11,7 +11,7 @@ using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
-using WoW.Realmserver.DB.Model.Characters;
+using WoW.Server.Shared.Database.Model.Realm.Character;
 using WoW.Server.Shared.Serializable;
 
 namespace WoW.Realmserver.Components

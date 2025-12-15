@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WoW.Realmserver.DB;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
 
 #nullable disable
 
@@ -24,7 +25,7 @@ namespace WoW.Realmserver.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.PlayerCharacter", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.PlayerCharacter", b =>
                 {
                     b.Property<int>("AccountId")
                         .HasColumnType("int")

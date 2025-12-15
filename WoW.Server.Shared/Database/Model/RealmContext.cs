@@ -11,7 +11,7 @@ using WoW.Server.Shared.Database.Model.Realm.Chat;
 
 namespace WoW.Server.Shared.Database.Model
 {
-    internal class RealmContext : DbContext
+    public class RealmContext : DbContext
     {
         public DbSet<PlayerCharacter> Characters { get; set; }
         public DbSet<PlayerCharacterStatistic> CharacterStatistics { get; set; }

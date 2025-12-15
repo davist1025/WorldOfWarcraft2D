@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WoW.Realmserver.DB;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
 
 #nullable disable
 
@@ -24,7 +25,7 @@ namespace WoW.Realmserver.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.CharacterRaceSpawn", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.CharacterRaceSpawn", b =>
                 {
                     b.Property<int>("RaceId")
                         .HasColumnType("int")
@@ -48,7 +49,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("character_race_spawn");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Chat.ChatCommand", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Chat.ChatCommand", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -79,7 +80,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("chat_command");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Chat.ChatCommandChild", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Chat.ChatCommandChild", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,7 +116,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("chat_command_children");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.NonPlayerCharacter", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.NonPlayerCharacter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -147,7 +148,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("npc");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.NonPlayerCharacterBehaviors", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.NonPlayerCharacterBehaviors", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -169,7 +170,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("npc_behavior");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.PlayerCharacter", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.PlayerCharacter", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("varchar(16)")

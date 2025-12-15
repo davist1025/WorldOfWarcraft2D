@@ -17,10 +17,10 @@ using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.Content;
-using WoW.Realmserver.DB;
-using WoW.Realmserver.DB.Model;
-using WoW.Realmserver.DB.Model.Characters;
-using WoW.Realmserver.DB.Model.Chat;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
+using WoW.Server.Shared.Database.Model.Realm.Character;
+using WoW.Server.Shared.Database.Model.Realm.Chat;
 using WoW.Server.Shared;
 
 namespace WoW.Realmserver

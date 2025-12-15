@@ -9,8 +9,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
-using WoW.Authserver.DB;
-using WoW.Authserver.DB.Model;
+using WoW.Server.Shared.Database.Model;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
@@ -18,6 +17,7 @@ using WoW.Client.Shared.Data;
 using WoW.Server.Shared;
 using WoW.Server.Shared.Serializable;
 using static WoW.Server.Shared.Vocab;
+using WoW.Server.Shared.Database.Model.Auth;
 
 namespace WoW.Authserver
 {

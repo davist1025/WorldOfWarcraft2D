@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Shared;
-using WoW.Realmserver.DB;
+using WoW.Server.Shared.Database;
 
 namespace WoW.Realmserver
 {
