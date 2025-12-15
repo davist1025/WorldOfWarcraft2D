@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Net.Http.Json;
 
 namespace WoW.Launcher
@@ -71,5 +72,12 @@ namespace WoW.Launcher
         {
             MessageBox.Show("Coming soon!\n\nRefer to the GitHub, Trello or BlueSky pages for more information.", "WoW Pixel Project", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        // todo: crash when using a url here? weird. errors trying to run the link in this working directory.
+        private void OnBskyClick(object sender, EventArgs e) => Process.Start("https://bsky.app/profile/mrkokiri.bsky.social");
+
+        private void OnTrelloClick(object sender, EventArgs e) => Process.Start("https://trello.com/b/4BRTSQXK/wow2d");
+
+        private void OnGitClick(object sender, EventArgs e) => Process.Start("https://github.com/davist1025/WorldOfWarcraft2D");
     }
 }

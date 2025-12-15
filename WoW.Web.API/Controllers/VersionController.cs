@@ -13,8 +13,8 @@ namespace WoW.Web.API.Controllers
             return new OkObjectResult(JsonConvert.SerializeObject(
                 new Dictionary<string, string>()
                 {
-                    { "client", "0.1.0" },
-                    { "launcher", "0.2.0" }
+                    { "client", "-infdev-rev1" },
+                    { "launcher", "-infdev-rev1" }
                 }));
         }
     }

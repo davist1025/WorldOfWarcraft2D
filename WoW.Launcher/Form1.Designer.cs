@@ -43,17 +43,17 @@
             textBoxAccountName = new TextBox();
             label1 = new Label();
             linkLabelNews = new LinkLabel();
-            pictureBox2 = new PictureBox();
-            pictureBox3 = new PictureBox();
-            pictureBox4 = new PictureBox();
+            pictureBoxGit = new PictureBox();
+            pictureBoxTrello = new PictureBox();
+            pictureBoxBsky = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxGit).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -202,44 +202,47 @@
             linkLabelNews.Text = "News";
             linkLabelNews.LinkClicked += linkLabelNews_LinkClicked;
             // 
-            // pictureBox2
+            // pictureBoxGit
             // 
-            pictureBox2.Cursor = Cursors.Hand;
-            pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(128, 85);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(34, 36);
-            pictureBox2.TabIndex = 6;
-            pictureBox2.TabStop = false;
+            pictureBoxGit.Cursor = Cursors.Hand;
+            pictureBoxGit.Image = (Image)resources.GetObject("pictureBoxGit.Image");
+            pictureBoxGit.Location = new Point(128, 85);
+            pictureBoxGit.Name = "pictureBoxGit";
+            pictureBoxGit.Size = new Size(34, 36);
+            pictureBoxGit.TabIndex = 6;
+            pictureBoxGit.TabStop = false;
+            pictureBoxGit.Click += OnGitClick;
             // 
-            // pictureBox3
+            // pictureBoxTrello
             // 
-            pictureBox3.Cursor = Cursors.Hand;
-            pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
-            pictureBox3.Location = new Point(168, 85);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(34, 36);
-            pictureBox3.TabIndex = 7;
-            pictureBox3.TabStop = false;
+            pictureBoxTrello.Cursor = Cursors.Hand;
+            pictureBoxTrello.Image = (Image)resources.GetObject("pictureBoxTrello.Image");
+            pictureBoxTrello.Location = new Point(168, 85);
+            pictureBoxTrello.Name = "pictureBoxTrello";
+            pictureBoxTrello.Size = new Size(34, 36);
+            pictureBoxTrello.TabIndex = 7;
+            pictureBoxTrello.TabStop = false;
+            pictureBoxTrello.Click += OnTrelloClick;
             // 
-            // pictureBox4
+            // pictureBoxBsky
             // 
-            pictureBox4.Cursor = Cursors.Hand;
-            pictureBox4.Image = (Image)resources.GetObject("pictureBox4.Image");
-            pictureBox4.Location = new Point(208, 85);
-            pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(34, 36);
-            pictureBox4.TabIndex = 8;
-            pictureBox4.TabStop = false;
+            pictureBoxBsky.Cursor = Cursors.Hand;
+            pictureBoxBsky.Image = (Image)resources.GetObject("pictureBoxBsky.Image");
+            pictureBoxBsky.Location = new Point(208, 85);
+            pictureBoxBsky.Name = "pictureBoxBsky";
+            pictureBoxBsky.Size = new Size(34, 36);
+            pictureBoxBsky.TabIndex = 8;
+            pictureBoxBsky.TabStop = false;
+            pictureBoxBsky.Click += OnBskyClick;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(364, 380);
-            Controls.Add(pictureBox4);
-            Controls.Add(pictureBox3);
-            Controls.Add(pictureBox2);
+            Controls.Add(pictureBoxBsky);
+            Controls.Add(pictureBoxTrello);
+            Controls.Add(pictureBoxGit);
             Controls.Add(linkLabelNews);
             Controls.Add(splitContainer1);
             Controls.Add(labelLauncherVer);
@@ -257,9 +260,9 @@
             splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxGit).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -280,8 +283,8 @@
         private LinkLabel linkLabelGoToLogin;
         private CheckBox checkBoxOfflineMode;
         private LinkLabel linkLabelNews;
-        private PictureBox pictureBox2;
-        private PictureBox pictureBox3;
-        private PictureBox pictureBox4;
+        private PictureBox pictureBoxGit;
+        private PictureBox pictureBoxTrello;
+        private PictureBox pictureBoxBsky;
     }
 }
