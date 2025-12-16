@@ -19,10 +19,19 @@ namespace WoW.Server.Shared.Database.Model
         public DbSet<Realmserver> Realmlist { get; set; }
         public DbSet<Account> Accounts { get; set; }
 
-        // todo: we might be able to allow a host to set this in a production context, since the database is automatically migrated upon launch.
+        // todo: make this global. currently there are like 3-4 instances??
         private const string _connectionString = "server=127.0.0.1;uid=root;pwd=1111;database=wpp_auth";
 
+        private DbContextOptions<AuthContext> _options;
+
+        public AuthContext(DbContextOptions<AuthContext> options)
+        {
+            _options = options;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
+        {
+            optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
+        }
     }
 }

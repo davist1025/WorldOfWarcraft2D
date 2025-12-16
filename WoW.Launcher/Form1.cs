@@ -64,8 +64,14 @@ namespace WoW.Launcher
             textBoxPassword.Enabled = !checkBoxOfflineMode.Checked;
         }
 
-        private void buttonRegister_Click(object sender, EventArgs e)
+        private async void buttonRegister_Click(object sender, EventArgs e)
         {
+            if (_isLoginState)
+            {
+                // hack: debug code to test http services.
+                var logonResponse = await HttpService.Login(textBoxAccountName.Text, textBoxPassword.Text);
+                MessageBox.Show(logonResponse);
+            }
         }
 
         private void linkLabelNews_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
