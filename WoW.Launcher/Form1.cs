@@ -80,10 +80,10 @@ namespace WoW.Launcher
         }
 
         // todo: crash when using a url here? weird. errors trying to run the link in this working directory.
-        private void OnBskyClick(object sender, EventArgs e) => Process.Start("https://bsky.app/profile/mrkokiri.bsky.social");
+        private void OnBskyClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://bsky.app/profile/mrkokiri.bsky.social") { UseShellExecute = true });
 
-        private void OnTrelloClick(object sender, EventArgs e) => Process.Start("https://trello.com/b/4BRTSQXK/wow2d");
+        private void OnTrelloClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://trello.com/b/4BRTSQXK/wow2d") { UseShellExecute = true });
 
-        private void OnGitClick(object sender, EventArgs e) => Process.Start("https://github.com/davist1025/WorldOfWarcraft2D");
+        private void OnGitClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://github.com/davist1025/WorldOfWarcraft2D") { UseShellExecute = true });
     }
 }
