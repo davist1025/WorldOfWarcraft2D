@@ -24,6 +24,8 @@ namespace WoW.Server.Shared.Database.Model
 
         private DbContextOptions<AuthContext> _options;
 
+        public AuthContext() { }
+
         public AuthContext(DbContextOptions<AuthContext> options)
         {
             _options = options;
