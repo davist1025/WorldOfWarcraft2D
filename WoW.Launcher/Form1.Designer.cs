@@ -32,6 +32,15 @@
             pictureBox1 = new PictureBox();
             labelGameVer = new Label();
             labelLauncherVer = new Label();
+            linkLabelNews = new LinkLabel();
+            pictureBoxGit = new PictureBox();
+            pictureBoxTrello = new PictureBox();
+            pictureBoxBsky = new PictureBox();
+            menuStrip1 = new MenuStrip();
+            gameToolStripMenuItem = new ToolStripMenuItem();
+            installToolStripMenuItem = new ToolStripMenuItem();
+            optionsToolStripMenuItem = new ToolStripMenuItem();
+            statusStrip1 = new StatusStrip();
             splitContainer1 = new SplitContainer();
             linkLabelGoToLogin = new LinkLabel();
             buttonRegister = new Button();
@@ -41,23 +50,17 @@
             label2 = new Label();
             textBoxAccountName = new TextBox();
             label1 = new Label();
-            linkLabelNews = new LinkLabel();
-            pictureBoxGit = new PictureBox();
-            pictureBoxTrello = new PictureBox();
-            pictureBoxBsky = new PictureBox();
-            menuStrip1 = new MenuStrip();
-            gameToolStripMenuItem = new ToolStripMenuItem();
-            installToolStripMenuItem = new ToolStripMenuItem();
-            optionsToolStripMenuItem = new ToolStripMenuItem();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxGit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).BeginInit();
             menuStrip1.SuspendLayout();
+            statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
@@ -87,101 +90,6 @@
             labelLauncherVer.Size = new Size(97, 20);
             labelLauncherVer.TabIndex = 3;
             labelLauncherVer.Text = "Launcher v{0}";
-            // 
-            // splitContainer1
-            // 
-            splitContainer1.BorderStyle = BorderStyle.Fixed3D;
-            splitContainer1.Dock = DockStyle.Bottom;
-            splitContainer1.Location = new Point(0, 192);
-            splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            splitContainer1.Panel1.Controls.Add(linkLabelGoToLogin);
-            // 
-            // splitContainer1.Panel2
-            // 
-            splitContainer1.Panel2.Controls.Add(buttonRegister);
-            splitContainer1.Panel2.Controls.Add(textBoxEmail);
-            splitContainer1.Panel2.Controls.Add(label3);
-            splitContainer1.Panel2.Controls.Add(textBoxPassword);
-            splitContainer1.Panel2.Controls.Add(label2);
-            splitContainer1.Panel2.Controls.Add(textBoxAccountName);
-            splitContainer1.Panel2.Controls.Add(label1);
-            splitContainer1.Size = new Size(364, 208);
-            splitContainer1.SplitterDistance = 163;
-            splitContainer1.TabIndex = 4;
-            // 
-            // linkLabelGoToLogin
-            // 
-            linkLabelGoToLogin.AutoSize = true;
-            linkLabelGoToLogin.Location = new Point(20, 86);
-            linkLabelGoToLogin.Name = "linkLabelGoToLogin";
-            linkLabelGoToLogin.Size = new Size(126, 20);
-            linkLabelGoToLogin.TabIndex = 0;
-            linkLabelGoToLogin.TabStop = true;
-            linkLabelGoToLogin.Text = "Have an account?";
-            linkLabelGoToLogin.LinkClicked += linkLabelGoToLogin_LinkClicked;
-            // 
-            // buttonRegister
-            // 
-            buttonRegister.Location = new Point(91, 172);
-            buttonRegister.Name = "buttonRegister";
-            buttonRegister.Size = new Size(94, 29);
-            buttonRegister.TabIndex = 6;
-            buttonRegister.Text = "Register";
-            buttonRegister.UseVisualStyleBackColor = true;
-            buttonRegister.Click += buttonRegister_Click;
-            // 
-            // textBoxEmail
-            // 
-            textBoxEmail.Location = new Point(14, 139);
-            textBoxEmail.Name = "textBoxEmail";
-            textBoxEmail.PlaceholderText = "Optional";
-            textBoxEmail.Size = new Size(171, 27);
-            textBoxEmail.TabIndex = 5;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(14, 116);
-            label3.Name = "label3";
-            label3.Size = new Size(46, 20);
-            label3.TabIndex = 4;
-            label3.Text = "Email";
-            // 
-            // textBoxPassword
-            // 
-            textBoxPassword.Location = new Point(14, 86);
-            textBoxPassword.Name = "textBoxPassword";
-            textBoxPassword.PasswordChar = '*';
-            textBoxPassword.Size = new Size(171, 27);
-            textBoxPassword.TabIndex = 3;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(14, 63);
-            label2.Name = "label2";
-            label2.Size = new Size(70, 20);
-            label2.TabIndex = 2;
-            label2.Text = "Password";
-            // 
-            // textBoxAccountName
-            // 
-            textBoxAccountName.Location = new Point(14, 33);
-            textBoxAccountName.Name = "textBoxAccountName";
-            textBoxAccountName.Size = new Size(171, 27);
-            textBoxAccountName.TabIndex = 1;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(14, 10);
-            label1.Name = "label1";
-            label1.Size = new Size(107, 20);
-            label1.TabIndex = 0;
-            label1.Text = "Account Name";
             // 
             // linkLabelNews
             // 
@@ -255,17 +163,128 @@
             optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             optionsToolStripMenuItem.Size = new Size(75, 24);
             optionsToolStripMenuItem.Text = "Options";
+            optionsToolStripMenuItem.Click += optionsToolStripMenuItem_Click;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.ImageScalingSize = new Size(20, 20);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 401);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(364, 26);
+            statusStrip1.TabIndex = 10;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // splitContainer1
+            // 
+            splitContainer1.BorderStyle = BorderStyle.Fixed3D;
+            splitContainer1.Dock = DockStyle.Bottom;
+            splitContainer1.Location = new Point(0, 193);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(linkLabelGoToLogin);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(buttonRegister);
+            splitContainer1.Panel2.Controls.Add(textBoxEmail);
+            splitContainer1.Panel2.Controls.Add(label3);
+            splitContainer1.Panel2.Controls.Add(textBoxPassword);
+            splitContainer1.Panel2.Controls.Add(label2);
+            splitContainer1.Panel2.Controls.Add(textBoxAccountName);
+            splitContainer1.Panel2.Controls.Add(label1);
+            splitContainer1.Size = new Size(364, 208);
+            splitContainer1.SplitterDistance = 163;
+            splitContainer1.TabIndex = 11;
+            // 
+            // linkLabelGoToLogin
+            // 
+            linkLabelGoToLogin.AutoSize = true;
+            linkLabelGoToLogin.Location = new Point(20, 86);
+            linkLabelGoToLogin.Name = "linkLabelGoToLogin";
+            linkLabelGoToLogin.Size = new Size(126, 20);
+            linkLabelGoToLogin.TabIndex = 0;
+            linkLabelGoToLogin.TabStop = true;
+            linkLabelGoToLogin.Text = "Have an account?";
+            // 
+            // buttonRegister
+            // 
+            buttonRegister.Location = new Point(91, 172);
+            buttonRegister.Name = "buttonRegister";
+            buttonRegister.Size = new Size(94, 29);
+            buttonRegister.TabIndex = 6;
+            buttonRegister.Text = "Register";
+            buttonRegister.UseVisualStyleBackColor = true;
+            // 
+            // textBoxEmail
+            // 
+            textBoxEmail.Location = new Point(14, 139);
+            textBoxEmail.Name = "textBoxEmail";
+            textBoxEmail.PlaceholderText = "Optional";
+            textBoxEmail.Size = new Size(171, 27);
+            textBoxEmail.TabIndex = 5;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(14, 116);
+            label3.Name = "label3";
+            label3.Size = new Size(46, 20);
+            label3.TabIndex = 4;
+            label3.Text = "Email";
+            // 
+            // textBoxPassword
+            // 
+            textBoxPassword.Location = new Point(14, 86);
+            textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
+            textBoxPassword.Size = new Size(171, 27);
+            textBoxPassword.TabIndex = 3;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(14, 63);
+            label2.Name = "label2";
+            label2.Size = new Size(70, 20);
+            label2.TabIndex = 2;
+            label2.Text = "Password";
+            // 
+            // textBoxAccountName
+            // 
+            textBoxAccountName.Location = new Point(14, 33);
+            textBoxAccountName.Name = "textBoxAccountName";
+            textBoxAccountName.Size = new Size(171, 27);
+            textBoxAccountName.TabIndex = 1;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(14, 10);
+            label1.Name = "label1";
+            label1.Size = new Size(107, 20);
+            label1.TabIndex = 0;
+            label1.Text = "Account Name";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(54, 20);
+            toolStripStatusLabel1.Text = "Ready!";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(364, 400);
+            ClientSize = new Size(364, 427);
+            Controls.Add(splitContainer1);
+            Controls.Add(statusStrip1);
             Controls.Add(pictureBoxBsky);
             Controls.Add(pictureBoxTrello);
             Controls.Add(pictureBoxGit);
             Controls.Add(linkLabelNews);
-            Controls.Add(splitContainer1);
             Controls.Add(labelLauncherVer);
             Controls.Add(labelGameVer);
             Controls.Add(pictureBox1);
@@ -277,17 +296,19 @@
             Text = "WPP Launcher";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxGit).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel1.PerformLayout();
             splitContainer1.Panel2.ResumeLayout(false);
             splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBoxGit).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).EndInit();
-            menuStrip1.ResumeLayout(false);
-            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -297,15 +318,6 @@
         private PictureBox pictureBox1;
         private Label labelGameVer;
         private Label labelLauncherVer;
-        private SplitContainer splitContainer1;
-        private Label label1;
-        private TextBox textBoxEmail;
-        private Label label3;
-        private TextBox textBoxPassword;
-        private Label label2;
-        private TextBox textBoxAccountName;
-        private Button buttonRegister;
-        private LinkLabel linkLabelGoToLogin;
         private LinkLabel linkLabelNews;
         private PictureBox pictureBoxGit;
         private PictureBox pictureBoxTrello;
@@ -314,5 +326,16 @@
         private ToolStripMenuItem gameToolStripMenuItem;
         private ToolStripMenuItem installToolStripMenuItem;
         private ToolStripMenuItem optionsToolStripMenuItem;
+        private StatusStrip statusStrip1;
+        private SplitContainer splitContainer1;
+        private LinkLabel linkLabelGoToLogin;
+        private Button buttonRegister;
+        private TextBox textBoxEmail;
+        private Label label3;
+        private TextBox textBoxPassword;
+        private Label label2;
+        private TextBox textBoxAccountName;
+        private Label label1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
     }
 }

@@ -84,5 +84,10 @@ namespace WoW.Launcher
         private void OnTrelloClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://trello.com/b/4BRTSQXK/wow2d") { UseShellExecute = true });
 
         private void OnGitClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://github.com/davist1025/WorldOfWarcraft2D") { UseShellExecute = true });
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new FormOptions().ShowDialog(this);
+        }
     }
 }
