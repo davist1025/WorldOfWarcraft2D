@@ -28,7 +28,6 @@ namespace WoW.Launcher
             {
                 label3.Hide();
                 textBoxEmail.Hide();
-                checkBoxOfflineMode.Show();
                 buttonRegister.Text = "Login";
                 linkLabelGoToLogin.Text = "Need an account?";
                 _isLoginState = true;
@@ -37,7 +36,6 @@ namespace WoW.Launcher
             {
                 label3.Show();
                 textBoxEmail.Show();
-                checkBoxOfflineMode.Hide();
                 buttonRegister.Text = "Register";
                 linkLabelGoToLogin.Text = "Have an account?";
                 _isLoginState = false;
@@ -55,12 +53,6 @@ namespace WoW.Launcher
 
             labelGameVer.Text = string.Format(labelGameVer.Text, GameVersion);
             labelLauncherVer.Text = string.Format(labelLauncherVer.Text, LauncherVersion);
-        }
-
-        private void OnOfflineModeChanged(object sender, EventArgs e)
-        {
-            textBoxAccountName.Enabled = !checkBoxOfflineMode.Checked;
-            textBoxPassword.Enabled = !checkBoxOfflineMode.Checked;
         }
 
         private async void buttonRegister_Click(object sender, EventArgs e)
