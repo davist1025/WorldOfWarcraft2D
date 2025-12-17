@@ -34,7 +34,6 @@
             labelLauncherVer = new Label();
             splitContainer1 = new SplitContainer();
             linkLabelGoToLogin = new LinkLabel();
-            checkBoxOfflineMode = new CheckBox();
             buttonRegister = new Button();
             textBoxEmail = new TextBox();
             label3 = new Label();
@@ -46,6 +45,10 @@
             pictureBoxGit = new PictureBox();
             pictureBoxTrello = new PictureBox();
             pictureBoxBsky = new PictureBox();
+            menuStrip1 = new MenuStrip();
+            gameToolStripMenuItem = new ToolStripMenuItem();
+            installToolStripMenuItem = new ToolStripMenuItem();
+            optionsToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -54,12 +57,13 @@
             ((System.ComponentModel.ISupportInitialize)pictureBoxGit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).BeginInit();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(152, 12);
+            pictureBox1.Location = new Point(148, 27);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(66, 67);
             pictureBox1.TabIndex = 0;
@@ -68,7 +72,7 @@
             // labelGameVer
             // 
             labelGameVer.AutoSize = true;
-            labelGameVer.Location = new Point(0, 129);
+            labelGameVer.Location = new Point(0, 150);
             labelGameVer.Name = "labelGameVer";
             labelGameVer.Size = new Size(77, 20);
             labelGameVer.TabIndex = 2;
@@ -78,7 +82,7 @@
             // labelLauncherVer
             // 
             labelLauncherVer.AutoSize = true;
-            labelLauncherVer.Location = new Point(0, 149);
+            labelLauncherVer.Location = new Point(0, 170);
             labelLauncherVer.Name = "labelLauncherVer";
             labelLauncherVer.Size = new Size(97, 20);
             labelLauncherVer.TabIndex = 3;
@@ -88,7 +92,7 @@
             // 
             splitContainer1.BorderStyle = BorderStyle.Fixed3D;
             splitContainer1.Dock = DockStyle.Bottom;
-            splitContainer1.Location = new Point(0, 172);
+            splitContainer1.Location = new Point(0, 192);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -97,7 +101,6 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(checkBoxOfflineMode);
             splitContainer1.Panel2.Controls.Add(buttonRegister);
             splitContainer1.Panel2.Controls.Add(textBoxEmail);
             splitContainer1.Panel2.Controls.Add(label3);
@@ -119,17 +122,6 @@
             linkLabelGoToLogin.TabStop = true;
             linkLabelGoToLogin.Text = "Have an account?";
             linkLabelGoToLogin.LinkClicked += linkLabelGoToLogin_LinkClicked;
-            // 
-            // checkBoxOfflineMode
-            // 
-            checkBoxOfflineMode.AutoSize = true;
-            checkBoxOfflineMode.Location = new Point(14, 119);
-            checkBoxOfflineMode.Name = "checkBoxOfflineMode";
-            checkBoxOfflineMode.Size = new Size(121, 24);
-            checkBoxOfflineMode.TabIndex = 7;
-            checkBoxOfflineMode.Text = "Offline-mode";
-            checkBoxOfflineMode.UseVisualStyleBackColor = true;
-            checkBoxOfflineMode.CheckedChanged += OnOfflineModeChanged;
             // 
             // buttonRegister
             // 
@@ -194,7 +186,7 @@
             // linkLabelNews
             // 
             linkLabelNews.AutoSize = true;
-            linkLabelNews.Location = new Point(319, 149);
+            linkLabelNews.Location = new Point(319, 169);
             linkLabelNews.Name = "linkLabelNews";
             linkLabelNews.Size = new Size(45, 20);
             linkLabelNews.TabIndex = 5;
@@ -206,7 +198,7 @@
             // 
             pictureBoxGit.Cursor = Cursors.Hand;
             pictureBoxGit.Image = (Image)resources.GetObject("pictureBoxGit.Image");
-            pictureBoxGit.Location = new Point(128, 85);
+            pictureBoxGit.Location = new Point(124, 100);
             pictureBoxGit.Name = "pictureBoxGit";
             pictureBoxGit.Size = new Size(34, 36);
             pictureBoxGit.TabIndex = 6;
@@ -217,7 +209,7 @@
             // 
             pictureBoxTrello.Cursor = Cursors.Hand;
             pictureBoxTrello.Image = (Image)resources.GetObject("pictureBoxTrello.Image");
-            pictureBoxTrello.Location = new Point(168, 85);
+            pictureBoxTrello.Location = new Point(164, 100);
             pictureBoxTrello.Name = "pictureBoxTrello";
             pictureBoxTrello.Size = new Size(34, 36);
             pictureBoxTrello.TabIndex = 7;
@@ -228,18 +220,47 @@
             // 
             pictureBoxBsky.Cursor = Cursors.Hand;
             pictureBoxBsky.Image = (Image)resources.GetObject("pictureBoxBsky.Image");
-            pictureBoxBsky.Location = new Point(208, 85);
+            pictureBoxBsky.Location = new Point(204, 100);
             pictureBoxBsky.Name = "pictureBoxBsky";
             pictureBoxBsky.Size = new Size(34, 36);
             pictureBoxBsky.TabIndex = 8;
             pictureBoxBsky.TabStop = false;
             pictureBoxBsky.Click += OnBskyClick;
             // 
+            // menuStrip1
+            // 
+            menuStrip1.ImageScalingSize = new Size(20, 20);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { gameToolStripMenuItem, optionsToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(364, 28);
+            menuStrip1.TabIndex = 9;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // gameToolStripMenuItem
+            // 
+            gameToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { installToolStripMenuItem });
+            gameToolStripMenuItem.Name = "gameToolStripMenuItem";
+            gameToolStripMenuItem.Size = new Size(62, 24);
+            gameToolStripMenuItem.Text = "Game";
+            // 
+            // installToolStripMenuItem
+            // 
+            installToolStripMenuItem.Name = "installToolStripMenuItem";
+            installToolStripMenuItem.Size = new Size(140, 26);
+            installToolStripMenuItem.Text = "Install...";
+            // 
+            // optionsToolStripMenuItem
+            // 
+            optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            optionsToolStripMenuItem.Size = new Size(75, 24);
+            optionsToolStripMenuItem.Text = "Options";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(364, 380);
+            ClientSize = new Size(364, 400);
             Controls.Add(pictureBoxBsky);
             Controls.Add(pictureBoxTrello);
             Controls.Add(pictureBoxGit);
@@ -248,7 +269,9 @@
             Controls.Add(labelLauncherVer);
             Controls.Add(labelGameVer);
             Controls.Add(pictureBox1);
+            Controls.Add(menuStrip1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             Name = "Form1";
             Text = "WPP Launcher";
@@ -263,6 +286,8 @@
             ((System.ComponentModel.ISupportInitialize)pictureBoxGit).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxBsky).EndInit();
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -281,10 +306,13 @@
         private TextBox textBoxAccountName;
         private Button buttonRegister;
         private LinkLabel linkLabelGoToLogin;
-        private CheckBox checkBoxOfflineMode;
         private LinkLabel linkLabelNews;
         private PictureBox pictureBoxGit;
         private PictureBox pictureBoxTrello;
         private PictureBox pictureBoxBsky;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem gameToolStripMenuItem;
+        private ToolStripMenuItem installToolStripMenuItem;
+        private ToolStripMenuItem optionsToolStripMenuItem;
     }
 }

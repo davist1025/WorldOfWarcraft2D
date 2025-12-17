@@ -46,8 +46,6 @@ namespace WoW.Launcher
 
         private async void Form1_Load(object sender, EventArgs e)
         {
-            checkBoxOfflineMode.Hide();
-
             // fetch the current game, launcher version.
             var value = await HttpService.GetVersionAsync();
             dynamic dynamicResponse = JsonConvert.DeserializeObject(value); // this is icky.
