@@ -39,5 +39,29 @@ namespace WoW.Launcher
             using var response = await _webClient.PostAsync($"{_apiRoot}/auth", content);
             return await response.Content.ReadAsStringAsync();
         }
+
+        /// <summary>
+        /// Attempt to create a new account using the given account name and password.
+        /// 
+        /// Passwords are pre-hashed with SHA256 by the client.
+        /// </summary>
+        /// <param name="accountName"></param>
+        /// <param name="password"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public static async Task<string> Register(string accountName, string password, string email = "")
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(
+                new Dictionary<string, string>()
+                {
+                    { "accountName", $"{accountName}" },
+                    { "hashedPw", $"{password}" }
+                }, Formatting.Indented), Encoding.UTF8, "application/json");
+            // todo: email in registration is currently unused.
+
+            using var response = await _webClient.PostAsync($"{_apiRoot}/register", content);
+
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }

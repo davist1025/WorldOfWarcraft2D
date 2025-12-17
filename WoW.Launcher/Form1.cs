@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http.Json;
+using WoW.Client.Shared;
 
 namespace WoW.Launcher
 {
@@ -66,11 +67,20 @@ namespace WoW.Launcher
 
         private async void buttonRegister_Click(object sender, EventArgs e)
         {
+            string accountName = textBoxAccountName.Text.Trim();
+            string hashedPassword = Utils.ToSHA256(textBoxPassword.Text.Trim());
+
+
             if (_isLoginState)
             {
                 // hack: debug code to test http services.
-                var logonResponse = await HttpService.Login(textBoxAccountName.Text, textBoxPassword.Text);
+                var logonResponse = await HttpService.Login(accountName, hashedPassword);
                 MessageBox.Show(logonResponse);
+            }
+            else
+            {
+                var registerResponse = await HttpService.Register(accountName, hashedPassword);
+                MessageBox.Show(registerResponse);
             }
         }
 
@@ -79,7 +89,6 @@ namespace WoW.Launcher
             MessageBox.Show("Coming soon!\n\nRefer to the GitHub, Trello or BlueSky pages for more information.", "WoW Pixel Project", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // todo: crash when using a url here? weird. errors trying to run the link in this working directory.
         private void OnBskyClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://bsky.app/profile/mrkokiri.bsky.social") { UseShellExecute = true });
 
         private void OnTrelloClick(object sender, EventArgs e) => Process.Start(new ProcessStartInfo("https://trello.com/b/4BRTSQXK/wow2d") { UseShellExecute = true });

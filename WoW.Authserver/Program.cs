@@ -54,7 +54,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "admin".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("123")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("123")),
                         SecurityLevel = (int)SecurityLevel.Administrator
                     });
                 }
@@ -64,7 +64,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "gamemaster".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("456")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("456")),
                         SecurityLevel = (int)SecurityLevel.Gamemaster
                     });
                 }
@@ -74,7 +74,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "player".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("789")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("789")),
                         SecurityLevel = (int)SecurityLevel.Player
                     });
                 }
