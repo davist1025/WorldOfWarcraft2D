@@ -58,7 +58,15 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 var targetPosition = Controller.Processor.Map.WorldToTilePosition(_randomPosition);
 
                 _pathPoints = _graph.Search(_myTilePos, targetPosition);
-                _pathCount = _pathPoints.Count; // todo: Crash here due to "_pathPoints" being null. This came after the function ran a number of times successfully.
+
+                if (_pathPoints == null)
+                {
+                    Log.Print($"{GetType().Name}: _pathPoints was null after attempting to search for a path to: {targetPosition}; resetting...", LogType.Debug);
+                    _isRoaming = false;
+                    _randomPosition = Vector2.Zero;
+                }
+                else
+                    _pathCount = _pathPoints.Count;
             }
 
             if (!_isMovingToPoint)

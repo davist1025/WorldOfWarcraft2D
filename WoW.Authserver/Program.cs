@@ -103,13 +103,9 @@ namespace WoW.Authserver
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.NetworkReceiveEvent += (peer, reader, delivery) => _netProcessor.ReadAllPackets(reader, peer);
 
-            _netProcessor.SubscribeReusable<RealmAuth_Disconnection, NetPeer>((disconnect, peer) => PacketManager.OnPlayerDisconnect(disconnect));
-
             _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) => PacketManager.OnRealmRegister(newAuthRegistration, peer));
 
             _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
-
-            _netProcessor.SubscribeReusable<RealmAuth_SessionVerification, NetPeer>((request, peer) => PacketManager.OnSessionVerification(request, peer));
 
             _netManager = new NetManager(_netEventListener);
             _netManager.Start(8070);

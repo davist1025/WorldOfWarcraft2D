@@ -69,35 +69,6 @@ namespace WoW.Authserver
             }
         }
 
-        public static void OnSessionVerification(RealmAuth_SessionVerification verification, NetPeer peer)
-        {
-            using (var ctx = new AuthContext())
-            {
-                Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.ToLower().Equals(verification.SessionId));
-                if (account != null)
-                {
-                    Log.Print($"Transferring {account.Username} to realm...", LogType.Network);
-                    Program.SendSerializable(peer, new AuthRealm_SessionVerification()
-                    {
-                        User = new PlayerAccount()
-                        {
-                            Id = account.Id,
-                            SessionId = account.SessionId,
-                            Security = account.Security
-                        }
-                    });
-                }
-            }
-        }
-
-        public static void OnPlayerDisconnect(RealmAuth_Disconnection disconnection)
-        {
-            using (var ctx = new AuthContext())
-            {
-                ctx.Accounts.Where(a => a.Id == disconnection.AccountId).ExecuteUpdate(setters => setters.SetProperty(p => p.SessionId, default(string)));
-            }
-        }
-
         public static void OnRealmRegister(RealmAuth_Registrar realmData, NetPeer peer)
         {
             using (var ctx = new AuthContext())

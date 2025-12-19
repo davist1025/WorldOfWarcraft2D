@@ -18,15 +18,15 @@ using WoW.Server.Shared.Database;
 using WoW.Server.Shared.Database.Model;
 using WoW.Server.Shared;
 using WoW.Server.Shared.Database.Model.Realm.Character;
+using WoW.Server.Shared.Serializable;
+using WoW.Server.Shared.Database.Model.Auth;
 
 namespace WoW.Realmserver
 {
     internal class Program : CoreHeadless
     {
         private static NetManager _netManager;
-        private static NetManager _authNetManager;
         private EventBasedNetListener _netEventListener;
-        private EventBasedNetListener _authListener;
         private static NetPacketProcessor _netProcessor;
 
         public static RealmConfiguration Configuration;
@@ -35,7 +35,7 @@ namespace WoW.Realmserver
         public static float DeltaTime = 0f;
         public const float TickRate = 0.1f;
 
-        public static Dictionary<string, NetPeer> AuthTransfers = new Dictionary<string, NetPeer>();
+        public static Queue<PendingPlayer> PendingPlayers = new Queue<PendingPlayer>();
 
         public Program()
         {
@@ -113,7 +113,7 @@ namespace WoW.Realmserver
             
             _netProcessor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) => PacketManager.OnPlayerTransferToRealm(transfer, peer));
 
-            _netProcessor.SubscribeNetSerializable<AuthRealm_SessionVerification, NetPeer>((session, peer) => PacketManager.OnAuthSessionVerification(session, peer));
+            //_netProcessor.SubscribeNetSerializable<AuthRealm_SessionVerification, NetPeer>((session, peer) => PacketManager.OnAuthSessionVerification(session, peer));
 
             _netProcessor.SubscribeReusable<ClientRealm_CreateCharacter, NetPeer>((request, peer) => PacketManager.OnPlayerCreateCharacter(request, peer));
 
@@ -143,21 +143,9 @@ namespace WoW.Realmserver
              * 
              */ 
 
-            _authListener = new EventBasedNetListener();
-            _authListener.PeerConnectedEvent += (peer) =>
-            {
-                SendToAuthserver(new RealmAuth_Registrar() { Ip = Configuration.IpAddress, Port = Configuration.Port });
-            };
-
-            _authListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
-            _authNetManager = new NetManager(_authListener);
-            _authNetManager.Start();
-            _authNetManager.Connect("127.0.0.1", 8070, "");
-
             while (true)
             {
                 _netManager.PollEvents();
-                _authNetManager.PollEvents();
                 Tick();
             }
         }
@@ -166,6 +154,40 @@ namespace WoW.Realmserver
         {
             DeltaTime = deltaTime;
             Scene.Update();
+
+            using (var authCtx = new AuthContext())
+            {
+                if (PendingPlayers.TryDequeue(out var newPendingConnection))
+                {
+                    var sessionId = newPendingConnection.SessionId;
+
+                    if (authCtx.Accounts.Any(x => x.SessionId == sessionId)) ;
+                    {
+                        // todo: can this object just be stored and tracked to avoid making PlayerAccount?
+                        Account account = authCtx.Accounts.FirstOrDefault(a => a.SessionId.ToLower().Equals(sessionId));
+
+                        if (account != null)
+                        {
+                            PlayerAccount localAccount = new PlayerAccount()
+                            {
+                                Id = account.Id,
+                                SessionId = sessionId,
+                                Security = account.Security,
+                            };
+
+                            WorldSessionComponent newSession = new WorldSessionComponent(localAccount);
+                            Entity newEntity = Scene.CreateEntity(Guid.NewGuid().ToString());
+                            newEntity.Tag = (int)EntityType.NetPlayer;
+                            newEntity.AddComponent(newSession);
+                            newPendingConnection.Connection.Tag = newEntity;
+
+                            Log.Print($"Pending connection w/ Account ({account.Username}) has been verified.", LogType.Network);
+
+                            PacketManager.SendCharactersTo(newSession.Account.Id, newPendingConnection.Connection);
+                        }
+                    }
+                }
+            }
         }
 
         public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
@@ -225,9 +247,6 @@ namespace WoW.Realmserver
             foreach (var p in players)
                 SendTo(p.Name, packet, delivery);
         }
-
-        public static void SendToAuthserver<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-            => _netProcessor.Send(_authNetManager, packet, delivery);
 
         static void Main(string[] args)
             => new Program();
