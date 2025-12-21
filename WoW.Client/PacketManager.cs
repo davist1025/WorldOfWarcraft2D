@@ -117,33 +117,45 @@ namespace WoW.Client
 
         public static void OnPlayerPositionUpdate(RealmClient_MovementStateChange netUpdate)
         {
-            var netPlayer = Core.Scene.FindEntity(netUpdate.Id);
+            var allPlayers = Game1.Scene.FindEntitiesWithTag((int)EntityType.NetPlayer);
 
-            if (netPlayer != null)
+            for (int i = 0; i < allPlayers.Count; i++)
             {
-                if (netUpdate.IsTeleportUpdate)
-                    netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
-
-                if (netPlayer.HasComponent<NpcController>())
-                    netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
-                else if (netPlayer.HasComponent<NetPlayerController>())
+                var entity = allPlayers[i];
+                if (entity.Name.Equals(netUpdate.Id))
                 {
-                    var controller = netPlayer.GetComponent<NetPlayerController>();
-
-                    if (netUpdate.IsColliding)
-                    {
-                        var normal = netUpdate.ColliderNormal.ToVector2XNA();
-
-                        if (normal.Y != 0f)
-                            netUpdate.MovementY = 0f;
-
-                        if (normal.X != 0f)
-                            netUpdate.MovementX = 0f;
-                    }
-
+                    var controller = entity.GetComponent<NetPlayerController>();
                     controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
                 }
             }
+
+            //var netPlayer = Core.Scene.FindEntity(netUpdate.Id);
+
+            //if (netPlayer != null)
+            //{
+            //    if (netUpdate.IsTeleportUpdate)
+            //        netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
+
+            //    if (netPlayer.HasComponent<NpcController>())
+            //        netPlayer.SetPosition(netUpdate.ResultX, netUpdate.ResultY);
+            //    else if (netPlayer.HasComponent<NetPlayerController>())
+            //    {
+            //        var controller = netPlayer.GetComponent<NetPlayerController>();
+
+            //        if (netUpdate.IsColliding)
+            //        {
+            //            var normal = netUpdate.ColliderNormal.ToVector2XNA();
+
+            //            if (normal.Y != 0f)
+            //                netUpdate.MovementY = 0f;
+
+            //            if (normal.X != 0f)
+            //                netUpdate.MovementX = 0f;
+            //        }
+
+            //        controller.MovementDirectionQueue.Enqueue(new Vector2(netUpdate.MovementX, netUpdate.MovementY));
+            //    }
+            //}
         }
 
         public static void OnChat(ChatMessage newChat) 

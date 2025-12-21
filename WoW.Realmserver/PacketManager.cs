@@ -154,7 +154,7 @@ namespace WoW.Realmserver
             }
             thisEntity.SetPosition(thisSession.Character.XPosition, thisSession.Character.YPosition);
             thisSession.InitializeGameComponents();
-            var collider = thisEntity.GetComponent<CircleCollider>();
+            //var collider = thisEntity.GetComponent<CircleCollider>();
 
             // add this entity to the matching processor.
             var mapProcessor = processorComponents.Find(processor => processor.Map.Properties["id"].ToLower().Equals(thisSession.Character.MapId));

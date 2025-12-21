@@ -133,7 +133,7 @@ namespace WoW.Realmserver
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
             _netManager = new NetManager(_netEventListener);
-            _netManager.Start(Configuration.Port);
+            _netManager.Start("10.0.0.45", "", Configuration.Port);
 
             /**
              * Some simulated packet/latency loss has been tested against the current netcode.
@@ -239,7 +239,12 @@ namespace WoW.Realmserver
 
         public static void SendToMapFromPlayer<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
+
+
             var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
+            // todo: crash here when a player moves in the world while x # of players are on the char. select screen.
+            // its suspected the if players are on the char. select screen while another player is in-game moving, it will crash the server.
+
             var entity = peer.Tag as Entity;
             var processor = Scene.FindComponentsOfType<TiledMapProcessor>().Where(processor => processor.Creatures.Contains(entity)).FirstOrDefault();
             var players = processor.Creatures.Where(e => e.HasComponent<WorldSessionComponent>() && !e.Name.ToLower().Equals(gObjectId)).ToArray();

@@ -52,7 +52,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
                     Nez.Random.Range(Controller.Spawner.Bounds.Y, Controller.Spawner.Bounds.Y + Controller.Spawner.Bounds.Height));
             }
 
-            if (_isRoaming && _randomPosition != Vector2.Zero && _pathPoints.Count == 0)
+            if (_isRoaming && _randomPosition != Vector2.Zero && _pathPoints != null && _pathPoints.Count == 0)
             {
                 _myTilePos = Controller.Processor.Map.WorldToTilePosition(Controller.Entity.Position);
                 var targetPosition = Controller.Processor.Map.WorldToTilePosition(_randomPosition);
@@ -69,7 +69,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
                     _pathCount = _pathPoints.Count;
             }
 
-            if (!_isMovingToPoint)
+            if (!_isMovingToPoint && _pathPoints != null)
             {
                 if (_nextPointIndex == _pathCount - 1 || _pathPoints.Count == 0)
                 {

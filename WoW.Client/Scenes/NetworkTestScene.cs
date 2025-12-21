@@ -76,10 +76,10 @@ namespace WoW.Client.Scenes
             if (tmxMapByMapId != null)
             {
                 mapRenderer = CreateEntity("map").AddComponent(new TiledMapRenderer(tmxMapByMapId, "collision_layer"));
-                Camera.AddComponent(new CameraLockController(new Vector2(tmxMapByMapId.TileWidth, tmxMapByMapId.TileWidth), 
-                    new Vector2(
-                        tmxMapByMapId.TileWidth * (tmxMapByMapId.Width - 1), 
-                        tmxMapByMapId.TileWidth * (tmxMapByMapId.Height - 1))));
+                //Camera.AddComponent(new CameraLockController(new Vector2(tmxMapByMapId.TileWidth, tmxMapByMapId.TileWidth), 
+                //    new Vector2(
+                //        tmxMapByMapId.TileWidth * (tmxMapByMapId.Width - 1), 
+                //        tmxMapByMapId.TileWidth * (tmxMapByMapId.Height - 1))));
             }
 
             if (mapRenderer != null)
@@ -121,8 +121,8 @@ namespace WoW.Client.Scenes
             base.Update();
 
             // todo: crashes from a null reference?
-            if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Client.Content.ControlMap.TabTarget]))
-                Game1.Configuration.ControlHandlers[Client.Content.ControlMap.TabTarget]?.Invoke(null, null);
+            //if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Client.Content.ControlMap.TabTarget]))
+            //    Game1.Configuration.ControlHandlers[Client.Content.ControlMap.TabTarget]?.Invoke(null, null);
         }
     }
 }
