@@ -9,8 +9,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
-using WoW.Authserver.DB;
-using WoW.Authserver.DB.Model;
+using WoW.Server.Shared.Database.Model;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared.Client;
@@ -18,6 +17,7 @@ using WoW.Client.Shared.Data;
 using WoW.Server.Shared;
 using WoW.Server.Shared.Serializable;
 using static WoW.Server.Shared.Vocab;
+using WoW.Server.Shared.Database.Model.Auth;
 
 namespace WoW.Authserver
 {
@@ -54,7 +54,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "admin".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("123")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("123")),
                         SecurityLevel = (int)SecurityLevel.Administrator
                     });
                 }
@@ -64,7 +64,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "gamemaster".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("456")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("456")),
                         SecurityLevel = (int)SecurityLevel.Gamemaster
                     });
                 }
@@ -74,7 +74,7 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "player".ToUpper(),
-                        HashedPassword = Argon2.Hash(Utils.ToSHA256("789")),
+                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("789")),
                         SecurityLevel = (int)SecurityLevel.Player
                     });
                 }
@@ -103,16 +103,12 @@ namespace WoW.Authserver
             _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
             _netEventListener.NetworkReceiveEvent += (peer, reader, delivery) => _netProcessor.ReadAllPackets(reader, peer);
 
-            _netProcessor.SubscribeReusable<RealmAuth_Disconnection, NetPeer>((disconnect, peer) => PacketManager.OnPlayerDisconnect(disconnect));
-
             _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) => PacketManager.OnRealmRegister(newAuthRegistration, peer));
 
             _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
 
-            _netProcessor.SubscribeReusable<RealmAuth_SessionVerification, NetPeer>((request, peer) => PacketManager.OnSessionVerification(request, peer));
-
             _netManager = new NetManager(_netEventListener);
-            _netManager.Start(8070);
+            _netManager.Start("10.0.0.45", "", 8070);
 
             while (true)
             {

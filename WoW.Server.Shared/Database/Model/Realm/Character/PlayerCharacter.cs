@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
 
-namespace WoW.Realmserver.DB.Model.Characters
+namespace WoW.Server.Shared.Database.Model.Realm.Character
 {
     /// <summary>
     /// Contains base information for a player character.

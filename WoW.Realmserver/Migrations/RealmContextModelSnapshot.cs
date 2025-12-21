@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WoW.Realmserver.DB;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
 
 #nullable disable
 
@@ -22,7 +23,7 @@ namespace WoW.Realmserver.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Characters.CharacterClassBaseStatistic", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Characters.CharacterClassBaseStatistic", b =>
                 {
                     b.Property<int>("ClassId")
                         .HasColumnType("int")
@@ -53,7 +54,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("character_class_stats");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Characters.CharacterRaceSpawn", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Characters.CharacterRaceSpawn", b =>
                 {
                     b.Property<int>("RaceId")
                         .HasColumnType("int")
@@ -77,7 +78,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("character_race_spawn");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Characters.FilteredCharacterName", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Characters.FilteredCharacterName", b =>
                 {
                     b.Property<int>("NameOrPhraseId")
                         .ValueGeneratedOnAdd()
@@ -96,7 +97,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("character_name_filter");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Characters.PlayerCharacter", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Characters.PlayerCharacter", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("varchar(16)")
@@ -140,7 +141,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("characters");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Characters.PlayerCharacterStatistic", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Characters.PlayerCharacterStatistic", b =>
                 {
                     b.Property<int>("CharacterId")
                         .HasColumnType("int")
@@ -171,7 +172,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("character_stats");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Chat.ChatCommand", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Chat.ChatCommand", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,7 +203,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("chat_command");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.Chat.ChatCommandChild", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.Chat.ChatCommandChild", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -238,7 +239,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("chat_command_children");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.NonPlayerCharacter", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.NonPlayerCharacter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,7 +291,7 @@ namespace WoW.Realmserver.Migrations
                     b.ToTable("npc");
                 });
 
-            modelBuilder.Entity("WoW.Realmserver.DB.Model.NonPlayerCharacterBehavior", b =>
+            modelBuilder.Entity("WoW.Server.Shared.Database.Model.NonPlayerCharacterBehavior", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

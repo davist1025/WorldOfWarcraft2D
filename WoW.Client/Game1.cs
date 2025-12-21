@@ -54,7 +54,7 @@ namespace WoW.Client
         public static Dictionary<string, Texture2D> InterfaceTextures;
 
         public static string AccountName;
-        public static string SessionId;
+        public static string SessionId; // todo: move this global data to another class object?
         public static RemoteRealmserver LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
         public static string CurrentMapId = "";
@@ -116,26 +116,13 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
             {
-                // todo: search for networked player first, then local player if not found.
-                var playerForValidation = Scene.FindEntity(result.PlayerName);
-                if (playerForValidation != null)
-                {
-                    if (playerForValidation.HasComponent<LocalPlayerController>())
-                    {
-                        var localController = playerForValidation.GetComponent<LocalPlayerController>();
-                        localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
+                var localController = Player.GetComponent<LocalPlayerController>();
+                localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
 
-                        var animator = localController.GetComponent<SpriteAnimator>();
-                        animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
+                var animator = Player.GetComponent<SpriteAnimator>();
+                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
 
-                        localController.ProcessInputValidation(result);
-                    }
-                    else if (playerForValidation.HasComponent<NetPlayerController>())
-                    {
-                        var netController = playerForValidation.GetComponent<NetPlayerController>();
-                        netController.Entity.SetPosition(result.ServerCalculation.ToVector2XNA());
-                    }
-                }
+                localController.ProcessInputValidation(result);
             });
 
             _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
@@ -207,7 +194,7 @@ namespace WoW.Client
         public static void ConnectAndLogin(string accountName, string password)
         {
             // todo: grab auth ip/port from config.
-            ClientNetwork.Connect("127.0.0.1", 8070, "");
+            ClientNetwork.Connect("68.48.237.139", 8070, "");
 
             _temporaryLogonPacket = new ClientAuth_Logon()
             {

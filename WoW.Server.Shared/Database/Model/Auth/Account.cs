@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static WoW.Server.Shared.Vocab;
 
-namespace WoW.Authserver.DB.Model
+namespace WoW.Server.Shared.Database.Model.Auth
 {
     [Table("accounts")]
     public class Account

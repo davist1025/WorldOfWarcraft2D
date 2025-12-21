@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Authserver.DB.Model
+namespace WoW.Server.Shared.Database.Model.Auth
 {
     [Table("realmlist")]
     public class Realmserver

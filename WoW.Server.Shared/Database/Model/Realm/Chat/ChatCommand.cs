@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver.DB.Model.Chat
+namespace WoW.Server.Shared.Database.Model.Realm.Chat
 {
     [Table("chat_command")]
     public class ChatCommand

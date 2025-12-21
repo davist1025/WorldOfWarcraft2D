@@ -10,7 +10,7 @@ namespace WoW.Client.Shared.Realm
 {
     public class RealmClient_MovementStateValidation
     {
-        public string PlayerName { get; set; }
+        //public string PlayerName { get; set; }
         public Vector2Serializable ServerCalculation { get; set; }
         public long Sequence { get; set; }
     }

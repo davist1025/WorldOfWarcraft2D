@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.10.35004.147
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoW.Client", "WoW.Client\WoW.Client.csproj", "{C1137D66-31C0-4791-9FA5-9BFA01793B2D}"
 EndProject
@@ -35,6 +35,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E93DA6F9-D960-4809-948C-F24F754DDE10}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{8293E068-EBF5-4902-B806-4F93D4250115}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Web.API", "WoW.Web.API\WoW.Web.API.csproj", "{E41CCFFD-8E32-4C03-B774-1047665AC193}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Launcher", "WoW.Launcher\WoW.Launcher.csproj", "{2E760E80-255C-44A7-B62E-90B37689408F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +86,14 @@ Global
 		{39BCFA2E-C28E-4563-AB45-BA970F1C7894}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39BCFA2E-C28E-4563-AB45-BA970F1C7894}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39BCFA2E-C28E-4563-AB45-BA970F1C7894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E41CCFFD-8E32-4C03-B774-1047665AC193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E41CCFFD-8E32-4C03-B774-1047665AC193}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E41CCFFD-8E32-4C03-B774-1047665AC193}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E41CCFFD-8E32-4C03-B774-1047665AC193}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E760E80-255C-44A7-B62E-90B37689408F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E760E80-255C-44A7-B62E-90B37689408F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E760E80-255C-44A7-B62E-90B37689408F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E760E80-255C-44A7-B62E-90B37689408F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +108,8 @@ Global
 		{2F7FF45F-183A-4C23-9969-D10156A237B7} = {8293E068-EBF5-4902-B806-4F93D4250115}
 		{91844615-62DC-4500-A5D7-2F65D627918B} = {8293E068-EBF5-4902-B806-4F93D4250115}
 		{39BCFA2E-C28E-4563-AB45-BA970F1C7894} = {E93DA6F9-D960-4809-948C-F24F754DDE10}
+		{E41CCFFD-8E32-4C03-B774-1047665AC193} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{2E760E80-255C-44A7-B62E-90B37689408F} = {E93DA6F9-D960-4809-948C-F24F754DDE10}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8637C730-ABA5-40F2-9514-EC7BB6040FF7}

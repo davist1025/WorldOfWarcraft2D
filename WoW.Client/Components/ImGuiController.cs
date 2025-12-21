@@ -66,6 +66,7 @@ namespace WoW.Client.Components
             switch (Game1.NetState)
             {
                 case GameNetworkState.Offline:
+                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(300f, 125f));
                     ImGui.Begin("Login");
                     ImGui.InputText("Account Name", ref _accountNameInput, 32);
                     ImGui.InputText("Password", ref _accountPasswordInput, 64, ImGuiInputTextFlags.Password);
@@ -101,6 +102,7 @@ namespace WoW.Client.Components
                     ImGui.End();
                     break;
                 case GameNetworkState.Auth_Realmlist:
+                    ImGui.SetNextWindowSize(new System.Numerics.Vector2(300f, 125f));
                     if (Realmlist.Count > 0)
                     {
                         ImGui.Begin("Realmlist");
@@ -295,6 +297,7 @@ namespace WoW.Client.Components
                             ImGui.Text($"{controller.Name}");
                             ImGui.Text($"{Game1.SessionId}");
                             ImGui.Text($"Map Id: {Game1.CurrentMapId}");
+                            ImGui.Checkbox("Auto move", ref controller.AutoMove);
 
                             ImGui.End();
                         }

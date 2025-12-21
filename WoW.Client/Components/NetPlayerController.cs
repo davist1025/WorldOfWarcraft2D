@@ -45,8 +45,8 @@ namespace WoW.Client.Components
             _subPixelMovement = new SubpixelVector2();
 
             _mover = Entity.AddComponent<Mover>();
-            _circleCollider = Entity.AddComponent<CircleCollider>();
-            _circleCollider.SetRadius(8f);
+            //_circleCollider = Entity.AddComponent<CircleCollider>();
+            //_circleCollider.SetRadius(8f);
         }
 
         public void Update()
@@ -104,7 +104,7 @@ namespace WoW.Client.Components
                             break;
                     }
 
-                    _mover.CalculateMovementExcluding(ref velocity, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
+                    //_mover.CalculateMovementExcluding(ref velocity, new[] { Entity.Scene.FindComponentOfType<LocalPlayerController>().Entity }, out var res);
                     _subPixelMovement.Update(ref velocity);
                     _mover.ApplyMovement(velocity);
                 }
@@ -151,6 +151,7 @@ namespace WoW.Client.Components
             _animator.RenderLayer = 5;
             _animator.Speed = 0.5f;
             Entity.AddComponent(_animator);
+            _isInMap = true;
 
             //renderer = Entity.AddComponent(new SpriteRenderer(aseFile.Frames[0].ToSprite()));
 

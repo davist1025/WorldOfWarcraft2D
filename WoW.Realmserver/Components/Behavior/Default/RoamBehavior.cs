@@ -52,16 +52,24 @@ namespace WoW.Realmserver.Components.Behavior.Default
                     Nez.Random.Range(Controller.Spawner.Bounds.Y, Controller.Spawner.Bounds.Y + Controller.Spawner.Bounds.Height));
             }
 
-            if (_isRoaming && _randomPosition != Vector2.Zero && _pathPoints.Count == 0)
+            if (_isRoaming && _randomPosition != Vector2.Zero && _pathPoints != null && _pathPoints.Count == 0)
             {
                 _myTilePos = Controller.Processor.Map.WorldToTilePosition(Controller.Entity.Position);
                 var targetPosition = Controller.Processor.Map.WorldToTilePosition(_randomPosition);
 
                 _pathPoints = _graph.Search(_myTilePos, targetPosition);
-                _pathCount = _pathPoints.Count; // todo: Crash here due to "_pathPoints" being null. This came after the function ran a number of times successfully.
+
+                if (_pathPoints == null)
+                {
+                    Log.Print($"{GetType().Name}: _pathPoints was null after attempting to search for a path to: {targetPosition}; resetting...", LogType.Debug);
+                    _isRoaming = false;
+                    _randomPosition = Vector2.Zero;
+                }
+                else
+                    _pathCount = _pathPoints.Count;
             }
 
-            if (!_isMovingToPoint)
+            if (!_isMovingToPoint && _pathPoints != null)
             {
                 if (_nextPointIndex == _pathCount - 1 || _pathPoints.Count == 0)
                 {

@@ -41,7 +41,8 @@ namespace Nez.ECS.Headless
 			{
 				var collider = new BoxCollider(collisionRects[i].X + 0f /* local offset X */,
 					collisionRects[i].Y + 0f, collisionRects[i].Width, collisionRects[i].Height);
-				collider.PhysicsLayer = PhysicsLayer;
+				Flags.SetFlagExclusive(ref collider.CollidesWithLayers, 1);
+				Flags.SetFlagExclusive(ref collider.PhysicsLayer, 10);
 				collider.Entity = Entity;
 				_colliders[i] = collider;
 

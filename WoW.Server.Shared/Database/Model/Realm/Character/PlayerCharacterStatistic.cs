@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver.DB.Model.Characters
+namespace WoW.Server.Shared.Database.Model.Realm.Character
 {
     [Table("character_stats")]
     public class PlayerCharacterStatistic

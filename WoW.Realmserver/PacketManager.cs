@@ -17,10 +17,10 @@ using WoW.Client.Shared.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.Content;
-using WoW.Realmserver.DB;
-using WoW.Realmserver.DB.Model;
-using WoW.Realmserver.DB.Model.Characters;
-using WoW.Realmserver.DB.Model.Chat;
+using WoW.Server.Shared.Database;
+using WoW.Server.Shared.Database.Model;
+using WoW.Server.Shared.Database.Model.Realm.Character;
+using WoW.Server.Shared.Database.Model.Realm.Chat;
 using WoW.Server.Shared;
 
 namespace WoW.Realmserver
@@ -154,7 +154,7 @@ namespace WoW.Realmserver
             }
             thisEntity.SetPosition(thisSession.Character.XPosition, thisSession.Character.YPosition);
             thisSession.InitializeGameComponents();
-            var collider = thisEntity.GetComponent<CircleCollider>();
+            //var collider = thisEntity.GetComponent<CircleCollider>();
 
             // add this entity to the matching processor.
             var mapProcessor = processorComponents.Find(processor => processor.Map.Properties["id"].ToLower().Equals(thisSession.Character.MapId));
@@ -405,37 +405,9 @@ namespace WoW.Realmserver
         /// <param name="peer"></param>
         public static void OnPlayerTransferToRealm(ClientRealm_TransferLogon transfer, NetPeer peer)
         {
-            Log.Print($"Session ({transfer.SessionId}) is transferring from the authserver.", LogType.Network);
+            Log.Print($"Session ({transfer.SessionId}) is attempting to connect to the realm.", LogType.Network);
 
-            Program.AuthTransfers.Add(transfer.SessionId, peer);
-            Program.SendToAuthserver(new RealmAuth_SessionVerification() { SessionId = transfer.SessionId });
-        }
-
-        /// <summary>
-        /// Invoked when the authserver sends back a verification response.
-        /// 
-        /// This occurs when the realmserver attempts to verify a user's SessionId when they connect.
-        /// </summary>
-        /// <param name="verification"></param>
-        /// <param name="peer"></param>
-        public static void OnAuthSessionVerification(AuthRealm_SessionVerification verification, NetPeer peer)
-        {
-            if (verification.User != null && Program.AuthTransfers.ContainsKey(verification.User.SessionId))
-            {
-                NetPeer sessionPeer = Program.AuthTransfers[verification.User.SessionId];
-                Program.AuthTransfers.Remove(verification.User.SessionId);
-
-                WorldSessionComponent newSession = new WorldSessionComponent(verification.User);
-                Entity newEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString());
-                newEntity.Tag = (int)EntityType.NetPlayer;
-                newEntity.AddComponent(newSession);
-                sessionPeer.Tag = newEntity;
-
-                Log.Print($"Session ({verification.User.SessionId} is verified with the authserver.", LogType.Debug);
-
-                // get all characters for this user.
-                SendCharactersTo(newSession.Account.Id, sessionPeer);
-            }
+            Program.PendingPlayers.Enqueue(new PendingPlayer(transfer.SessionId, peer));
         }
 
         /// <summary>
@@ -450,8 +422,6 @@ namespace WoW.Realmserver
                 var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSessionComponent>();
                 Log.Print($"Player ({session.Character.Name}) has left the game world.", LogType.Network);
-
-                Program.SendToAuthserver(new RealmAuth_Disconnection() { AccountId = session.Account.Id });
 
                 // save world position.
                 if (session.Character != null)
@@ -468,6 +438,14 @@ namespace WoW.Realmserver
                             .SetProperty(c => c.YPosition, session.Entity.Position.Y)
                             .SetProperty(c => c.MapId, session.Character.MapId)
                             .SetProperty(c => c.Direction, session.Character.Direction));
+                    }
+
+                    using (var aCtx = new AuthContext())
+                    {
+                        aCtx.Accounts
+                            .Where(a => a.Id == session.Account.Id)
+                            .ExecuteUpdate(setters => setters
+                                .SetProperty(a => a.SessionId, default(string)));
                     }
                 }
 
@@ -512,7 +490,7 @@ namespace WoW.Realmserver
         /// </summary>
         /// <param name="accountId"></param>
         /// <param name="accountOwner"></param>
-        private static void SendCharactersTo(int accountId, NetPeer accountOwner)
+        public static void SendCharactersTo(int accountId, NetPeer accountOwner)
         {
             List<RemoteCharacter> characters = new List<RemoteCharacter>();
 

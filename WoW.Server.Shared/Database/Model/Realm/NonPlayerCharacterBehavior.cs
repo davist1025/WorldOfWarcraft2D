@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver.DB.Model
+namespace WoW.Server.Shared.Database.Model.Realm
 {
     [Table("npc_behavior")]
     public class NonPlayerCharacterBehavior

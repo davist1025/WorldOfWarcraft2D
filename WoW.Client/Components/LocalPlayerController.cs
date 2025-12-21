@@ -38,6 +38,8 @@ namespace WoW.Client.Components
         /** Debug variables **/
         public Vector2 LastServerCalculation = Vector2.Zero;
 
+        public bool AutoMove = false;
+
         public LocalPlayerController(string name, SpriteDirection direction)
         {
             Name = name;
@@ -56,11 +58,9 @@ namespace WoW.Client.Components
 
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
-            _circleCollder = Entity.AddComponent(new CircleCollider(8f));
+            //_circleCollder = Entity.AddComponent(new CircleCollider(8f));
             _animator = Entity.GetComponent<SpriteAnimator>();
             _animator.Speed = 0.5f;
-            // todo: should collider size be set by the server and transmitted?
-            // yes :3
         }
 
         public void Update()
@@ -68,6 +68,9 @@ namespace WoW.Client.Components
             if (!ImGui.IsAnyItemActive())
                 _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
             _animator.Update();
+
+            if (AutoMove)
+                _movementInput.X = 1f;
 
             if (!_animator.IsRunning)
             {
@@ -161,7 +164,8 @@ namespace WoW.Client.Components
             var moveDirection = Game1.MovementSpeed * Time.DeltaTime * input;
             moveDirection.Round();
 
-            _mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
+            //_mover.CalculateMovement(ref moveDirection, out var _);
+            //_mover.CalculateMovementExcluding(ref moveDirection, Entity.Scene.FindComponentsOfType<NetPlayerController>().Select(x => x.Entity).ToArray(), out var res);
             _subPixelMovement.Update(ref moveDirection);
             _mover.ApplyMovement(moveDirection);
         }

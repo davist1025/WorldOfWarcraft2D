@@ -5,13 +5,13 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Realmserver.DB.Model;
-using WoW.Realmserver.DB.Model.Characters;
-using WoW.Realmserver.DB.Model.Chat;
+using WoW.Server.Shared.Database.Model.Realm;
+using WoW.Server.Shared.Database.Model.Realm.Character;
+using WoW.Server.Shared.Database.Model.Realm.Chat;
 
-namespace WoW.Realmserver.DB
+namespace WoW.Server.Shared.Database.Model
 {
-    internal class RealmContext : DbContext
+    public class RealmContext : DbContext
     {
         public DbSet<PlayerCharacter> Characters { get; set; }
         public DbSet<PlayerCharacterStatistic> CharacterStatistics { get; set; }

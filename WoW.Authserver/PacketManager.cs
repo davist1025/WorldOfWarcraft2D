@@ -6,16 +6,16 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Authserver.DB;
 using WoW.Client.Shared.Auth;
 using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Server.Shared;
 using Org.BouncyCastle.Asn1.Ocsp;
-using WoW.Authserver.DB.Model;
 using WoW.Server.Shared.Serializable;
 using Isopoh.Cryptography.Argon2;
+using WoW.Server.Shared.Database.Model;
+using WoW.Server.Shared.Database.Model.Auth;
 
 namespace WoW.Authserver
 {
@@ -66,35 +66,6 @@ namespace WoW.Authserver
                 }
 
                 ctx.SaveChanges();
-            }
-        }
-
-        public static void OnSessionVerification(RealmAuth_SessionVerification verification, NetPeer peer)
-        {
-            using (var ctx = new AuthContext())
-            {
-                Account account = ctx.Accounts.FirstOrDefault(a => a.SessionId.ToLower().Equals(verification.SessionId));
-                if (account != null)
-                {
-                    Log.Print($"Transferring {account.Username} to realm...", LogType.Network);
-                    Program.SendSerializable(peer, new AuthRealm_SessionVerification()
-                    {
-                        User = new PlayerAccount()
-                        {
-                            Id = account.Id,
-                            SessionId = account.SessionId,
-                            Security = account.Security
-                        }
-                    });
-                }
-            }
-        }
-
-        public static void OnPlayerDisconnect(RealmAuth_Disconnection disconnection)
-        {
-            using (var ctx = new AuthContext())
-            {
-                ctx.Accounts.Where(a => a.Id == disconnection.AccountId).ExecuteUpdate(setters => setters.SetProperty(p => p.SessionId, default(string)));
             }
         }
 
