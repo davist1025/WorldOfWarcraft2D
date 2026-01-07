@@ -133,7 +133,7 @@ namespace WoW.Realmserver
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
             _netManager = new NetManager(_netEventListener);
-            _netManager.Start("10.0.0.45", "", Configuration.Port);
+            _netManager.Start("127.0.0.1", "", Configuration.Port);
 
             /**
              * Some simulated packet/latency loss has been tested against the current netcode.

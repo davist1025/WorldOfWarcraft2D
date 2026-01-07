@@ -297,7 +297,6 @@ namespace WoW.Client.Components
                             ImGui.Text($"{controller.Name}");
                             ImGui.Text($"{Game1.SessionId}");
                             ImGui.Text($"Map Id: {Game1.CurrentMapId}");
-                            ImGui.Checkbox("Auto move", ref controller.AutoMove);
 
                             ImGui.End();
                         }

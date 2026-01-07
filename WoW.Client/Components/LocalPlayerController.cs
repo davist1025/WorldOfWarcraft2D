@@ -38,8 +38,6 @@ namespace WoW.Client.Components
         /** Debug variables **/
         public Vector2 LastServerCalculation = Vector2.Zero;
 
-        public bool AutoMove = false;
-
         public LocalPlayerController(string name, SpriteDirection direction)
         {
             Name = name;
@@ -68,9 +66,6 @@ namespace WoW.Client.Components
             if (!ImGui.IsAnyItemActive())
                 _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
             _animator.Update();
-
-            if (AutoMove)
-                _movementInput.X = 1f;
 
             if (!_animator.IsRunning)
             {

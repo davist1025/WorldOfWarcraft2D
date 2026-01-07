@@ -22,6 +22,7 @@ using WoW.Server.Shared.Database.Model;
 using WoW.Server.Shared.Database.Model.Realm.Character;
 using WoW.Server.Shared.Database.Model.Realm.Chat;
 using WoW.Server.Shared;
+using WoW.Realmserver.Data;
 
 namespace WoW.Realmserver
 {
@@ -241,7 +242,8 @@ namespace WoW.Realmserver
         {
             var entity = peer.Tag as Entity;
             var session = entity.GetComponent<WorldSessionComponent>();
-            session.AddMovementStateChange(movement);
+
+            session.QueueMovementUpdate(new ClientMovementUpdate(movement.VelocityX, movement.VelocityY, movement.DeltaTime, movement.Sequence));
 
         }
 

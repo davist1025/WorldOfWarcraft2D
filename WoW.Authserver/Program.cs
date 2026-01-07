@@ -108,7 +108,7 @@ namespace WoW.Authserver
             _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
 
             _netManager = new NetManager(_netEventListener);
-            _netManager.Start("10.0.0.45", "", 8070);
+            _netManager.Start("127.0.0.1", "", 8070);
 
             while (true)
             {
