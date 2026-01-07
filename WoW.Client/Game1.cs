@@ -194,7 +194,7 @@ namespace WoW.Client
         public static void ConnectAndLogin(string accountName, string password)
         {
             // todo: grab auth ip/port from config.
-            ClientNetwork.Connect("68.48.237.139", 8070, "");
+            ClientNetwork.Connect("127.0.0.1", 8070, "");
 
             _temporaryLogonPacket = new ClientAuth_Logon()
             {

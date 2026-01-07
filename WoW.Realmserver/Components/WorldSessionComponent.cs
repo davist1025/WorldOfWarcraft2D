@@ -11,6 +11,7 @@ using WoW.Client.Shared;
 using WoW.Client.Shared.Client;
 using WoW.Client.Shared.Data;
 using WoW.Client.Shared.Realm;
+using WoW.Realmserver.Data;
 using WoW.Server.Shared.Database.Model.Realm.Character;
 using WoW.Server.Shared.Serializable;
 
@@ -30,7 +31,7 @@ namespace WoW.Realmserver.Components
 
         private float _tickAccumulator = 0f;
         private long _lastProcessedSequence = 0;
-        private Queue<ClientRealm_Movement> _movementStateChanges = new Queue<ClientRealm_Movement>();
+        private Queue<ClientMovementUpdate> _movementUpdates = new Queue<ClientMovementUpdate>();
 
         public List<Entity> AvailableTargets = new List<Entity>();
         public int TargetIndex = -1;
@@ -40,12 +41,12 @@ namespace WoW.Realmserver.Components
 
         public void Update()
         {
-            if (_movementStateChanges.TryDequeue(out var inputStateChange))
+            if (_movementUpdates.TryDequeue(out var inputStateChange))
             {
                 _tickAccumulator += inputStateChange.DeltaTime;
                 _lastProcessedSequence = inputStateChange.Sequence;
 
-                var vector = new Vector2(inputStateChange.VelocityX, inputStateChange.VelocityY);
+                var vector = new Vector2(inputStateChange.X, inputStateChange.Y);
 
                 _moveDirection = Program.Configuration.WorldParameters["global_movement_speed"] * Program.DeltaTime * vector;
                 _moveDirection.Round();
@@ -65,9 +66,6 @@ namespace WoW.Realmserver.Components
                         ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y),
                         Sequence = _lastProcessedSequence
                     });
-
-                    //Program.SendToAll(
-                    //    new RealmClient_MovementStateValidation() { PlayerName = Entity.Name, ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y), Sequence = _lastProcessedSequence });
                 }
 
                 if (vector.X < 0f) Character.Direction = (int)SpriteDirection.West;
@@ -105,7 +103,7 @@ namespace WoW.Realmserver.Components
             Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
         }
 
-        public void AddMovementStateChange(ClientRealm_Movement stateChange)
-            => _movementStateChanges.Enqueue(stateChange);
+        public void QueueMovementUpdate(ClientMovementUpdate moveUpdate)
+            => _movementUpdates.Enqueue(moveUpdate);
     }
 }
