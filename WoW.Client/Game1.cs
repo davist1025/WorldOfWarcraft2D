@@ -72,6 +72,7 @@ namespace WoW.Client
         {
             IsMouseVisible = true;
             PauseOnFocusLost = false;
+            IsFixedTimeStep = true;
         }
 
         protected override void Initialize()
