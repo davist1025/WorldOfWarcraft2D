@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WoW.Server.Shared.Database.Model;
+using WoW.Database.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var version = ServerVersion.AutoDetect("server=127.0.0.1;uid=root;pwd=1111;database=wpp_auth");

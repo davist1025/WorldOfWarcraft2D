@@ -15,6 +15,12 @@ namespace WoW.Network.Objects
         public string Hostname { get; init; }
         public int Port { get; init; }
 
+        public RealmserverMetadataObject(string name, string hostname, int port)
+        {
+            Name = name;
+            Hostname = hostname;
+            Port = port;
+        }
         // todo: realm flags.
     }
 }

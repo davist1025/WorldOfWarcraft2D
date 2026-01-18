@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
 {
@@ -18,7 +19,7 @@ namespace WoW.Client.Components
         public int RaceId;
         public int HairId;
         public string MapId;
-        public SpriteDirection Direction;
+        public ActorAnimationDirection Direction;
 
         private Vector2 _currentMoveDirection = Vector2.Zero;
         private SubpixelVector2 _subPixelMovement;
@@ -37,7 +38,7 @@ namespace WoW.Client.Components
             RaceId = networkPlayer.RaceId;
             HairId = networkPlayer.HairId;
             MapId = networkPlayer.MapId;
-            Direction = (SpriteDirection)networkPlayer.Direction;
+            Direction = (ActorAnimationDirection)networkPlayer.Direction;
         }
 
         public override void OnAddedToEntity()
@@ -58,10 +59,10 @@ namespace WoW.Client.Components
                     string startingAnimation = "";
                     switch (Direction)
                     {
-                        case SpriteDirection.North:
-                        case SpriteDirection.East:
-                        case SpriteDirection.South:
-                        case SpriteDirection.West:
+                        case ActorAnimationDirection.North:
+                        case ActorAnimationDirection.East:
+                        case ActorAnimationDirection.South:
+                        case ActorAnimationDirection.West:
                             startingAnimation = "idle";
                             break;
                     }
@@ -79,26 +80,26 @@ namespace WoW.Client.Components
 
                     if (movement.X < 0f)
                     {
-                        Direction = SpriteDirection.West;
+                        Direction = ActorAnimationDirection.West;
                         _animator.FlipX = true;
                     }
 
                     if (movement.X > 0f)
                     {
-                        Direction = SpriteDirection.East;
+                        Direction = ActorAnimationDirection.East;
                         _animator.FlipX = false;
                     }
 
-                    if (movement.Y > 0f) Direction = SpriteDirection.South;
+                    if (movement.Y > 0f) Direction = ActorAnimationDirection.South;
 
-                    if (movement.Y < 0f) Direction = SpriteDirection.North;
+                    if (movement.Y < 0f) Direction = ActorAnimationDirection.North;
 
                     switch (Direction)
                     {
-                        case SpriteDirection.North:
-                        case SpriteDirection.East:
-                        case SpriteDirection.South:
-                        case SpriteDirection.West:
+                        case ActorAnimationDirection.North:
+                        case ActorAnimationDirection.East:
+                        case ActorAnimationDirection.South:
+                        case ActorAnimationDirection.West:
                             if (!_animator.CurrentAnimationName.Equals("walk"))
                                 _animator.Play("walk");
                             break;
@@ -113,10 +114,10 @@ namespace WoW.Client.Components
                 {
                     switch (Direction)
                     {
-                        case SpriteDirection.North:
-                        case SpriteDirection.East:
-                        case SpriteDirection.South:
-                        case SpriteDirection.West:
+                        case ActorAnimationDirection.North:
+                        case ActorAnimationDirection.East:
+                        case ActorAnimationDirection.South:
+                        case ActorAnimationDirection.West:
                             if (!_animator.CurrentAnimationName.Equals("idle"))
                                 _animator.Play("idle");
                             break;
@@ -133,14 +134,14 @@ namespace WoW.Client.Components
         public void AddToMap()
         {
             AsepriteFile aseFile = null;
-            RaceType characterRace = (RaceType)RaceId;
+            ActorRaceType characterRace = (ActorRaceType)RaceId;
 
             switch (characterRace)
             {
-                case RaceType.Human:
+                case ActorRaceType.Human:
                     aseFile = Core.Scene.Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
                     break;
-                case RaceType.Orc:
+                case ActorRaceType.Orc:
                     aseFile = Core.Scene.Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
                     break;
             }

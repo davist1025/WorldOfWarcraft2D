@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static WoW.Server.Shared.Vocab;
+using static WoW.Framework.Utils;
 
 namespace WoW.Database.Models.Auth
 {
@@ -39,6 +39,6 @@ namespace WoW.Database.Models.Auth
         public int SecurityLevel { get; set; }
 
         [NotMapped]
-        public SecurityLevel Security => (SecurityLevel)SecurityLevel;
+        public AccountSecurityType Security => (AccountSecurityType)SecurityLevel;
     }
 }

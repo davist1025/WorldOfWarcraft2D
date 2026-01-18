@@ -15,7 +15,8 @@ namespace WoW.Network.Objects
         /// <summary>
         /// May be null if this object is built by the client.
         /// </summary>
-        public string Id { get; init; } = null;
+        public string Uid { get; init; } = null;
+        public int Id { get; init; }
         public string Name { get; init; }
         public ActorRaceType Race { get; init; }
         public int Hair { get; init; }
@@ -25,9 +26,10 @@ namespace WoW.Network.Objects
         /// </summary>
         public string MapId { get; init; } = null;
 
-        public CharacterMetadataObject(string name, ActorRaceType race, int hair, string id = null, string mapId = null)
+        public CharacterMetadataObject(int id, string name, ActorRaceType race, int hair, string uId = null, string mapId = null)
         {
             Id = id;
+            Uid = uId;
             Name = name;
             Race = race;
             Hair = hair;

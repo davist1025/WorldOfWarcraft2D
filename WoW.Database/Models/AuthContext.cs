@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models.Auth;
-using static WoW.Server.Shared.Vocab;
 
 namespace WoW.Database.Models
 {

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static WoW.Framework.Utils;
 
-namespace WoW.Network.Client.Packets.Authentication
+namespace WoW.Network.Packets.Authenticcation
 {
     public class AuthClient_LogonCode
     {
-        public LogonCode Code { get; set; }
+        public AuthCodeType Code { get; set; }
     }
 }

@@ -8,18 +8,16 @@ using Nez.Systems;
 using Nez.Tiled;
 using System.Diagnostics;
 using System.Net;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Database.Models;
+using WoW.Database.Models.Auth;
+using WoW.Database.Models.Realm.Character;
+using WoW.Framework.Logging;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Content;
-using WoW.Server.Shared.Database;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared;
-using WoW.Server.Shared.Database.Model.Realm.Character;
-using WoW.Server.Shared.Serializable;
-using WoW.Server.Shared.Database.Model.Auth;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver
 {
@@ -70,30 +68,30 @@ namespace WoW.Realmserver
             //    }
             //}
 
-            Log.Print("Verifying default racial spawn locations...", LogType.Process);
+            Logger.Print("Verifying default racial spawn locations...", LogEntryType.Process);
             using (var ctx = new RealmContext())
             {
                 Entity mapEntity = null;
 
-                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Human))
+                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)ActorRaceType.Human))
                 {
                     mapEntity = Scene.FindEntity("elwynn_forest");
                     var spawnerComponent = mapEntity.GetComponents<SpawnerComponent>().Where(spawner => spawner.IsPlayerSpawner).Single();
 
                     ctx.RaceSpawns.Add(new CharacterRaceSpawn()
                     {
-                        RaceId = (int)RaceType.Human,
+                        RaceId = (int)ActorRaceType.Human,
                         MapId = "elwynn_forest",
                         X = spawnerComponent.Position.X,
                         Y = spawnerComponent.Position.Y,
                     });
                 }
 
-                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)RaceType.Orc))
+                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)ActorRaceType.Orc))
                 {
                     ctx.RaceSpawns.Add(new CharacterRaceSpawn()
                     {
-                        RaceId = (int)RaceType.Orc,
+                        RaceId = (int)ActorRaceType.Orc,
                         MapId = "valley_of_trials",
                         X = 50f,
                         Y = 50f,
@@ -128,7 +126,7 @@ namespace WoW.Realmserver
 
             _netProcessor.SubscribeReusable<ClientRealm_TabTarget, NetPeer>((req, peer) => PacketManager.OnTabTargetRequest(peer));
 
-            _netProcessor.SubscribeReusable<ChatMessage, NetPeer>((newChat, peer) => PacketManager.OnPlayerChat(newChat, peer));
+            _netProcessor.SubscribeReusable<ChatMessageObject, NetPeer>((newChat, peer) => PacketManager.OnPlayerChat(newChat, peer));
 
             _netEventListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader, peer);
 
@@ -168,20 +166,13 @@ namespace WoW.Realmserver
 
                         if (account != null)
                         {
-                            PlayerAccount localAccount = new PlayerAccount()
-                            {
-                                Id = account.Id,
-                                SessionId = sessionId,
-                                Security = account.Security,
-                            };
-
-                            WorldSessionComponent newSession = new WorldSessionComponent(localAccount);
+                            WorldSessionComponent newSession = new WorldSessionComponent(account);
                             Entity newEntity = Scene.CreateEntity(Guid.NewGuid().ToString());
-                            newEntity.Tag = (int)EntityType.NetPlayer;
+                            newEntity.Tag = (int)ActorType.Networked;
                             newEntity.AddComponent(newSession);
                             newPendingConnection.Connection.Tag = newEntity;
 
-                            Log.Print($"Pending connection w/ Account ({account.Username}) has been verified.", LogType.Network);
+                            Logger.Print($"Pending connection w/ Account ({account.Username}) has been verified.", LogEntryType.Network);
 
                             PacketManager.SendCharactersTo(newSession.Account.Id, newPendingConnection.Connection);
                         }
@@ -221,7 +212,7 @@ namespace WoW.Realmserver
         public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
         {
             if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
-                Log.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogType.Error);
+                Logger.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogEntryType.Error);
             else
             {
                 var peer = _netManager.ConnectedPeerList.Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();

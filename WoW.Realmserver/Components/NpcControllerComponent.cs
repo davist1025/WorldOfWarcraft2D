@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
 using WoW.Realmserver.Components.Behavior;
 
 namespace WoW.Realmserver.Components
@@ -16,7 +16,7 @@ namespace WoW.Realmserver.Components
         /// <summary>
         /// The database Metadata for the NPC.
         /// </summary>
-        public NpcMetadata Metadata { get; init; }
+        public NpcMetadataObject Metadata { get; init; }
 
         /// <summary>
         /// The TiledMap this NPC is on.

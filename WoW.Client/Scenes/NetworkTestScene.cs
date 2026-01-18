@@ -10,9 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
 using WoW.Client.Components.NPC;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Objects;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Scenes
 {
@@ -35,25 +36,25 @@ namespace WoW.Client.Scenes
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
-            _theController = new LocalPlayerController(thePlayer.Name, (SpriteDirection)thePlayer.Direction);
+            _theController = new LocalPlayerController(thePlayer.Name, (ActorAnimationDirection)thePlayer.Direction);
             Game1.Player = CreateEntity(thePlayer.WorldId);
             Game1.Player.Transform.Position = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
-            Game1.Player.Tag = (int)EntityType.LocalPlayer;
+            Game1.Player.Tag = (int)ActorType.Local;
             Game1.CurrentMapId = thePlayer.MapId;
 
             Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
 
             AsepriteFile aseFile = null;
-            RaceType characterRace = (RaceType)thePlayer.RaceId;
+            ActorRaceType characterRace = (ActorRaceType)thePlayer.RaceId;
 
             switch (characterRace)
             {
-                case RaceType.Human:
+                case ActorRaceType.Human:
                     aseFile = Content.LoadAsepriteFile("Content/Data/Characters/human_spritesheet.ase");
                     break;
-                case RaceType.Orc:
+                case ActorRaceType.Orc:
                     aseFile = Content.LoadAsepriteFile("Content/Data/Characters/orc_spritesheet.ase");
                     break;
             }
@@ -96,7 +97,7 @@ namespace WoW.Client.Scenes
         {
             var netController = new NetPlayerController(theOtherPlayer);
             var theOtherEntity = CreateEntity(theOtherPlayer.WorldId, new Vector2(theOtherPlayer.ZoneX, theOtherPlayer.ZoneY));
-            theOtherEntity.Tag = (int)EntityType.NetPlayer;
+            theOtherEntity.Tag = (int)ActorType.Networked;
 
             Debug.Log($"Player: {theOtherEntity.Name} ({netController.Name}) has joined the world!");
 
@@ -107,11 +108,11 @@ namespace WoW.Client.Scenes
                 netController.AddToMap();
         }
 
-        public void CreateNPC(NpcMetadata remoteData)
+        public void CreateNPC(NpcMetadataObject remoteData)
         {
             var npcController = new NpcController(remoteData);
-            var theNpcEntity = CreateEntity($"{remoteData.WorldId}", new Vector2(remoteData.X, remoteData.Y));
-            theNpcEntity.Tag = (int)EntityType.NPC;
+            var theNpcEntity = CreateEntity($"{remoteData.Uid}", remoteData.Position.ToXnaVector2());
+            theNpcEntity.Tag = (int)ActorType.Mob;
 
             theNpcEntity.AddComponent(npcController);
         }

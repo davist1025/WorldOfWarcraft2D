@@ -9,15 +9,13 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
-using WoW.Server.Shared.Database.Model;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Auth;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Server.Shared;
-using WoW.Server.Shared.Serializable;
-using static WoW.Server.Shared.Vocab;
-using WoW.Server.Shared.Database.Model.Auth;
+using WoW.Database.Models;
+using WoW.Database.Models.Auth;
+using WoW.Framework;
+using WoW.Framework.Logging;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Authserver
 {
@@ -41,21 +39,20 @@ namespace WoW.Authserver
 
             using (var ctx = new AuthContext())
             {
-                Log.Print("Resetting session keys...", LogType.Process);
+                Logger.Print("Resetting session keys...", LogEntryType.Process);
                 // hack: probably not a proper way of resetting the session.
-                ctx.Accounts.Where(a => a.SessionId != string.Empty)
-                    .ExecuteUpdate(setters => setters
-                        .SetProperty(p => p.SessionId, default(string)));
+                RelationalQueryableExtensions
+                    .ExecuteUpdate(ctx.Accounts.Where(account => account.SessionId != string.Empty), setters => setters.SetProperty(acc => acc.SessionId, "-"));
 
                 // todo: add flag in config for debug account usage.
-                Log.Print("Verifying debug account integrity...", LogType.Process);
+                Logger.Print("Verifying debug account integrity...", LogEntryType.Process);
                 if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "admin".ToUpper(),
-                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("123")),
-                        SecurityLevel = (int)SecurityLevel.Administrator
+                        HashedPassword = Argon2.Hash(Utils.ToSha256("123")),
+                        SecurityLevel = (int)AccountSecurityType.Administrator
                     });
                 }
 
@@ -64,8 +61,8 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "gamemaster".ToUpper(),
-                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("456")),
-                        SecurityLevel = (int)SecurityLevel.Gamemaster
+                        HashedPassword = Argon2.Hash(Utils.ToSha256("456")),
+                        SecurityLevel = (int)AccountSecurityType.Gamemaster
                     });
                 }
 
@@ -74,15 +71,15 @@ namespace WoW.Authserver
                     ctx.Accounts.Add(new Account()
                     {
                         Username = "player".ToUpper(),
-                        HashedPassword = Argon2.Hash(Server.Shared.Utils.ToSha256("789")),
-                        SecurityLevel = (int)SecurityLevel.Player
+                        HashedPassword = Argon2.Hash(Utils.ToSha256("789")),
+                        SecurityLevel = (int)AccountSecurityType.Player
                     });
                 }
 
                 ctx.SaveChanges();
 
                 // todo: add flag in config for debug realmlist usage.
-                Log.Print("Verifying debug realmist integrity...", LogType.Process);
+                Logger.Print("Verifying debug realmist integrity...", LogEntryType.Process);
                 if (ctx.Realmlist.Count() == 0)
                 {
                     ctx.Add(new Realmserver()
@@ -95,7 +92,7 @@ namespace WoW.Authserver
                     ctx.SaveChanges();
                 }
 
-                Log.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogType.Process);
+                Logger.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogEntryType.Process);
             }
             _netProcessor = new NetPacketProcessor();
 

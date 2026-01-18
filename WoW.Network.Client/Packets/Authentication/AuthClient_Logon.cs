@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Network.Client.Packets.Authentication
+namespace WoW.Network.Packets.Authenticcation
 {
     /// <summary>
     /// Auth -> Client

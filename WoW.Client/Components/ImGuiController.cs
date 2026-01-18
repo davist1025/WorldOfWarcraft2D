@@ -10,9 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Scenes;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Client;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
 {
@@ -47,16 +48,16 @@ namespace WoW.Client.Components
             }
         }
 
-        public List<ChatMessage> ChatHistory = new List<ChatMessage>();
-        public List<ChatMessage> GMChatHistory = new List<ChatMessage>();
-        public List<RemoteRealmserver> Realmlist = new List<RemoteRealmserver>();
-        public List<RemoteCharacter> Characters = new List<RemoteCharacter>();
+        public List<ChatMessageObject> ChatHistory = new List<ChatMessageObject>();
+        public List<ChatMessageObject> GMChatHistory = new List<ChatMessageObject>();
+        public List<RealmserverMetadataObject> Realmlist = new List<RealmserverMetadataObject>();
+        public List<CharacterMetadataObject> Characters = new List<CharacterMetadataObject>();
 
         public override void OnAddedToEntity()
         {
             Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(DrawGUI);
 
-            _chatChannels = Enum.GetNames<ChatChannel>();
+            _chatChannels = Enum.GetNames<ChatChannelType>();
         }
 
         private void DrawGUI()
@@ -116,7 +117,7 @@ namespace WoW.Client.Components
 
                         for (int i = 0; i < Realmlist.Count; i++)
                         {
-                            RemoteRealmserver realmserver = Realmlist[i];
+                            RealmserverMetadataObject realmserver = Realmlist[i];
 
                             if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
@@ -164,24 +165,24 @@ namespace WoW.Client.Components
 
                         for (int i = 0; i < Characters.Count; i++)
                         {
-                            RemoteCharacter character = Characters[i];
+                            CharacterMetadataObject character = Characters[i];
 
-                            if (ImGui.Selectable($"##{character.CharacterName}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
+                            if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
-                                _characterSelectIndex = character.CharacterId;
+                                _characterSelectIndex = i;
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
                                     Game1.NetState = GameNetworkState.LoadingWorld;
-                                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
+                                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.Id });
                                 }
                             }
 
                             ImGui.SameLine();
-                            ImGui.Text($"{character.CharacterName}");
+                            ImGui.Text($"{character.Name}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.RaceId}");
+                            ImGui.Text($"{character.Race}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.HairId}");
+                            ImGui.Text($"{character.Hair}");
                             ImGui.NextColumn();
                         }
                         ImGui.Columns(0);
@@ -213,7 +214,7 @@ namespace WoW.Client.Components
 
                     ImGui.InputText("Name", ref _newCharacterNameInput, 12);
 
-                    var raceTypeNames = Enum.GetNames<RaceType>();
+                    var raceTypeNames = Enum.GetNames<ActorRaceType>();
                     ImGui.Combo("Race", ref _newCharacterRaceId, raceTypeNames, raceTypeNames.Length);
 
                     var hairFiles = Directory.GetFiles("Content/Data/Characters/").Where(f => f.ToLower().Contains("hair")).ToArray();
@@ -315,10 +316,10 @@ namespace WoW.Client.Components
                         for (int i = 0; i < ChatHistory.Count; i++)
                         {
                             var chatHistory = ChatHistory[i];
-                            var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
+                            var color = WoW.Framework.Utils.ChannelColors[chatHistory.Channel];
 
                             ImGui.PushStyleColor(ImGuiCol.Text, color);
-                            ImGui.TextWrapped(chatHistory.Message);
+                            ImGui.TextWrapped(chatHistory.Input);
                             ImGui.PopStyleColor();
                         }
                         ImGui.SetScrollHereY(1f);
@@ -353,10 +354,10 @@ namespace WoW.Client.Components
                         if (!string.IsNullOrEmpty(sanitizedInput))
                         {
                             // todo: determine a function for using different channels.
-                            Game1.Send(new ChatMessage
+                            Game1.Send(new ChatMessageObject
                             {
-                                Message = sanitizedInput,
-                                Channel = (ChatChannel)_chatChannelIndex
+                                Input = sanitizedInput,
+                                Channel = (ChatChannelType)_chatChannelIndex
                             });
 
                             sanitizedInput = "";
@@ -424,7 +425,7 @@ namespace WoW.Client.Components
                                     //var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
 
                                     //ImGui.PushStyleColor(ImGuiCol.Text, color);
-                                    ImGui.Text(chatHistory.Message);
+                                    ImGui.Text(chatHistory.Input);
                                     //ImGui.PopStyleColor();
                                 }
                                 ImGui.SetScrollHereY(1f);

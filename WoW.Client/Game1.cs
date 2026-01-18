@@ -18,11 +18,12 @@ using System.Text;
 using WoW.Client.Components;
 using WoW.Client.Content;
 using WoW.Client.Scenes;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Auth;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Objects;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Authentication;
+using WoW.Network.Packets.Authenticcation;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
 
 namespace WoW.Client
 {
@@ -55,7 +56,7 @@ namespace WoW.Client
 
         public static string AccountName;
         public static string SessionId; // todo: move this global data to another class object?
-        public static RemoteRealmserver LastRealm; // todo: save to disk.
+        public static RealmserverMetadataObject LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
         public static string CurrentMapId = "";
 
@@ -87,6 +88,7 @@ namespace WoW.Client
                 if (NetState == GameNetworkState.Auth_LoggingIn)
                 {
                     Send(_temporaryLogonPacket);
+                    Debug.Log($"Logging in...");
                 }
 
                 if (NetState == GameNetworkState.Realm)
@@ -103,7 +105,7 @@ namespace WoW.Client
             _netProcessor.RegisterNestedType<Vector2Serializable>();
             _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
 
-            _netProcessor.SubscribeReusable<AuthClient_LogonCode>((logonCode) => PacketManager.OnLogonResponse(logonCode));
+            _netProcessor.SubscribeReusable<AuthClient_LogonCode>((AuthCodeType) => PacketManager.OnLogonResponse(AuthCodeType));
 
             _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) => PacketManager.OnLogonSuccess(logon));
 
@@ -141,7 +143,7 @@ namespace WoW.Client
 
             _netProcessor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
 
-            _netProcessor.SubscribeReusable<ChatMessage>((newChat) => PacketManager.OnChat(newChat));
+            _netProcessor.SubscribeReusable<ChatMessageObject>((newChat) => PacketManager.OnChat(newChat));
 
             ClientNetwork = new NetManager(ClientListener);
             ClientNetwork.Start();
@@ -200,7 +202,7 @@ namespace WoW.Client
             _temporaryLogonPacket = new ClientAuth_Logon()
             {
                 AccountName = accountName,
-                Password = Shared.Utils.ToSHA256(password)
+                Password = WoW.Framework.Utils.ToSha256(password)
             };
         }
 

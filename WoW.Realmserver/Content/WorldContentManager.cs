@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
+using WoW.Framework.Logging;
 using WoW.Realmserver.Components;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Content
 {
@@ -31,7 +32,7 @@ namespace WoW.Realmserver.Content
 
         public void LoadTiled()
         {
-            Log.Print("Loading Tiled maps...", LogType.Process);
+            Logger.Print("Loading Tiled maps...", LogEntryType.Process);
 
             var tiledMaps = Directory.GetFiles($"{_rootDirectory}\\Tiled");
 
@@ -53,7 +54,7 @@ namespace WoW.Realmserver.Content
             processor.PhysicsLayer = (physicsLayerIndex == 0) ? 1 << 0 : 1 << physicsLayerIndex;
             mapEntity.AddComponent(processor);
 
-            Log.Print($"Creating a Tiled processor for: '{mapName}'....", LogType.Process);
+            Logger.Print($"Creating a Tiled processor for: '{mapName}'....", LogEntryType.Process);
 
             _mapProcessors.Add(mapName, new TiledMapProcessor(map, "collision_layer"));
 
@@ -83,7 +84,7 @@ namespace WoW.Realmserver.Content
                         var spawnerComp = new SpawnerComponent(processor, npcId, maxCount, timer, isPlayer, position, new Vector2(spawnObject.Width, spawnObject.Height));
                         mapEntity.AddComponent(spawnerComp);
                     }
-                    Log.Print($"Generated {spawners.Objects.Count} spawner(s) to {mapName}.", LogType.Debug);
+                    Logger.Print($"Generated {spawners.Objects.Count} spawner(s) to {mapName}.", LogEntryType.Debug);
                 }
             }
         }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Network.Client.Packets.Client
+namespace WoW.Network.Packets.Client
 {
     /// <summary>
     /// Client -> Realms

@@ -8,13 +8,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
-using WoW.Server.Shared.Database;
-using WoW.Server.Shared.Database.Model;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Content
 {
@@ -68,10 +66,10 @@ namespace WoW.Realmserver.Content
                     fullMsg += $"{part} ";
             }
 
-            ChatMessage newServerMessage = new ChatMessage()
+            ChatMessageObject newServerMessage = new ChatMessageObject()
             {
-                Message = $"{fullMsg}",
-                Channel = ChatChannel.Server
+                Input = $"{fullMsg}",
+                Channel = ChatChannelType.Server
             };
 
             Program.SendToAll(newServerMessage);

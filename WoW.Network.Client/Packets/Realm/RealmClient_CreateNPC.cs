@@ -4,39 +4,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
+using static WoW.Framework.Utils;
 
-namespace WoW.Network.Client.Packets.Realm
+namespace WoW.Network.Packets.Realm
 {
     public class RealmClient_CreateNPC : INetSerializable
     {
-        public NpcMetadata Metadata;
+        public NpcMetadataObject Metadata;
 
         public void Deserialize(NetDataReader reader)
         {
-            Metadata = new NpcMetadata()
+            Metadata = new NpcMetadataObject()
             {
-                WorldId = reader.GetString(),
+                Uid = reader.GetString(),
                 Name = reader.GetString(),
                 ModelId = reader.GetString(),
-                Flags = (NpcTypeFlags)reader.GetInt(),
+                Flags = (ActorFlagTypes)reader.GetInt(),
                 Level = reader.GetInt(),
                 MapId = reader.GetString(),
-                X = reader.GetFloat(),
-                Y = reader.GetFloat(),
+                Position = new Framework.Vector2S
+                {
+                    X = reader.GetFloat(),
+                    Y = reader.GetFloat(),
+                }
             };
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Metadata.WorldId);
+            writer.Put(Metadata.Uid);
             writer.Put(Metadata.Name);
             writer.Put(Metadata.ModelId);
             writer.Put((int)Metadata.Flags);
             writer.Put(Metadata.Level);
             writer.Put(Metadata.MapId);
-            writer.Put(Metadata.X);
-            writer.Put(Metadata.Y);
+            writer.Put(Metadata.Position.X);
+            writer.Put(Metadata.Position.Y);
         }
     }
 }

@@ -7,19 +7,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Database.Models.Auth;
+using WoW.Database.Models.Realm.Character;
+using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Data;
-using WoW.Server.Shared.Database.Model.Realm.Character;
-using WoW.Server.Shared.Serializable;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Components
 {
     public class WorldSessionComponent : Component, IUpdatable
     {
-        public PlayerAccount Account;
+        public Account Account;
         public PlayerCharacter Character;
 
         private SubpixelVector2 _subPixelMovement;
@@ -36,7 +34,7 @@ namespace WoW.Realmserver.Components
         public List<Entity> AvailableTargets = new List<Entity>();
         public int TargetIndex = -1;
 
-        public WorldSessionComponent(PlayerAccount user)
+        public WorldSessionComponent(Account user)
             => Account = user;
 
         public void Update()
@@ -68,13 +66,13 @@ namespace WoW.Realmserver.Components
                     });
                 }
 
-                if (vector.X < 0f) Character.Direction = (int)SpriteDirection.West;
+                if (vector.X < 0f) Character.Direction = (int)ActorAnimationDirection.West;
 
-                if (vector.X > 0f) Character.Direction = (int)SpriteDirection.East;
+                if (vector.X > 0f) Character.Direction = (int)ActorAnimationDirection.East;
 
-                if (vector.Y > 0f) Character.Direction = (int)SpriteDirection.South;
+                if (vector.Y > 0f) Character.Direction = (int)ActorAnimationDirection.South;
 
-                if (vector.Y < 0f) Character.Direction = (int)SpriteDirection.North;
+                if (vector.Y < 0f) Character.Direction = (int)ActorAnimationDirection.North;
 
                 Program.SendToExcept(Entity.Name,
                     new RealmClient_MovementStateChange()

@@ -75,6 +75,14 @@ namespace WoW.Framework
             Administrator
         }
 
+        public enum AuthCodeType : int
+        {
+            Success,
+            NoRecord,
+            InvalidPassword,
+            AlreadyOnline
+        }
+
         #endregion
 
         #region Logger definitions
@@ -104,8 +112,6 @@ namespace WoW.Framework
             return shaHash;
         }
 
-        // todo: chat channel colors.
-        [Obsolete("Unused 1/8/26")]
         public static Dictionary<ChatChannelType, System.Numerics.Vector4> ChannelColors = new Dictionary<ChatChannelType, System.Numerics.Vector4>()
         {
             { ChatChannelType.Say, new System.Numerics.Vector4(255 / 255f, 255f / 255f, 255f / 255f, 1f) },

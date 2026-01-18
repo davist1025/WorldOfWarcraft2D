@@ -1,21 +1,20 @@
-﻿using LiteNetLib;
+﻿using Isopoh.Cryptography.Argon2;
+using LiteNetLib;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Auth;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Server.Shared;
-using Org.BouncyCastle.Asn1.Ocsp;
-using WoW.Server.Shared.Serializable;
-using Isopoh.Cryptography.Argon2;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared.Database.Model.Auth;
+using WoW.Database.Models;
+using WoW.Framework.Logging;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Authenticcation;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Authserver
 {
@@ -23,7 +22,7 @@ namespace WoW.Authserver
     {
         public static void OnUserLogin(ClientAuth_Logon logon, NetPeer peer) 
         {
-            Log.Print($"{logon.AccountName} is attempting to log-in...", LogType.Network);
+            Logger.Print($"{logon.AccountName} is attempting to log-in...", LogEntryType.Network);
 
             using (var ctx = new AuthContext())
             {
@@ -31,37 +30,37 @@ namespace WoW.Authserver
                 string accountSessionId = "";
                 var account = ctx.Accounts.FirstOrDefault(a => a.Username.ToLower().Equals(logon.AccountName));
 
-                if (account != null && account.SessionId == default(string))
+                if (account != null && account.SessionId == "-")
                 {
                     if (Argon2.Verify(account.HashedPassword, logon.Password))
                     {
-                        Log.Print($"{logon.AccountName} logged in successfully; generating a new session key...", LogType.Network);
+                        Logger.Print($"{logon.AccountName} logged in successfully; generating a new session key...", Framework.Utils.LogEntryType.Network);
                         accountSessionId = Guid.NewGuid().ToString().Replace("-", "");
                         account.SessionId = accountSessionId;
-                        loginCode.Code = LogonCode.Success;
+                        loginCode.Code = Framework.Utils.AuthCodeType.Success;
                     }
                     else
-                        loginCode.Code = LogonCode.InvalidPassword;
+                        loginCode.Code = Framework.Utils.AuthCodeType.InvalidPassword;
                 }
                 else if (account == null)
                 {
-                    loginCode.Code = LogonCode.NoRecord;
+                    loginCode.Code = Framework.Utils.AuthCodeType.NoRecord;
                 }
                 else
                 {
-                    loginCode.Code = LogonCode.AlreadyOnline;
+                    loginCode.Code = Framework.Utils.AuthCodeType.AlreadyOnline;
                 }
 
                 Program.Send(peer, loginCode);
 
-                if (loginCode.Code == LogonCode.Success)
+                if (loginCode.Code == Framework.Utils.AuthCodeType.Success)
                 {
                     Program.Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
 
-                    var realms = new List<RemoteRealmserver>();
+                    var realms = new List<RealmserverMetadataObject>();
 
                     foreach (var realm in ctx.Realmlist)
-                        realms.Add(new RemoteRealmserver(realm.Name, realm.Hostname, realm.Port));
+                        realms.Add(new RealmserverMetadataObject(realm.Name, realm.Hostname, realm.Port));
                     Program.SendSerializable(peer, new AuthClient_Realm() { Realmlist = realms });
                 }
 
@@ -69,6 +68,7 @@ namespace WoW.Authserver
             }
         }
 
+        [Obsolete("Unused 1/18/26.")]
         public static void OnRealmRegister(RealmAuth_Registrar realmData, NetPeer peer)
         {
             using (var ctx = new AuthContext())
@@ -78,7 +78,7 @@ namespace WoW.Authserver
 
                 if (storedRealm != null)
                 {
-                    Log.Print($"{storedRealm.Name} has come online.", LogType.Network);
+                    Logger.Print($"{storedRealm.Name} has come online.", LogEntryType.Network);
                     // does this need additional security?
                 }
                 else

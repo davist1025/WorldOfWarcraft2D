@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Realm;
+using WoW.Framework.Logging;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Components.Behavior.Default
 {
@@ -34,7 +35,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
             _graph = new AstarGridGraph(Controller.Processor.CollisionLayer);
             _timerInSeconds = 5f;
 
-            Log.Print($"Added Roaming to creature ({Controller.Metadata.Name}:{Controller.Metadata.WorldId})", LogType.Debug);
+            Logger.Print($"Added Roaming to creature ({Controller.Metadata.Name}:{Controller.Metadata.Uid})", LogEntryType.Debug);
         }
 
         public override void Update()
@@ -61,7 +62,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
                 if (_pathPoints == null)
                 {
-                    Log.Print($"{GetType().Name}: _pathPoints was null after attempting to search for a path to: {targetPosition}; resetting...", LogType.Debug);
+                    Logger.Print($"{GetType().Name}: _pathPoints was null after attempting to search for a path to: {targetPosition}; resetting...", LogEntryType.Debug);
                     _isRoaming = false;
                     _randomPosition = Vector2.Zero;
                 }
@@ -99,7 +100,7 @@ namespace WoW.Realmserver.Components.Behavior.Default
                 Program.SendToAll(new RealmClient_MovementStateChange()
                 {
                     // todo: send simulated direction so the client can replicate animations?
-                    Id = Controller.Metadata.WorldId,
+                    Id = Controller.Metadata.Uid,
                     ResultX = Controller.Entity.Position.X,
                     ResultY = Controller.Entity.Position.Y
                 });

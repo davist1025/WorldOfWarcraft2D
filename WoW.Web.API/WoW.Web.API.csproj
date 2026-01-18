@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WoW.Server.Shared\WoW.Server.Shared.csproj" />
+    <ProjectReference Include="..\WoW.Database\WoW.Database.csproj" />
   </ItemGroup>
 
 </Project>

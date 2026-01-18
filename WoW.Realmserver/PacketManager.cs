@@ -10,19 +10,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Database.Models;
+using WoW.Database.Models.Realm.Character;
+using WoW.Database.Models.Realm.Chat;
+using WoW.Framework.Logging;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
 using WoW.Realmserver.Content;
-using WoW.Server.Shared.Database;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared.Database.Model.Realm.Character;
-using WoW.Server.Shared.Database.Model.Realm.Chat;
-using WoW.Server.Shared;
 using WoW.Realmserver.Data;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver
 {
@@ -81,7 +80,7 @@ namespace WoW.Realmserver
                     ctx.Add(newCharacter);
                     ctx.SaveChanges();
 
-                    Log.Print($"Account (id={session.Account.Id}) has created a new character ({newCharacter.Name}).", LogType.Network);
+                    Logger.Print($"Account (id={session.Account.Id}) has created a new character ({newCharacter.Name}).", LogEntryType.Network);
                 }
 
                 Program.Send(peer, new RealmClient_CreateCharacter() { CreationResult = creationResult });
@@ -102,16 +101,16 @@ namespace WoW.Realmserver
 
                 using (var ctx = new RealmContext())
                 {
-                    // todo: backup deleted characters to another table.
-                    isSuccess = (ctx.Characters
-                        .Where(a => a.AccountId == session.Account.Id)
-                        .Where(c => c.CharacterId == characterData.CharacterId)
-                        .ExecuteDelete()) > 0;
+                    RelationalQueryableExtensions
+                        .ExecuteDelete(
+                            ctx.Characters
+                                .Where(account => account.AccountId == session.Account.Id)
+                                .Where(character => character.CharacterId == characterData.CharacterId));
                 }
 
                 if (isSuccess)
                 {
-                    Log.Print($"Account (id={session.Account.Id}) has deleted character (id={characterData.CharacterId})", LogType.Network);
+                    Logger.Print($"Account (id={session.Account.Id}) has deleted character (id={characterData.CharacterId})", LogEntryType.Network);
                     SendCharactersTo(session.Account.Id, peer);
                 }
             }
@@ -173,7 +172,7 @@ namespace WoW.Realmserver
                 ZoneY = thisSession.Character.YPosition,
                 Direction = thisSession.Character.Direction
             });
-            Log.Print($"Character ({thisSession.Character.Name}) is entering the game world.", LogType.Network);
+            Logger.Print($"Character ({thisSession.Character.Name}) is entering the game world.", LogEntryType.Network);
 
             var allSessionsExceptThis = Program
                 .Scene
@@ -252,12 +251,12 @@ namespace WoW.Realmserver
         /// </summary>
         /// <param name="chat"></param>
         /// <param name="peer"></param>
-        public static void OnPlayerChat(ChatMessage newChat, NetPeer peer)
+        public static void OnPlayerChat(ChatMessageObject newChat, NetPeer peer)
         {
             WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
 
-            string unformattedMessage = newChat.Message;
-            ChatChannel channel = newChat.Channel;
+            string unformattedMessage = newChat.Input;
+            ChatChannelType channel = newChat.Channel;
 
             if (unformattedMessage.StartsWith("."))
             {
@@ -272,7 +271,7 @@ namespace WoW.Realmserver
                         userCommandParts = removedCommandIdentifier.Split(' ');
                         string commandName = userCommandParts[0];
 
-                        Log.Print($"Character ({session.Character.Name}) is attempting to access command ({commandName}).", LogType.Network);
+                        Logger.Print($"Character ({session.Character.Name}) is attempting to access command ({commandName}).", LogEntryType.Network);
 
                         ChatCommand commandInDb = rctx.Commands
                             .Single(command => 
@@ -329,9 +328,9 @@ namespace WoW.Realmserver
             if (!unformattedMessage.StartsWith(".") && !unformattedMessage.StartsWith("/"))
             {
                 string verbage =
-                    (channel == ChatChannel.Say) ? "says:" :
-                    (channel == ChatChannel.Yell) ? "yells:" :
-                    (channel == ChatChannel.World) ? "[world]" :
+                    (channel == ChatChannelType.Say) ? "says:" :
+                    (channel == ChatChannelType.Yell) ? "yells:" :
+                    (channel == ChatChannelType.World) ? "[world]" :
                     $"{session.Character.Name} says: {unformattedMessage}";
                     // todo: whispers, support (gm chat), etc.
                     // todo: add range for certain channels (ex: say, yell)
@@ -343,12 +342,12 @@ namespace WoW.Realmserver
                 else
                     formattedMessage = $"{session.Character.Name} {verbage} {unformattedMessage}";
 
-                ChatChannel flags = ChatChannel.Say;
+                ChatChannelType flags = ChatChannelType.Say;
 
-                var chatPacket = new ChatMessage()
+                var chatPacket = new ChatMessageObject()
                 {
                     Channel = flags,
-                    Message = formattedMessage
+                    Input = formattedMessage
                 };
                 Program.SendToAll(chatPacket);
             }
@@ -394,7 +393,7 @@ namespace WoW.Realmserver
                 for (int i = 0; i < controller.Behaviors.Count; i++)
                     controller.Behaviors[i].OnTargeted(session);
 
-                Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Metadata.WorldId });
+                Program.Send(peer, new RealmClient_SetTarget() { WorldId = controller.Metadata.Uid });
             }
         }
         #endregion
@@ -407,7 +406,7 @@ namespace WoW.Realmserver
         /// <param name="peer"></param>
         public static void OnPlayerTransferToRealm(ClientRealm_TransferLogon transfer, NetPeer peer)
         {
-            Log.Print($"Session ({transfer.SessionId}) is attempting to connect to the realm.", LogType.Network);
+            Logger.Print($"Session ({transfer.SessionId}) is attempting to connect to the realm.", LogEntryType.Network);
 
             Program.PendingPlayers.Enqueue(new PendingPlayer(transfer.SessionId, peer));
         }
@@ -423,7 +422,7 @@ namespace WoW.Realmserver
             {
                 var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<WorldSessionComponent>();
-                Log.Print($"Player ({session.Character.Name}) has left the game world.", LogType.Network);
+                Logger.Print($"Player ({session.Character.Name}) has left the game world.", LogEntryType.Network);
 
                 // save world position.
                 if (session.Character != null)
@@ -433,21 +432,25 @@ namespace WoW.Realmserver
                         // todo: test if session.Character is tracked after setting the reference.
                         // Could just do SaveChanges() here?
 
-                        ctx.Characters
-                        .Where(c => c.CharacterId == session.Character.CharacterId && c.AccountId == session.Account.Id)
-                        .ExecuteUpdate(setters => setters
-                            .SetProperty(c => c.XPosition, session.Entity.Position.X)
-                            .SetProperty(c => c.YPosition, session.Entity.Position.Y)
-                            .SetProperty(c => c.MapId, session.Character.MapId)
-                            .SetProperty(c => c.Direction, session.Character.Direction));
+                        RelationalQueryableExtensions
+                        .ExecuteUpdate(
+                            ctx.Characters
+                                .Where(character => character.CharacterId == session.Character.CharacterId && character.AccountId == session.Account.Id), 
+                                setters => setters
+                                    .SetProperty(c => c.XPosition, session.Entity.Position.X)
+                                    .SetProperty(c => c.YPosition, session.Entity.Position.Y)
+                                    .SetProperty(c => c.MapId, session.Character.MapId)
+                                    .SetProperty(c => c.Direction, session.Character.Direction));
                     }
 
                     using (var aCtx = new AuthContext())
                     {
-                        aCtx.Accounts
-                            .Where(a => a.Id == session.Account.Id)
-                            .ExecuteUpdate(setters => setters
-                                .SetProperty(a => a.SessionId, default(string)));
+                        RelationalQueryableExtensions
+                        .ExecuteUpdate(
+                            aCtx.Accounts
+                                .Where(account => account.Id == session.Account.Id),
+                                setters => setters
+                                    .SetProperty(acc => acc.SessionId, "-"));
                     }
                 }
 
@@ -455,7 +458,7 @@ namespace WoW.Realmserver
                 for (int i = 0; i < processors.Length; i++)
                 {
                     if (processors[i].Creatures.Remove(entity))
-                        Log.Print($"Removed ({session.Character.Name}) from Tiled processor: {processors[i].Map.Properties["id"]}", LogType.Debug);
+                        Logger.Print($"Removed ({session.Character.Name}) from Tiled processor: {processors[i].Map.Properties["id"]}", LogEntryType.Debug);
                 }
 
                 // todo: only send to players within the game world; not at character select, etc.
@@ -494,14 +497,14 @@ namespace WoW.Realmserver
         /// <param name="accountOwner"></param>
         public static void SendCharactersTo(int accountId, NetPeer accountOwner)
         {
-            List<RemoteCharacter> characters = new List<RemoteCharacter>();
+            List<CharacterMetadataObject> characters = new List<CharacterMetadataObject>();
 
             using (var ctx = new RealmContext())
             {
                 foreach (var character in ctx.Characters.Where(a => a.AccountId == accountId))
-                    characters.Add(new RemoteCharacter(character.CharacterId, character.Name, character.RaceId, character.HairId, character.MapId));
+                    characters.Add(new CharacterMetadataObject(character.CharacterId, character.Name, (ActorRaceType)character.RaceId, character.HairId, mapId: character.MapId));
             }
-            Log.Print($"Sending {characters.Count} characters to account (id={accountId}).", LogType.Network);
+            Logger.Print($"Sending {characters.Count} characters to account (id={accountId}).", LogEntryType.Network);
 
             Program.SendSerializable(accountOwner, new RealmClient_PlayerCharacters() { Characters = characters });
         }

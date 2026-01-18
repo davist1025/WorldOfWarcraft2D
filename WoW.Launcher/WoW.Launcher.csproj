@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WoW.Client.Shared\WoW.Client.Shared.csproj" />
+    <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Framework;
 using static WoW.Framework.Utils;
 
 namespace WoW.Network.Objects

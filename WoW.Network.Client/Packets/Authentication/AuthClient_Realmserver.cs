@@ -5,20 +5,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
 
-namespace WoW.Network.Client.Packets.Authentication
+namespace WoW.Network.Packets.Authenticcation
 {
     /// <summary>
     /// Auth -> Client.
     /// </summary>
     public class AuthClient_Realm : INetSerializable
     {
-        public List<RemoteRealmserver> Realmlist;
+        public List<RealmserverMetadataObject> Realmlist;
 
         public void Deserialize(NetDataReader reader)
         {
-            Realmlist = new List<RemoteRealmserver>();
+            Realmlist = new List<RealmserverMetadataObject>();
             int realmCount = reader.GetInt();
 
             if (realmCount > 0)
@@ -29,7 +29,7 @@ namespace WoW.Network.Client.Packets.Authentication
                     var hostname = reader.GetString();
                     var port = reader.GetInt();
 
-                    var realmserver = new RemoteRealmserver(name, hostname, port);
+                    var realmserver = new RealmserverMetadataObject(name, hostname, port);
                     Realmlist.Add(realmserver);
                 }
             }

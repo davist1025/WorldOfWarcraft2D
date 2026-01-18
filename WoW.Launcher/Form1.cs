@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http.Json;
-using WoW.Client.Shared;
+using WoW.Framework;
 
 namespace WoW.Launcher
 {
@@ -58,7 +58,7 @@ namespace WoW.Launcher
         private async void buttonRegister_Click(object sender, EventArgs e)
         {
             string accountName = textBoxAccountName.Text.Trim();
-            string hashedPassword = Utils.ToSHA256(textBoxPassword.Text.Trim());
+            string hashedPassword = Utils.ToSha256(textBoxPassword.Text.Trim());
 
 
             if (_isLoginState)

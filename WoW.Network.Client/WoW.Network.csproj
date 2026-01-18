@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Lib\LiteNetLib-0.9.5.2\LiteNetLib\LiteNetLib.csproj" />
+    <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
+  </ItemGroup>
+
 </Project>

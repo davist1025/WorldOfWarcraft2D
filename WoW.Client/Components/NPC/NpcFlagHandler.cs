@@ -44,19 +44,20 @@ namespace WoW.Client.Components.NPC
 
         private void OnHover(bool isEnter)
         {
-            if (isEnter && !_hasBeenSet)
-            {
-                var flags = _npcParent.Metadata.Flags;
+            // todo: on mob mouse hover.
+            //if (isEnter && !_hasBeenSet)
+            //{
+            //    var flags = _npcParent.Metadata.Flags;
 
-                if (flags.HasFlag(Shared.NpcTypeFlags.IsMerchant))
-                    Mouse.SetCursor(_bagCursor);
-                _hasBeenSet = true;
-            }
-            else if (!isEnter && _hasBeenSet)
-            {
-                Mouse.SetCursor(_defaultCursor);
-                _hasBeenSet = false;
-            }
+            //    if (flags.HasFlag(Framework.Utils.ActorFlagTypes.None))
+            //        Mouse.SetCursor(_bagCursor);
+            //    _hasBeenSet = true;
+            //}
+            //else if (!isEnter && _hasBeenSet)
+            //{
+            //    Mouse.SetCursor(_defaultCursor);
+            //    _hasBeenSet = false;
+            //}
         }
     }
 }

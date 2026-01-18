@@ -11,11 +11,14 @@ using System.Threading.Tasks;
 using WoW.Client.Components;
 using WoW.Client.Components.NPC;
 using WoW.Client.Scenes;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Auth;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Authentication;
+using WoW.Network.Packets.Client;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Realm;
+using WoW.Network;
+using static WoW.Framework.Utils;
+using WoW.Network.Packets.Authenticcation;
 
 namespace WoW.Client
 {
@@ -26,11 +29,14 @@ namespace WoW.Client
         {
             switch (code.Code)
             {
-                case LogonCode.NoRecord:
-                case LogonCode.InvalidPassword:
+                case AuthCodeType.Success:
+                    Game1.NetState = GameNetworkState.Auth_Realmlist;
+                    break;
+                case AuthCodeType.NoRecord:
+                case AuthCodeType.InvalidPassword:
                     Game1.NetState = GameNetworkState.Auth_Invalid;
                     break;
-                case LogonCode.AlreadyOnline:
+                case AuthCodeType.AlreadyOnline:
                     Game1.NetState = GameNetworkState.Auth_IsOnline;
                     break;
             }
@@ -107,17 +113,17 @@ namespace WoW.Client
 
             var gui = Game1.NetworkScene.FindEntity("gui").GetComponent<ImGuiController>();
 
-            var newChatStorage = new ChatMessage()
+            var newChatStorage = new ChatMessageObject()
             {
-                Message = worldParams.MOTD,
-                Channel = ChatChannel.Server
+                Input = worldParams.MOTD,
+                Channel = ChatChannelType.Server
             };
             gui.ChatHistory.Add(newChatStorage);
         }
 
         public static void OnPlayerPositionUpdate(RealmClient_MovementStateChange netUpdate)
         {
-            var allPlayers = Game1.Scene.FindEntitiesWithTag((int)EntityType.NetPlayer);
+            var allPlayers = Game1.Scene.FindEntitiesWithTag((int)ActorType.Networked);
 
             for (int i = 0; i < allPlayers.Count; i++)
             {
@@ -158,13 +164,13 @@ namespace WoW.Client
             //}
         }
 
-        public static void OnChat(ChatMessage newChat) 
+        public static void OnChat(ChatMessageObject newChat) 
         {
             var guiController = Game1.Scene.FindEntity("gui").GetComponent<ImGuiController>();
 
-            var newChatStorage = new ChatMessage()
+            var newChatStorage = new ChatMessageObject()
             {
-                Message = newChat.Message,
+                Input = newChat.Input,
                 Channel = newChat.Channel
             };
             
@@ -268,7 +274,7 @@ namespace WoW.Client
 
                         // Destroy the current map renderer/entity.
                         Core.Scene.FindEntity("map").Destroy();
-                        var npcEntities = Core.Scene.FindEntitiesWithTag((int)EntityType.NPC);
+                        var npcEntities = Core.Scene.FindEntitiesWithTag((int)ActorType.Mob);
 
                         //for (int i = 0; i < npcEntities.Count; i++)
                         //    npcEntities[i].Destroy();
@@ -295,7 +301,7 @@ namespace WoW.Client
 
                         foreach (var npc in allNpcs)
                         {
-                            Debug.Log($"Destroying NPC: {npc.Metadata.WorldId} from the previous map...");
+                            Debug.Log($"Destroying NPC: {npc.Metadata.Uid} from the previous map...");
                             npc.Entity.Destroy();
                         }
                     };

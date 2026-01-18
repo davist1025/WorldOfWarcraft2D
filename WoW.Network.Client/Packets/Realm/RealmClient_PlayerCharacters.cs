@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
+using static WoW.Framework.Utils;
 
-namespace WoW.Network.Client.Packets.Realm
+namespace WoW.Network.Packets.Realm
 {
     public class RealmClient_PlayerCharacters : INetSerializable
     {
-        public List<RemoteCharacter> Characters;
+        public List<CharacterMetadataObject> Characters;
 
         public void Deserialize(NetDataReader reader)
         {
-            Characters = new List<RemoteCharacter>();
+            Characters = new List<CharacterMetadataObject>();
             int characterCount = reader.GetInt();
 
             for (int i = 0; i < characterCount; i++)
@@ -25,7 +26,7 @@ namespace WoW.Network.Client.Packets.Realm
                 int hairId = reader.GetInt();
                 string mapId = reader.GetString();
 
-                Characters.Add(new RemoteCharacter(id, name, raceId, hairId, mapId));
+                Characters.Add(new CharacterMetadataObject(id, name, (ActorRaceType)raceId, hairId, mapId));
             }
         }
 
@@ -37,10 +38,11 @@ namespace WoW.Network.Client.Packets.Realm
             {
                 var character = Characters[i];
 
-                writer.Put(character.CharacterId);
-                writer.Put(character.CharacterName);
-                writer.Put(character.RaceId);
-                writer.Put(character.HairId);
+                writer.Put(character.Id);
+                //writer.Put(character.Uid);
+                writer.Put(character.Name);
+                writer.Put((int)character.Race);
+                writer.Put(character.Hair);
                 writer.Put(character.MapId);
             }
         }

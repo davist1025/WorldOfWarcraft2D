@@ -1,9 +1,9 @@
 ﻿using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared.Database.Model.Auth;
-using static WoW.Server.Shared.Vocab;
+using WoW.Database.Models;
+using WoW.Database.Models.Auth;
+using static WoW.Framework.Utils;
 
 namespace WoW.Web.API.Controllers
 {
@@ -37,7 +37,7 @@ namespace WoW.Web.API.Controllers
                     {
                         Username = accountName.ToUpper(),
                         HashedPassword = argonPassword,
-                        SecurityLevel = (int)SecurityLevel.Player
+                        SecurityLevel = (int)AccountSecurityType.Player
                     });
                     await _auth.SaveChangesAsync();
 
