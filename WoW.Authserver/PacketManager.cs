@@ -51,17 +51,17 @@ namespace WoW.Authserver
                     loginCode.Code = Framework.Utils.AuthCodeType.AlreadyOnline;
                 }
 
-                Program.Send(peer, loginCode);
+                Program.Network.SendToPeer(peer, loginCode);
 
                 if (loginCode.Code == Framework.Utils.AuthCodeType.Success)
                 {
-                    Program.Send(peer, new AuthClient_Logon() { SessionId = account.SessionId });
+                    Program.Network.SendToPeer(peer, new AuthClient_Logon() { SessionId = account.SessionId });
 
                     var realms = new List<RealmserverMetadataObject>();
 
                     foreach (var realm in ctx.Realmlist)
                         realms.Add(new RealmserverMetadataObject(realm.Name, realm.Hostname, realm.Port));
-                    Program.SendSerializable(peer, new AuthClient_Realm() { Realmlist = realms });
+                    Program.Network.SendSerializableToPeer(peer, new AuthClient_Realm() { Realmlist = realms });
                 }
 
                 ctx.SaveChanges();

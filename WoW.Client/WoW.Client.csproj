@@ -32,7 +32,7 @@
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Persistence\Nez.MG38.Persistence.csproj" />
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Portable\Nez.MG38.csproj" />
     <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
-    <ProjectReference Include="..\WoW.Network.Client\WoW.Network.csproj" />
+    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Content\Data\Characters\hair_1_spritesheet.ase">

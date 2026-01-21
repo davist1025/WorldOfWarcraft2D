@@ -41,7 +41,7 @@ namespace WoW.Client.Scenes
             Game1.Player.Transform.Position = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
             Game1.Player.Tag = (int)ActorType.Local;
-            Game1.CurrentMapId = thePlayer.MapId;
+            Game1.ActiveMapId = thePlayer.MapId;
 
             Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
             Camera.Zoom = 0.5f;
@@ -104,7 +104,7 @@ namespace WoW.Client.Scenes
             theOtherEntity.AddComponent(netController);
 
             // only create a renderer(s) if we're on the same map as them.
-            if (theOtherPlayer.MapId.ToLower().Equals(Game1.CurrentMapId))
+            if (theOtherPlayer.MapId.ToLower().Equals(Game1.ActiveMapId))
                 netController.AddToMap();
         }
 

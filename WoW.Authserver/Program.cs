@@ -13,6 +13,7 @@ using WoW.Database.Models;
 using WoW.Database.Models.Auth;
 using WoW.Framework;
 using WoW.Framework.Logging;
+using WoW.Network;
 using WoW.Network.Packets.Client;
 using WoW.Network.Packets.Realm;
 using static WoW.Framework.Utils;
@@ -29,9 +30,7 @@ namespace WoW.Authserver
 
     internal class Program
     {
-        private NetManager _netManager;
-        private EventBasedNetListener _netEventListener;
-        private static NetPacketProcessor _netProcessor;
+        public static NetworkController Network;
 
         public Program()
         {
@@ -86,38 +85,31 @@ namespace WoW.Authserver
                     {
                         Name = "Test PTR",
                         Hostname = "127.0.0.1",
-                        Port = 3733,
-                        Flag = (int)RealmFlags.IsPTR | (int)RealmFlags.IsRestricted
+                        Port = 3733
                     });
                     ctx.SaveChanges();
                 }
 
                 Logger.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogEntryType.Process);
             }
-            _netProcessor = new NetPacketProcessor();
 
-            _netEventListener = new EventBasedNetListener();
-            _netEventListener.ConnectionRequestEvent += (req) => req.Accept();
-            _netEventListener.NetworkReceiveEvent += (peer, reader, delivery) => _netProcessor.ReadAllPackets(reader, peer);
-
-            _netProcessor.SubscribeReusable<RealmAuth_Registrar, NetPeer>((newAuthRegistration, peer) => PacketManager.OnRealmRegister(newAuthRegistration, peer));
-
-            _netProcessor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
-
-            _netManager = new NetManager(_netEventListener);
-            _netManager.Start("127.0.0.1", "", 8070);
+            Network = new NetworkController();
+            Network.SubscribeFunction += SubscribeObjects;
+            Network.StartServer(port: 8070);
 
             while (true)
-            {
-                _netManager.PollEvents();
-            }
+                Network.Poll();
         }
 
-        public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-            => _netProcessor.Send(peer, packet, delivery);
-
-        public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-            => _netProcessor.SendNetSerializable(peer, packet, delivery);
+        /// <summary>
+        /// Subscribes all manner of objects to the network processor.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void SubscribeObjects(object sender, EventArgs e)
+        {
+            Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
+        }
 
         static void Main(string[] args)
             => new Program();

@@ -18,6 +18,8 @@ using System.Text;
 using WoW.Client.Components;
 using WoW.Client.Content;
 using WoW.Client.Scenes;
+using WoW.Framework;
+using WoW.Network;
 using WoW.Network.Objects;
 using WoW.Network.Packets;
 using WoW.Network.Packets.Authentication;
@@ -45,29 +47,26 @@ namespace WoW.Client
 
     public class Game1 : Core
     {
-        public static GameNetworkState NetState = GameNetworkState.Offline;
-        public static NetManager ClientNetwork;
-        public static EventBasedNetListener ClientListener;
-        private static NetPacketProcessor _netProcessor;
+        public static GameConfiguration Config;
+        public static NetworkController Network;
+        public static GameNetworkState NetworkState = GameNetworkState.Offline;
+
+        public static Entity Player;
+        public static string AccountName { get; set; }
+        public static string AccountSessionId { get; set; }
+        public static string ActiveMapId { get; set; }
+        public static float AssignedMovementSpeed = 1f;
+        public static RealmserverMetadataObject LastConnectedRealm;
 
         public static TmxMap[] Maps;
-        public static GameConfiguration Configuration;
+
         public static Dictionary<string, Texture2D> InterfaceTextures;
 
-        public static string AccountName;
-        public static string SessionId; // todo: move this global data to another class object?
-        public static RealmserverMetadataObject LastRealm; // todo: save to disk.
         public static NetworkTestScene NetworkScene;
-        public static string CurrentMapId = "";
 
         public static bool ShouldShowEscapeMenu = false;
         public static bool ShouldShowGMChat = false;
         public static bool ShouldShowWhoMenu = false;
-
-        public static Entity Player;
-        private static ClientAuth_Logon _temporaryLogonPacket;
-
-        public static float MovementSpeed = 1f;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
         {
@@ -78,77 +77,31 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
-            ClientListener = new EventBasedNetListener();
-            ClientListener.NetworkReceiveEvent += (peer, reader, method) => _netProcessor.ReadAllPackets(reader);
-            ClientListener.PeerConnectedEvent += (peer) =>
+            Network = new NetworkController();
+            Network.SubscribeFunction += SubscribeObjects;
+
+            // dictates specifc activity that should occur upon a successful connection attempt to a given server.
+            Network.OnPeerConnected += (sender, peer) =>
             {
-                if (NetState == GameNetworkState.Offline)
-                    NetState = GameNetworkState.Auth_LoggingIn;
-
-                if (NetState == GameNetworkState.Auth_LoggingIn)
+                switch (NetworkState)
                 {
-                    Send(_temporaryLogonPacket);
-                    Debug.Log($"Logging in...");
+                    case GameNetworkState.Auth_LoggingIn:
+                        string[] loginInfo = Core.Scene.FindEntity("gui").GetComponent<ImGuiController>().GetLogin().Split(':');
+                        Network.SendToServer(PacketManager.CreateLogonPacket(loginInfo[0], loginInfo[1]));
+                        break;
+                    case GameNetworkState.Realm:
+                        Network.SendToServer(new ClientRealm_TransferLogon() { SessionId = AccountSessionId });
+                        break;
                 }
-
-                if (NetState == GameNetworkState.Realm)
-                    Send(new ClientRealm_TransferLogon() { SessionId = SessionId });
             };
+            Network.StartClient();
 
             /*
              * NetState can be changed to display whichever UI is necessary, per ImGUI.
              * We need to set ClientNetwork's connection state at the same time we set this so the packet flow doesn't crash the client or server.
              */
 
-            _netProcessor = new NetPacketProcessor();
-
-            _netProcessor.RegisterNestedType<Vector2Serializable>();
-            _netProcessor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
-
-            _netProcessor.SubscribeReusable<AuthClient_LogonCode>((AuthCodeType) => PacketManager.OnLogonResponse(AuthCodeType));
-
-            _netProcessor.SubscribeReusable<AuthClient_Logon>((logon) => PacketManager.OnLogonSuccess(logon));
-
-            _netProcessor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) => PacketManager.OnRealmlist(realmlist));
-
-            _netProcessor.SubscribeReusable<RealmClient_CreateCharacter>((response) => PacketManager.OnCreateCharacter(response));
-
-            _netProcessor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) => PacketManager.OnCharacterList(characters));
-
-            _netProcessor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) => PacketManager.OnLocalPlayer(thePlayer));
-
-            _netProcessor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
-            {
-                var localController = Player.GetComponent<LocalPlayerController>();
-                localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
-
-                var animator = Player.GetComponent<SpriteAnimator>();
-                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
-
-                localController.ProcessInputValidation(result);
-            });
-
-            _netProcessor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
-
-            // mostly an empty packet. open to suggestions or later implementation :P
-            _netProcessor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) => PacketManager.OnEnterWorld(worldParams));
-
-            _netProcessor.SubscribeReusable<RealmClient_MovementStateChange>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
-
-            _netProcessor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
-
-            _netProcessor.SubscribeReusable<RealmClient_WhoCommand>((whoList) => PacketManager.OnWho(whoList));
-
-            _netProcessor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
-
-            _netProcessor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
-
-            _netProcessor.SubscribeReusable<ChatMessageObject>((newChat) => PacketManager.OnChat(newChat));
-
-            ClientNetwork = new NetManager(ClientListener);
-            ClientNetwork.Start();
-
-            Configuration = GameConfiguration.Load();
+            Config = GameConfiguration.Load();
 
             base.Initialize();
 
@@ -177,6 +130,7 @@ namespace WoW.Client
             };
             Core.RegisterGlobalManager(guiManager);
 
+            // todo: ew, clean this up.
             InterfaceTextures = new Dictionary<string, Texture2D>()
             {
                 { "gear_icon", Core.Content.LoadTexture("Content/Data/UI/gear_img.png") },
@@ -188,30 +142,62 @@ namespace WoW.Client
             Scene = new LogonScene();
         }
 
+        /// <summary>
+        /// Subscribes all manner of objects to the network processor.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SubscribeObjects(object sender, EventArgs e)
+        {
+            Network.Processor.RegisterNestedType<Vector2Serializable>();
+            Network.Processor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
+
+            Network.Processor.SubscribeReusable<AuthClient_LogonCode>((AuthCodeType) => PacketManager.OnLogonResponse(AuthCodeType));
+
+            Network.Processor.SubscribeReusable<AuthClient_Logon>((logon) => PacketManager.OnLogonSuccess(logon));
+
+            Network.Processor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) => PacketManager.OnRealmlist(realmlist));
+
+            Network.Processor.SubscribeReusable<RealmClient_CreateCharacter>((response) => PacketManager.OnCreateCharacter(response));
+
+            Network.Processor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) => PacketManager.OnCharacterList(characters));
+
+            Network.Processor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) => PacketManager.OnLocalPlayer(thePlayer));
+
+            Network.Processor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
+            {
+                var localController = Player.GetComponent<LocalPlayerController>();
+                localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
+
+                var animator = Player.GetComponent<SpriteAnimator>();
+                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
+
+                localController.ProcessInputValidation(result);
+            });
+
+            Network.Processor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
+
+            // mostly an empty packet. open to suggestions or later implementation :P
+            Network.Processor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) => PacketManager.OnEnterWorld(worldParams));
+
+            Network.Processor.SubscribeReusable<RealmClient_MovementStateChange>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
+
+            Network.Processor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
+
+            Network.Processor.SubscribeReusable<RealmClient_WhoCommand>((whoList) => PacketManager.OnWho(whoList));
+
+            Network.Processor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
+
+            Network.Processor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
+
+            Network.Processor.SubscribeReusable<ChatMessageObject>((newChat) => PacketManager.OnChat(newChat));
+        }
+
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            ClientNetwork.PollEvents();
-        }
 
-        public static void ConnectAndLogin(string accountName, string password)
-        {
-            // todo: grab auth ip/port from config.
-            ClientNetwork.Connect("127.0.0.1", 8070, "");
-
-            _temporaryLogonPacket = new ClientAuth_Logon()
-            {
-                AccountName = accountName,
-                Password = WoW.Framework.Utils.ToSha256(password)
-            };
-        }
-
-        public static void Send<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-            => _netProcessor.Send(ClientNetwork, packet, delivery);
-
-        public static void SendSerializable<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-        {
-            _netProcessor.SendNetSerializable(ClientNetwork, packet, delivery);
+            Network.Poll();
         }
 
         /// <summary>
@@ -223,15 +209,15 @@ namespace WoW.Client
             var component = gui.GetComponent<ImGuiController>();
             component.Characters.Clear();
             component.Realmlist.Clear();
-            ClientNetwork.DisconnectAll();
-            NetState = GameNetworkState.Offline;
+            Network.Disconnect();
+            NetworkState = GameNetworkState.Offline;
         }
 
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
 
-            Configuration.Save();
+            Config.Save();
         }
     }
 }

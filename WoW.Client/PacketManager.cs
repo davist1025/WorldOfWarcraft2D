@@ -25,26 +25,36 @@ namespace WoW.Client
     public static class PacketManager
     {
         #region Auth
+
+        public static ClientAuth_Logon CreateLogonPacket(string username, string password)
+        {
+            return new ClientAuth_Logon()
+            {
+                AccountName = username,
+                Password = ToSha256(password)
+            };
+        }
+
         public static void OnLogonResponse(AuthClient_LogonCode code)
         {
             switch (code.Code)
             {
                 case AuthCodeType.Success:
-                    Game1.NetState = GameNetworkState.Auth_Realmlist;
+                    Game1.NetworkState = GameNetworkState.Auth_Realmlist;
                     break;
                 case AuthCodeType.NoRecord:
                 case AuthCodeType.InvalidPassword:
-                    Game1.NetState = GameNetworkState.Auth_Invalid;
+                    Game1.NetworkState = GameNetworkState.Auth_Invalid;
                     break;
                 case AuthCodeType.AlreadyOnline:
-                    Game1.NetState = GameNetworkState.Auth_IsOnline;
+                    Game1.NetworkState = GameNetworkState.Auth_IsOnline;
                     break;
             }
         }
 
         public static void OnLogonSuccess(AuthClient_Logon session)
         {
-            Game1.SessionId = session.SessionId;
+            Game1.AccountSessionId = session.SessionId;
         }
 
         public static void OnRealmlist(AuthClient_Realm realmlist)
@@ -55,7 +65,7 @@ namespace WoW.Client
             var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
 
             gui.Realmlist.AddRange(realmlist.Realmlist);
-            Game1.NetState = GameNetworkState.Auth_Realmlist;
+            Game1.NetworkState = GameNetworkState.Auth_Realmlist;
         }
         #endregion
 
@@ -66,11 +76,11 @@ namespace WoW.Client
             {
                 case RealmClient_CreateCharacter.Result.NameBanned:
                 case RealmClient_CreateCharacter.Result.NameInUse:
-                    Game1.NetState = GameNetworkState.Realm_CharacterNameInvalid;
+                    Game1.NetworkState = GameNetworkState.Realm_CharacterNameInvalid;
                     break;
                 case RealmClient_CreateCharacter.Result.Success:
-                    Game1.Send(new ClientRealm_RequestCharacterList());
-                    Game1.NetState = GameNetworkState.Realm;
+                    Game1.Network.SendToServer(new ClientRealm_RequestCharacterList());
+                    Game1.NetworkState = GameNetworkState.Realm;
                     break;
             }
         }
@@ -83,7 +93,7 @@ namespace WoW.Client
 
             gui.Characters.Clear();
             gui.Characters.AddRange(characterList.Characters);
-            Game1.NetState = GameNetworkState.Realm_Characters;
+            Game1.NetworkState = GameNetworkState.Realm_Characters;
         }
         #endregion
 
@@ -106,9 +116,9 @@ namespace WoW.Client
         public static void OnEnterWorld(RealmClient_EnterWorld worldParams)
         {
             // todo: there may be a few of these, organize them in a dictionary or some other object.
-            Game1.MovementSpeed = worldParams.MovementSpeed;
+            Game1.AssignedMovementSpeed = worldParams.MovementSpeed;
 
-            Game1.NetState = GameNetworkState.World;
+            Game1.NetworkState = GameNetworkState.World;
             Core.StartSceneTransition(new FadeTransition(() => Game1.NetworkScene));
 
             var gui = Game1.NetworkScene.FindEntity("gui").GetComponent<ImGuiController>();
@@ -239,7 +249,7 @@ namespace WoW.Client
                     var controller = entity.GetComponent<NetPlayerController>();
                     controller.MapId = teleport.MapId;
 
-                    if (Game1.CurrentMapId.ToLower().Equals(teleport.MapId))
+                    if (Game1.ActiveMapId.ToLower().Equals(teleport.MapId))
                     {
                         controller.AddToMap();
                         controller.Entity.Position = new Vector2(teleport.X, teleport.Y);
@@ -262,7 +272,7 @@ namespace WoW.Client
 
                     // todo: bug may occur here where if we are summoned/teleported to the map we're already in, duplicate NPCs might be created.
 
-                    Game1.CurrentMapId = teleport.MapId;
+                    Game1.ActiveMapId = teleport.MapId;
 
                     var newLoadTransition = new FadeTransition();
                     newLoadTransition.OnScreenObscured = () =>
@@ -297,7 +307,7 @@ namespace WoW.Client
 
                     newLoadTransition.OnTransitionCompleted += () =>
                     {
-                        var allNpcs = Core.Scene.FindComponentsOfType<NpcController>().Where(npc => !npc.Metadata.MapId.ToLower().Equals(Game1.CurrentMapId.ToLower())).ToArray();
+                        var allNpcs = Core.Scene.FindComponentsOfType<NpcController>().Where(npc => !npc.Metadata.MapId.ToLower().Equals(Game1.ActiveMapId.ToLower())).ToArray();
 
                         foreach (var npc in allNpcs)
                         {
@@ -312,6 +322,6 @@ namespace WoW.Client
         #endregion
 
         public static void SendTabTargetRequest()
-            => Game1.Send(new ClientRealm_TabTarget(), LiteNetLib.DeliveryMethod.ReliableUnordered);
+            => Game1.Network.SendToServer(new ClientRealm_TabTarget(), LiteNetLib.DeliveryMethod.ReliableUnordered);
     }
 }

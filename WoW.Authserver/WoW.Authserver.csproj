@@ -22,7 +22,7 @@
     <ProjectReference Include="..\Lib\LiteNetLib-0.9.5.2\LiteNetLib\LiteNetLib.csproj" />
     <ProjectReference Include="..\WoW.Database\WoW.Database.csproj" />
     <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
-    <ProjectReference Include="..\WoW.Network.Client\WoW.Network.csproj" />
+    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
 
 </Project>
