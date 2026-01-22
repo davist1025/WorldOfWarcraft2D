@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Realmserver
+namespace WoW.Realmserver.Data
 {
     /// <summary>
     /// Represents a player that has just authenticated with the Authserver, now attempting to connect to a realmserver.

@@ -78,10 +78,10 @@ namespace WoW.Client
         protected override void Initialize()
         {
             Network = new NetworkController();
-            Network.SubscribeFunction += SubscribeObjects;
+            Network.OnProcessorSubscribe += ProcessorSubscription;
 
             // dictates specifc activity that should occur upon a successful connection attempt to a given server.
-            Network.OnPeerConnected += (sender, peer) =>
+            Network.OnPeerConnect += (peer) =>
             {
                 switch (NetworkState)
                 {
@@ -147,7 +147,7 @@ namespace WoW.Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SubscribeObjects(object sender, EventArgs e)
+        private void ProcessorSubscription()
         {
             Network.Processor.RegisterNestedType<Vector2Serializable>();
             Network.Processor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));

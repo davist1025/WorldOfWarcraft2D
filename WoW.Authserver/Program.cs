@@ -94,7 +94,7 @@ namespace WoW.Authserver
             }
 
             Network = new NetworkController();
-            Network.SubscribeFunction += SubscribeObjects;
+            Network.OnProcessorSubscribe += ProcessorSubscription;
             Network.StartServer(port: 8070);
 
             while (true)
@@ -106,7 +106,7 @@ namespace WoW.Authserver
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void SubscribeObjects(object sender, EventArgs e)
+        public void ProcessorSubscription()
         {
             Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
         }

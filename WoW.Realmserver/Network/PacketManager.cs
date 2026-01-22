@@ -23,7 +23,7 @@ using WoW.Realmserver.Content;
 using WoW.Realmserver.Data;
 using static WoW.Framework.Utils;
 
-namespace WoW.Realmserver
+namespace WoW.Realmserver.Network
 {
     /// <summary>
     /// Houses all packet handlers.

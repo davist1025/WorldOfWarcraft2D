@@ -34,6 +34,7 @@ namespace WoW.Database.Models.Auth
         public IPEndPoint StoredEndPoint => new IPEndPoint(IPAddress.Parse(Hostname), Port);
     }
 
+    [Obsolete("Realm flags are currently unused 1/21/26")]
     [Flags]
     public enum RealmFlags
     {

@@ -14,7 +14,6 @@ namespace WoW.Network
     public class NetworkController
     {
         private EventBasedNetListener _listener;
-        public EventHandler<NetPeer> OnPeerConnected;
 
         /// <summary>
         /// The packet processor.
@@ -23,7 +22,9 @@ namespace WoW.Network
         /// Example: NetworkController.Processor.SubscribeReusable<TObject, NetPeer>(PacketManager.HandleTObject);
         /// </summary>
         public NetPacketProcessor Processor;
-        public EventHandler SubscribeFunction;
+        public Action OnProcessorSubscribe;
+        public Action<NetPeer, DisconnectInfo> OnClientDisconnect;
+        public Action<NetPeer> OnPeerConnect;
 
         private NetManager _manager;
 
@@ -34,7 +35,8 @@ namespace WoW.Network
             _manager = new NetManager(_listener);
 
             _listener.ConnectionRequestEvent += (req) => req.Accept();
-            _listener.PeerConnectedEvent += (peer) => OnPeerConnected?.Invoke(null, peer);
+            _listener.PeerConnectedEvent += (peer) => OnPeerConnect?.Invoke(peer);
+            _listener.PeerDisconnectedEvent += (peer, reason) => OnClientDisconnect?.Invoke(peer, reason);
             _listener.NetworkReceiveEvent += (peer, reader, method) => Processor.ReadAllPackets(reader, peer);
         }
 
@@ -49,7 +51,7 @@ namespace WoW.Network
         /// </summary>
         public void StartClient()
         {
-            SubscribeFunction?.Invoke(null, null);
+            OnProcessorSubscribe?.Invoke();
             _manager.Start();
         }
 
@@ -72,7 +74,7 @@ namespace WoW.Network
         /// <param name="port"></param>
         public void StartServer(string hostname = "127.0.0.1", int port = 1111)
         {
-            SubscribeFunction?.Invoke(null, null);
+            OnProcessorSubscribe?.Invoke();
             _manager.Start(hostname, "", port);
         }
 
@@ -143,6 +145,14 @@ namespace WoW.Network
             _manager.IsRunning
             && _manager.FirstPeer != null
             && _manager.FirstPeer.ConnectionState == ConnectionState.Connected;
+
+        /// <summary>
+        /// Returns a list of all connected peers.
+        /// 
+        /// Client-mode will return one.
+        /// </summary>
+        /// <returns></returns>
+        public List<NetPeer> GetAllPeers() => _manager.ConnectedPeerList;
 
         /// <summary>
         /// Closes out all Network connections.
