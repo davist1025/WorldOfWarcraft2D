@@ -20,8 +20,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lib\LiteNetLib-0.9.5.2\LiteNetLib\LiteNetLib.csproj" />
-    <ProjectReference Include="..\WoW.Client.Shared\WoW.Client.Shared.csproj" />
-    <ProjectReference Include="..\WoW.Server.Shared\WoW.Server.Shared.csproj" />
+    <ProjectReference Include="..\WoW.Database\WoW.Database.csproj" />
+    <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
+    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
 
 </Project>

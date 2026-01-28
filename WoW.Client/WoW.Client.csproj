@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <PublishReadyToRun>false</PublishReadyToRun>
     <TieredCompilation>false</TieredCompilation>
@@ -31,7 +31,8 @@
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.ImGui\Nez.MG38.ImGui.csproj" />
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Persistence\Nez.MG38.Persistence.csproj" />
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Portable\Nez.MG38.csproj" />
-    <ProjectReference Include="..\WoW.Client.Shared\WoW.Client.Shared.csproj" />
+    <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
+    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Content\Data\Characters\hair_1_spritesheet.ase">

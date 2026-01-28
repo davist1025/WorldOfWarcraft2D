@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
 
 namespace WoW.Client.Components.NPC
 {
     public class NpcController : Component, IUpdatable
     {
-        public NpcMetadata Metadata;
+        public NpcMetadataObject Metadata;
 
-        public NpcController(NpcMetadata metadata)
+        public NpcController(NpcMetadataObject metadata)
             => Metadata = metadata;
 
         public override void OnAddedToEntity()
@@ -23,7 +23,7 @@ namespace WoW.Client.Components.NPC
 
             Debug.Log($"#### New NPC ####");
             Debug.Log($"{Metadata.Name} has a model of: {model}");
-            Debug.Log($"{Metadata.WorldId} flags: {Metadata.Flags}");
+            Debug.Log($"{Metadata.Uid} flags: {Metadata.Flags}");
 
             // Create renderers, mover, etc.
             var renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));

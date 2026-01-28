@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
+using WoW.Framework.Logging;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Content
 {
@@ -23,12 +24,12 @@ namespace WoW.Realmserver.Content
         {
             if (File.Exists("./realmserver.config"))
             {
-                Log.Print("Loading Realmserver configuration...", LogType.Process);
+                Logger.Print("Loading Realmserver configuration...", LogEntryType.Process);
                 var objData = JsonConvert.DeserializeObject<RealmConfiguration>(File.ReadAllText("./realmserver.config"));
                 return objData;
             }
 
-            Log.Print("Failed to load realmserver.config; creating a new configuration...", LogType.Process);
+            Logger.Print("Failed to load realmserver.config; creating a new configuration...", LogEntryType.Process);
             var newConfig = new RealmConfiguration()
             {
                 IpAddress = "127.0.0.1",

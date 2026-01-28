@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Client;
+using WoW.Network.Packets.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
 {
@@ -21,7 +21,7 @@ namespace WoW.Client.Components
         private VirtualIntegerAxis _xAxis, _yAxis;
         private Vector2 _movementInput;
         private SubpixelVector2 _subPixelMovement;
-        private SpriteDirection _direction = SpriteDirection.South;
+        private ActorAnimationDirection _direction = ActorAnimationDirection.South;
 
         private Mover _mover;
         private CircleCollider _circleCollder;
@@ -38,7 +38,7 @@ namespace WoW.Client.Components
         /** Debug variables **/
         public Vector2 LastServerCalculation = Vector2.Zero;
 
-        public LocalPlayerController(string name, SpriteDirection direction)
+        public LocalPlayerController(string name, ActorAnimationDirection direction)
         {
             Name = name;
             _direction = direction;
@@ -72,10 +72,10 @@ namespace WoW.Client.Components
                 string startingAnimation = "";
                 switch (_direction)
                 {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
+                    case ActorAnimationDirection.North:
+                    case ActorAnimationDirection.East:
+                    case ActorAnimationDirection.South:
+                    case ActorAnimationDirection.West:
                         startingAnimation = "idle";
                         break;
                 }
@@ -86,26 +86,26 @@ namespace WoW.Client.Components
             {
                 if (_movementInput.X < 0f)
                 {
-                    _direction = SpriteDirection.West;
+                    _direction = ActorAnimationDirection.West;
                     _animator.FlipX = true;
                 }
 
                 if (_movementInput.X > 0f)
                 {
-                    _direction = SpriteDirection.East;
+                    _direction = ActorAnimationDirection.East;
                     _animator.FlipX = false;
                 }
 
-                if (_movementInput.Y > 0f) _direction = SpriteDirection.South;
+                if (_movementInput.Y > 0f) _direction = ActorAnimationDirection.South;
 
-                if (_movementInput.Y < 0f) _direction = SpriteDirection.North;
+                if (_movementInput.Y < 0f) _direction = ActorAnimationDirection.North;
 
                 switch (_direction)
                 {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
+                    case ActorAnimationDirection.North:
+                    case ActorAnimationDirection.East:
+                    case ActorAnimationDirection.South:
+                    case ActorAnimationDirection.West:
                         if (!_animator.CurrentAnimationName.Equals("walk"))
                             _animator.Play("walk");
                         break;
@@ -121,17 +121,17 @@ namespace WoW.Client.Components
                     DeltaTime = Time.DeltaTime
                 };
                 _unprocessedInput.Add(movementUpdatePacket);
-                Game1.Send(movementUpdatePacket);
+                Game1.Network.SendToServer(movementUpdatePacket);
             }
 
             if (_movementInput == Vector2.Zero)
             {
                 switch (_direction)
                 {
-                    case SpriteDirection.North:
-                    case SpriteDirection.East:
-                    case SpriteDirection.South:
-                    case SpriteDirection.West:
+                    case ActorAnimationDirection.North:
+                    case ActorAnimationDirection.East:
+                    case ActorAnimationDirection.South:
+                    case ActorAnimationDirection.West:
                         if (!_animator.CurrentAnimationName.Equals("idle"))
                             _animator.Play("idle");
                         break;
@@ -156,7 +156,7 @@ namespace WoW.Client.Components
 
         private void ApplyInput(Vector2 input)
         {
-            var moveDirection = Game1.MovementSpeed * Time.DeltaTime * input;
+            var moveDirection = Game1.AssignedMovementSpeed * Time.DeltaTime * input;
             moveDirection.Round();
 
             //_mover.CalculateMovement(ref moveDirection, out var _);

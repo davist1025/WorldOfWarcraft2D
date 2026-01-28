@@ -41,6 +41,7 @@
             installToolStripMenuItem = new ToolStripMenuItem();
             optionsToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             splitContainer1 = new SplitContainer();
             linkLabelGoToLogin = new LinkLabel();
             buttonRegister = new Button();
@@ -50,7 +51,6 @@
             label2 = new Label();
             textBoxAccountName = new TextBox();
             label1 = new Label();
-            toolStripStatusLabel1 = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxGit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxTrello).BeginInit();
@@ -175,6 +175,12 @@
             statusStrip1.TabIndex = 10;
             statusStrip1.Text = "statusStrip1";
             // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(54, 20);
+            toolStripStatusLabel1.Text = "Ready!";
+            // 
             // splitContainer1
             // 
             splitContainer1.BorderStyle = BorderStyle.Fixed3D;
@@ -208,6 +214,7 @@
             linkLabelGoToLogin.TabIndex = 0;
             linkLabelGoToLogin.TabStop = true;
             linkLabelGoToLogin.Text = "Have an account?";
+            linkLabelGoToLogin.LinkClicked += linkLabelGoToLogin_LinkClicked;
             // 
             // buttonRegister
             // 
@@ -267,12 +274,6 @@
             label1.Size = new Size(107, 20);
             label1.TabIndex = 0;
             label1.Text = "Account Name";
-            // 
-            // toolStripStatusLabel1
-            // 
-            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(54, 20);
-            toolStripStatusLabel1.Text = "Ready!";
             // 
             // Form1
             // 

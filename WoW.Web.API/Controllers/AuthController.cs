@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared.Database.Model.Auth;
+using WoW.Database.Models;
+using WoW.Database.Models.Auth;
 
 namespace WoW.Web.API.Controllers
 {

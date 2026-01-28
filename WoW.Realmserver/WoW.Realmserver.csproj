@@ -22,8 +22,9 @@
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.ImGui\Nez.MG38.ImGui.csproj" />
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Persistence\Nez.MG38.Persistence.csproj" />
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Portable\Nez.MG38.csproj" />
-    <ProjectReference Include="..\WoW.Client.Shared\WoW.Client.Shared.csproj" />
-    <ProjectReference Include="..\WoW.Server.Shared\WoW.Server.Shared.csproj" />
+    <ProjectReference Include="..\WoW.Database\WoW.Database.csproj" />
+    <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
+    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
 
   <ItemGroup>

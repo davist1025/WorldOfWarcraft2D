@@ -8,14 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Data;
-using WoW.Client.Shared.Realm;
+using WoW.Database.Models;
+using WoW.Database.Models.Realm;
+using WoW.Framework.Logging;
+using WoW.Network.Objects;
+using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
-using WoW.Server.Shared.Database;
-using WoW.Server.Shared.Database.Model;
-using WoW.Server.Shared.Database.Model.Realm;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver
 {
@@ -39,7 +39,7 @@ namespace WoW.Realmserver
 
                 if (npcMetadata == null)
                 {
-                    Log.Print($"NPC (id={id}) does not exist.", LogType.Warning);
+                    Logger.Print($"NPC (id={id}) does not exist.", LogEntryType.Warning);
                     return null;
                 }
 
@@ -47,18 +47,21 @@ namespace WoW.Realmserver
 
                 // Create the entity.
                 Entity newNpcEntity = Program.Scene.CreateEntity(Guid.NewGuid().ToString(), spawnPosition);
-                newNpcEntity.Tag = (int)EntityType.NPC;
+                newNpcEntity.Tag = (int)ActorType.Mob;
 
-                NpcMetadata serializedNpc = new NpcMetadata()
+                NpcMetadataObject serializedNpc = new NpcMetadataObject()
                 {
-                    WorldId = newNpcEntity.Name,
+                    Uid = newNpcEntity.Name,
                     Name = npcMetadata.Name,
                     ModelId = npcMetadata.ModelId,
-                    Flags = (NpcTypeFlags)npcMetadata.FlagType,
+                    Flags = (ActorFlagTypes)npcMetadata.FlagType,
                     Level = npcMetadata.Level,
                     MapId = mapId,
-                    X = spawnPosition.X,
-                    Y = spawnPosition.Y
+                    Position = new Framework.Vector2S
+                    {
+                        X = spawnPosition.X,
+                        Y = spawnPosition.Y,
+                    }
                 };
 
                 TiledMapProcessor tiledProcessorForMapId = Program

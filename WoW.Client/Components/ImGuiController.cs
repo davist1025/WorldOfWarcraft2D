@@ -10,9 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Scenes;
-using WoW.Client.Shared;
-using WoW.Client.Shared.Client;
-using WoW.Client.Shared.Data;
+using WoW.Network.Objects;
+using WoW.Network.Packets;
+using WoW.Network.Packets.Client;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
 {
@@ -47,23 +48,23 @@ namespace WoW.Client.Components
             }
         }
 
-        public List<ChatMessage> ChatHistory = new List<ChatMessage>();
-        public List<ChatMessage> GMChatHistory = new List<ChatMessage>();
-        public List<RemoteRealmserver> Realmlist = new List<RemoteRealmserver>();
-        public List<RemoteCharacter> Characters = new List<RemoteCharacter>();
+        public List<ChatMessageObject> ChatHistory = new List<ChatMessageObject>();
+        public List<ChatMessageObject> GMChatHistory = new List<ChatMessageObject>();
+        public List<RealmserverMetadataObject> Realmlist = new List<RealmserverMetadataObject>();
+        public List<CharacterMetadataObject> Characters = new List<CharacterMetadataObject>();
 
         public override void OnAddedToEntity()
         {
             Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(DrawGUI);
 
-            _chatChannels = Enum.GetNames<ChatChannel>();
+            _chatChannels = Enum.GetNames<ChatChannelType>();
         }
 
         private void DrawGUI()
         {
             Scene currentScene = Entity.Scene;
 
-            switch (Game1.NetState)
+            switch (Game1.NetworkState)
             {
                 case GameNetworkState.Offline:
                     ImGui.SetNextWindowSize(new System.Numerics.Vector2(300f, 125f));
@@ -73,9 +74,8 @@ namespace WoW.Client.Components
 
                     if (ImGui.Button("Connect"))
                     {
-                        Game1.ConnectAndLogin(_accountNameInput, _accountPasswordInput);
-                        //Game1.AccountName = _accountNameInput;
-                        //Game1.ClientNetwork.Connect("127.0.0.1", 8070, "");
+                        Game1.Network.ConnectTo(port: 8070);
+                        Game1.NetworkState = GameNetworkState.Auth_LoggingIn;
                     }
                     ImGui.End();
                     break;
@@ -116,18 +116,18 @@ namespace WoW.Client.Components
 
                         for (int i = 0; i < Realmlist.Count; i++)
                         {
-                            RemoteRealmserver realmserver = Realmlist[i];
+                            RealmserverMetadataObject realmserver = Realmlist[i];
 
                             if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
-                                    Game1.NetState = GameNetworkState.Realm;
-                                    Game1.LastRealm = realmserver;
+                                    Game1.NetworkState = GameNetworkState.Realm;
+                                    Game1.LastConnectedRealm = realmserver;
 
                                     // todo: save last used realm for auto-connection later.
-                                    Game1.ClientNetwork.DisconnectAll();
-                                    Game1.ClientNetwork.Connect(realmserver.Hostname, realmserver.Port, "");
+                                    //Game1.Network.Disconnect();
+                                    Game1.Network.ConnectTo(realmserver.Hostname, realmserver.Port);
                                 }
                             }
 
@@ -164,24 +164,24 @@ namespace WoW.Client.Components
 
                         for (int i = 0; i < Characters.Count; i++)
                         {
-                            RemoteCharacter character = Characters[i];
+                            CharacterMetadataObject character = Characters[i];
 
-                            if (ImGui.Selectable($"##{character.CharacterName}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
+                            if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
-                                _characterSelectIndex = character.CharacterId;
+                                _characterSelectIndex = i;
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
-                                    Game1.NetState = GameNetworkState.LoadingWorld;
-                                    Game1.Send(new ClientRealm_TransferWorld() { LocalCharacterId = character.CharacterId });
+                                    Game1.NetworkState = GameNetworkState.LoadingWorld;
+                                    Game1.Network.SendToServer(new ClientRealm_TransferWorld() { LocalCharacterId = character.Id });
                                 }
                             }
 
                             ImGui.SameLine();
-                            ImGui.Text($"{character.CharacterName}");
+                            ImGui.Text($"{character.Name}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.RaceId}");
+                            ImGui.Text($"{character.Race}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.HairId}");
+                            ImGui.Text($"{character.Hair}");
                             ImGui.NextColumn();
                         }
                         ImGui.Columns(0);
@@ -189,14 +189,14 @@ namespace WoW.Client.Components
 
                     ImGui.SetCursorPosX((ImGui.GetWindowSize().X / 2f) / 2f);
                     if (ImGui.Button("Create Character"))
-                        Game1.NetState = GameNetworkState.Realm_CreateCharacter;
+                        Game1.NetworkState = GameNetworkState.Realm_CreateCharacter;
 
                     if (_characterSelectIndex > -1)
                     {
                         if (ImGui.Button("Delete Character"))
                         {
-                            Game1.Send(new ClientRealm_DeleteCharacter() { CharacterId = _characterSelectIndex });
-                            Game1.NetState = GameNetworkState.Realm;
+                            Game1.Network.SendToServer(new ClientRealm_DeleteCharacter() { CharacterId = _characterSelectIndex });
+                            Game1.NetworkState = GameNetworkState.Realm;
                             _characterSelectIndex = -1;
                         }
                     }
@@ -213,7 +213,7 @@ namespace WoW.Client.Components
 
                     ImGui.InputText("Name", ref _newCharacterNameInput, 12);
 
-                    var raceTypeNames = Enum.GetNames<RaceType>();
+                    var raceTypeNames = Enum.GetNames<ActorRaceType>();
                     ImGui.Combo("Race", ref _newCharacterRaceId, raceTypeNames, raceTypeNames.Length);
 
                     var hairFiles = Directory.GetFiles("Content/Data/Characters/").Where(f => f.ToLower().Contains("hair")).ToArray();
@@ -238,19 +238,19 @@ namespace WoW.Client.Components
 
                     if (NezImGui.CenteredButton("Create", 0.5f))
                     {
-                        Game1.Send(new ClientRealm_CreateCharacter() 
+                        Game1.Network.SendToServer(new ClientRealm_CreateCharacter() 
                         { 
                             Name = _newCharacterNameInput.Trim(),
                             RaceId = _newCharacterRaceId + 1,
                             HairId = _newCharacterHairId
                         });
-                        Game1.NetState = GameNetworkState.Realm;
+                        Game1.NetworkState = GameNetworkState.Realm;
                     }
 
                     if (NezImGui.CenteredButton("Back", 0.5f))
                     {
-                        Game1.Send(new ClientRealm_RequestCharacterList());
-                        Game1.NetState = GameNetworkState.Realm;
+                        Game1.Network.SendToServer(new ClientRealm_RequestCharacterList());
+                        Game1.NetworkState = GameNetworkState.Realm;
                     }
 
                     ImGui.End();
@@ -267,8 +267,8 @@ namespace WoW.Client.Components
 
                     if (ImGui.Button("Ok"))
                     {
-                        Game1.Send(new ClientRealm_RequestCharacterList());
-                        Game1.NetState = GameNetworkState.Realm;
+                        Game1.Network.SendToServer(new ClientRealm_RequestCharacterList());
+                        Game1.NetworkState = GameNetworkState.Realm;
                     }
 
                     ImGui.End();
@@ -295,8 +295,8 @@ namespace WoW.Client.Components
                         if (ImGui.Begin("information", infoWindowFlags))
                         {
                             ImGui.Text($"{controller.Name}");
-                            ImGui.Text($"{Game1.SessionId}");
-                            ImGui.Text($"Map Id: {Game1.CurrentMapId}");
+                            ImGui.Text($"{Game1.AccountSessionId}");
+                            ImGui.Text($"Map Id: {Game1.ActiveMapId}");
 
                             ImGui.End();
                         }
@@ -315,10 +315,10 @@ namespace WoW.Client.Components
                         for (int i = 0; i < ChatHistory.Count; i++)
                         {
                             var chatHistory = ChatHistory[i];
-                            var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
+                            var color = WoW.Framework.Utils.ChannelColors[chatHistory.Channel];
 
                             ImGui.PushStyleColor(ImGuiCol.Text, color);
-                            ImGui.TextWrapped(chatHistory.Message);
+                            ImGui.TextWrapped(chatHistory.Input);
                             ImGui.PopStyleColor();
                         }
                         ImGui.SetScrollHereY(1f);
@@ -353,10 +353,10 @@ namespace WoW.Client.Components
                         if (!string.IsNullOrEmpty(sanitizedInput))
                         {
                             // todo: determine a function for using different channels.
-                            Game1.Send(new ChatMessage
+                            Game1.Network.SendToServer(new ChatMessageObject
                             {
-                                Message = sanitizedInput,
-                                Channel = (ChatChannel)_chatChannelIndex
+                                Input = sanitizedInput,
+                                Channel = (ChatChannelType)_chatChannelIndex
                             });
 
                             sanitizedInput = "";
@@ -424,7 +424,7 @@ namespace WoW.Client.Components
                                     //var color = Shared.Utils.ChatChannelColors[chatHistory.Channel];
 
                                     //ImGui.PushStyleColor(ImGuiCol.Text, color);
-                                    ImGui.Text(chatHistory.Message);
+                                    ImGui.Text(chatHistory.Input);
                                     //ImGui.PopStyleColor();
                                 }
                                 ImGui.SetScrollHereY(1f);
@@ -442,8 +442,11 @@ namespace WoW.Client.Components
 
         public void Update()
         {
-            if (Input.IsKeyPressed(Game1.Configuration.KeyboardControlMap[Content.ControlMap.EscapeMenu]))
-                Game1.Configuration.ControlHandlers[Content.ControlMap.EscapeMenu]?.Invoke(null, null);
+            if (Input.IsKeyPressed(Game1.Config.KeyboardControlMap[Content.ControlMap.EscapeMenu]))
+                Game1.Config.ControlHandlers[Content.ControlMap.EscapeMenu]?.Invoke(null, null);
         }
+
+        public string GetLogin()
+            => $"{_accountNameInput.Trim()}:{_accountPasswordInput.Trim()}";
     }
 }
