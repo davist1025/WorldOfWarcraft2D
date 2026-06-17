@@ -40,21 +40,21 @@ namespace WoW.Client
             switch (code.Code)
             {
                 case AuthCodeType.Success:
-                    Game1.NetworkState = GameNetworkState.Auth_Realmlist;
+                    Global.OnlineState = GameNetworkState.Auth_Realmlist;
                     break;
                 case AuthCodeType.NoRecord:
                 case AuthCodeType.InvalidPassword:
-                    Game1.NetworkState = GameNetworkState.Auth_Invalid;
+                    Global.OnlineState = GameNetworkState.Auth_Invalid;
                     break;
                 case AuthCodeType.AlreadyOnline:
-                    Game1.NetworkState = GameNetworkState.Auth_IsOnline;
+                    Global.OnlineState = GameNetworkState.Auth_IsOnline;
                     break;
             }
         }
 
         public static void OnLogonSuccess(AuthClient_Logon session)
         {
-            Game1.AccountSessionId = session.SessionId;
+            Global.SessionId = session.SessionId;
         }
 
         public static void OnRealmlist(AuthClient_Realm realmlist)
@@ -65,7 +65,7 @@ namespace WoW.Client
             var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
 
             gui.Realmlist.AddRange(realmlist.Realmlist);
-            Game1.NetworkState = GameNetworkState.Auth_Realmlist;
+            Global.OnlineState = GameNetworkState.Auth_Realmlist;
         }
         #endregion
 
@@ -76,11 +76,11 @@ namespace WoW.Client
             {
                 case RealmClient_CreateCharacter.Result.NameBanned:
                 case RealmClient_CreateCharacter.Result.NameInUse:
-                    Game1.NetworkState = GameNetworkState.Realm_CharacterNameInvalid;
+                    Global.OnlineState = GameNetworkState.Realm_CharacterNameInvalid;
                     break;
                 case RealmClient_CreateCharacter.Result.Success:
-                    Game1.Network.SendToServer(new ClientRealm_RequestCharacterList());
-                    Game1.NetworkState = GameNetworkState.Realm;
+                    Global.Network.SendToServer(new ClientRealm_RequestCharacterList());
+                    Global.OnlineState = GameNetworkState.Realm;
                     break;
             }
         }
@@ -93,7 +93,7 @@ namespace WoW.Client
 
             gui.Characters.Clear();
             gui.Characters.AddRange(characterList.Characters);
-            Game1.NetworkState = GameNetworkState.Realm_Characters;
+            Global.OnlineState = GameNetworkState.Realm_Characters;
         }
         #endregion
 
@@ -116,9 +116,9 @@ namespace WoW.Client
         public static void OnEnterWorld(RealmClient_EnterWorld worldParams)
         {
             // todo: there may be a few of these, organize them in a dictionary or some other object.
-            Game1.AssignedMovementSpeed = worldParams.MovementSpeed;
+            Global.Speed = worldParams.MovementSpeed;
 
-            Game1.NetworkState = GameNetworkState.World;
+            Global.OnlineState = GameNetworkState.World;
             Core.StartSceneTransition(new FadeTransition(() => Game1.NetworkScene));
 
             var gui = Game1.NetworkScene.FindEntity("gui").GetComponent<ImGuiController>();
@@ -212,7 +212,7 @@ namespace WoW.Client
 
             if (targetEntity != null)
             {
-                var player = Game1.Player.GetComponent<LocalPlayerController>();
+                var player = Global.Player.GetComponent<LocalPlayerController>();
                 player.TargetWorldId = target.WorldId;
                 //switch ((EntityType)targetEntity.Tag)
                 //{
@@ -279,7 +279,7 @@ namespace WoW.Client
                     {
                         // Find the map given by the MapId.
                         TmxMap tmxMapByMapId;
-                        tmxMapByMapId = Game1.Maps.Where(map => map.Properties["id"].ToLower().Equals(teleport.MapId)).FirstOrDefault();
+                        tmxMapByMapId = Global.Maps.Where(map => map.Properties["id"].ToLower().Equals(teleport.MapId)).FirstOrDefault();
                         TiledMapRenderer mapRenderer = null;
 
                         // Destroy the current map renderer/entity.
@@ -322,6 +322,6 @@ namespace WoW.Client
         #endregion
 
         public static void SendTabTargetRequest()
-            => Game1.Network.SendToServer(new ClientRealm_TabTarget(), LiteNetLib.DeliveryMethod.ReliableUnordered);
+            => Global.Network.SendToServer(new ClientRealm_TabTarget(), LiteNetLib.DeliveryMethod.ReliableUnordered);
     }
 }

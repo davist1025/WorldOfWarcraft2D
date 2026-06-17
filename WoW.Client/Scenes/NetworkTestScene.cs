@@ -37,13 +37,13 @@ namespace WoW.Client.Scenes
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)
         {
             _theController = new LocalPlayerController(thePlayer.Name, (ActorAnimationDirection)thePlayer.Direction);
-            Game1.Player = CreateEntity(thePlayer.WorldId);
-            Game1.Player.Transform.Position = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
-            Game1.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
-            Game1.Player.Tag = (int)ActorType.Local;
+            Global.Player = CreateEntity(thePlayer.WorldId);
+            Global.Player.Transform.Position = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
+            Global.Player.Transform.LerpedPosition = new Vector2(thePlayer.ZoneX, thePlayer.ZoneY);
+            Global.Player.Tag = (int)ActorType.Local;
             Game1.ActiveMapId = thePlayer.MapId;
 
-            Camera.Entity.AddComponent(new FollowCamera(Game1.Player, Camera));
+            Camera.Entity.AddComponent(new FollowCamera(Global.Player, Camera));
             Camera.Zoom = 0.5f;
 
             AsepriteFile aseFile = null;
@@ -60,18 +60,18 @@ namespace WoW.Client.Scenes
             }
 
             var actorSpriteAtlas = aseFile.ToSpriteAtlas();
-            var animator = Game1.Player.AddComponent<SpriteAnimator>();
+            var animator = Global.Player.AddComponent<SpriteAnimator>();
             animator.AddAnimationsFromAtlas(actorSpriteAtlas);
             animator.IsNetworked = true;
-            animator.LastNetworkPosition = Game1.Player.Transform.LerpedPosition;
+            animator.LastNetworkPosition = Global.Player.Transform.LerpedPosition;
 
             // todo: how should we apply the shadow? unsure how to detach it from the rest of the animation and render it separately.
             animator.RenderLayer = 5;
 
-            Game1.Player.AddComponent(_theController);
+            Global.Player.AddComponent(_theController);
 
             TmxMap tmxMapByMapId;
-            tmxMapByMapId = Game1.Maps.Where(map => map.Properties["id"].ToLower().Equals(thePlayer.MapId)).FirstOrDefault();
+            tmxMapByMapId = Global.Maps.Where(map => map.Properties["id"].ToLower().Equals(thePlayer.MapId)).FirstOrDefault();
             TiledMapRenderer mapRenderer = null;
 
             if (tmxMapByMapId != null)

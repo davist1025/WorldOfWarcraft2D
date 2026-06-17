@@ -121,7 +121,7 @@ namespace WoW.Client.Components
                     DeltaTime = Time.DeltaTime
                 };
                 _unprocessedInput.Add(movementUpdatePacket);
-                Game1.Network.SendToServer(movementUpdatePacket);
+                Global.Network.SendToServer(movementUpdatePacket);
             }
 
             if (_movementInput == Vector2.Zero)
@@ -156,7 +156,7 @@ namespace WoW.Client.Components
 
         private void ApplyInput(Vector2 input)
         {
-            var moveDirection = Game1.AssignedMovementSpeed * Time.DeltaTime * input;
+            var moveDirection = Global.Speed * Time.DeltaTime * input;
             moveDirection.Round();
 
             //_mover.CalculateMovement(ref moveDirection, out var _);

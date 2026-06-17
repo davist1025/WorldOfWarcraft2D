@@ -21,8 +21,8 @@ namespace WoW.Client.Components.NPC
         {
             _npcParent = Entity.GetComponent<NpcController>();
 
-            _defaultCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["hand1_mouse"], 0, 0);
-            _bagCursor = MouseCursor.FromTexture2D(Game1.InterfaceTextures["merchant_bag_icon"], 0, 0);
+            _defaultCursor = MouseCursor.FromTexture2D(Global.InterfaceSprites["hand1_mouse"], 0, 0);
+            _bagCursor = MouseCursor.FromTexture2D(Global.InterfaceSprites["merchant_bag_icon"], 0, 0);
         }
 
         public void Update()
