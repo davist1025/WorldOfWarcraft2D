@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
@@ -26,11 +27,14 @@ namespace WoW.Database.Models
 
         public DbSet<CharacterRaceSpawn> RaceSpawns { get; set; }
 
-        private const string _connectionString = "server=127.0.0.1;uid=root;pwd=1111;database=wpp_realm";
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
+            string hostname = EnvironmentContext.AppSettings["db_hostname"];
+            string password = EnvironmentContext.AppSettings["db_password"];
+            string uid = "root";
+            string db = EnvironmentContext.AppSettings["database"];
+
+            optionsBuilder.UseMySql($"server={hostname};uid={uid};pwd={password};database={db}", ServerVersion.AutoDetect($"server={hostname};uid={uid};pwd={password};database={db}"));
         }
     }
 }

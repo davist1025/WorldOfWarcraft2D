@@ -6,8 +6,11 @@ using Nez;
 using Nez.ECS.Headless;
 using Nez.Systems;
 using Nez.Tiled;
+using System.Configuration;
 using System.Diagnostics;
 using System.Net;
+using System.Reflection;
+using WoW.Database;
 using WoW.Database.Models;
 using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
@@ -27,8 +30,6 @@ namespace WoW.Realmserver
     internal class Program : CoreHeadless
     {
         public static NetworkController Network;
-
-        public static RealmConfiguration Configuration;
         public static WorldContentManager Content;
 
         public static float DeltaTime = 0f;
@@ -45,13 +46,12 @@ namespace WoW.Realmserver
             IsFixedTimeStep = true;
             Scene = new WorldScene();
 
-            Configuration = RealmConfiguration.Load();
             Content = new WorldContentManager();
 
             Network = new NetworkController();
             Network.OnProcessorSubscribe += ProcessorSubscription;
             Network.OnClientDisconnect += ClientDisconnection;
-            Network.StartServer(Configuration.IpAddress, Configuration.Port);
+            Network.StartServer(ConfigurationManager.AppSettings["hostname"], Convert.ToInt32(ConfigurationManager.AppSettings["port"]));
 
             // load content.
             Content.LoadTiled();
@@ -59,7 +59,8 @@ namespace WoW.Realmserver
             // todo: ensurecreated for testing.
             // data doesn't need to persist across test runs, and can be initialized on startup.
 
-            Logger.Print("Verifying default racial spawn locations...", LogEntryType.Process);
+            Logger.Print("Initializing database...", LogEntryType.Process);
+            EnvironmentContext.AppSettings = ConfigurationManager.AppSettings;
             using (var ctx = new RealmContext())
             {
                 Entity mapEntity = null;

@@ -7,6 +7,7 @@ using Nez.ECS.Headless;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -227,7 +228,7 @@ namespace WoW.Realmserver.Network
             // tells the client they can enter the world.
             Program.SendTo(thisEntity.Name, new RealmClient_EnterWorld()
             {
-                MovementSpeed = Program.Configuration.WorldParameters["global_movement_speed"],
+                MovementSpeed = int.Parse(ConfigurationManager.AppSettings["default_player_movement_speed"]),
                 MOTD = "Welcome to the official PTR for the WoW Pixel Project. Enjoy your stay!"
             });
         }

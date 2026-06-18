@@ -19,6 +19,7 @@ using WoW.Network.Packets.Realm;
 using WoW.Network;
 using static WoW.Framework.Utils;
 using WoW.Network.Packets.Authenticcation;
+using System.Diagnostics;
 
 namespace WoW.Client
 {
@@ -59,7 +60,7 @@ namespace WoW.Client
 
         public static void OnRealmlist(AuthClient_Realm realmlist)
         {
-            Debug.Log($"Received realms: {realmlist.Realmlist.Count}");
+            Nez.Debug.Log($"Received realms: {realmlist.Realmlist.Count}");
 
             LogonScene scene = Core.Scene as LogonScene;
             var gui = scene.FindEntity("gui").GetComponent<ImGuiController>();
@@ -87,7 +88,7 @@ namespace WoW.Client
 
         public static void OnCharacterList(RealmClient_PlayerCharacters characterList)
         {
-            Debug.Log($"Received {characterList.Characters.Count} characters.");
+            Nez.Debug.Log($"Received {characterList.Characters.Count} characters.");
 
             var gui = (Core.Scene as LogonScene).FindEntity("gui").GetComponent<ImGuiController>();
 
@@ -117,6 +118,7 @@ namespace WoW.Client
         {
             // todo: there may be a few of these, organize them in a dictionary or some other object.
             Global.Speed = worldParams.MovementSpeed;
+            Nez.Debug.Log(Global.Speed);
 
             Global.OnlineState = GameNetworkState.World;
             Core.StartSceneTransition(new FadeTransition(() => Game1.NetworkScene));
@@ -200,7 +202,7 @@ namespace WoW.Client
                 var entity = Game1.NetworkScene.FindEntity(disconnect.Id);
                 var netController = entity.GetComponent<NetPlayerController>();
 
-                Debug.Log($"{entity.Name} has disconnected; deleting entity...");
+                Nez.Debug.Log($"{entity.Name} has disconnected; deleting entity...");
 
                 entity.Destroy();
             }
@@ -263,12 +265,12 @@ namespace WoW.Client
                         entity.RemoveComponent<Mover>();
                     }
 
-                    Debug.Log($"{controller.Name} has been teleported.");
+                    Nez.Debug.Log($"{controller.Name} has been teleported.");
                 }
 
                 if (entity.HasComponent<LocalPlayerController>())
                 {
-                    Debug.Log("We are being teleported...");
+                    Nez.Debug.Log("We are being teleported...");
 
                     // todo: bug may occur here where if we are summoned/teleported to the map we're already in, duplicate NPCs might be created.
 
@@ -311,7 +313,7 @@ namespace WoW.Client
 
                         foreach (var npc in allNpcs)
                         {
-                            Debug.Log($"Destroying NPC: {npc.Metadata.Uid} from the previous map...");
+                            Nez.Debug.Log($"Destroying NPC: {npc.Metadata.Uid} from the previous map...");
                             npc.Entity.Destroy();
                         }
                     };

@@ -143,7 +143,8 @@ namespace WoW.Client.Components
 
             if (_validatedInput.TryDequeue(out var result))
             {
-                Entity.Transform.Position = result.ServerCalculation.ToVector2XNA();
+                var serverPos = result.ServerCalculation.ToVector2XNA();
+                Entity.Transform.Position = Vector2.Lerp(serverPos, Entity.Transform.Position, 0.25f);
                 _unprocessedInput.RemoveAll(x => x.Sequence <= result.Sequence);
 
                 foreach (var unproccessedInput in _unprocessedInput)

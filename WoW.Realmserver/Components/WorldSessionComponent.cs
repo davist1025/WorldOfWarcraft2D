@@ -4,6 +4,7 @@ using Nez;
 using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace WoW.Realmserver.Components
 
                 var vector = new Vector2(inputStateChange.X, inputStateChange.Y);
 
-                _moveDirection = Program.Configuration.WorldParameters["global_movement_speed"] * Program.DeltaTime * vector;
+                _moveDirection = Convert.ToSingle(ConfigurationManager.AppSettings["default_player_movement_speed"]) * Program.DeltaTime * vector;
                 _moveDirection.Round();
 
                 //_mover.CalculateMovement(ref _moveDirection, out var res);
