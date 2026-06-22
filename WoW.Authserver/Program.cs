@@ -36,6 +36,8 @@ namespace WoW.Authserver
         {
             Console.Title = "Authserver";
 
+            // git test.
+
             using (var ctx = new AuthContext())
             {
                 Logger.Print("Resetting session keys...", LogEntryType.Process);
