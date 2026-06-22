@@ -40,8 +40,11 @@ namespace WoW.Authserver
             {
                 Logger.Print("Resetting session keys...", LogEntryType.Process);
                 // hack: probably not a proper way of resetting the session.
-                RelationalQueryableExtensions
-                    .ExecuteUpdate(ctx.Accounts.Where(account => account.SessionId != string.Empty), setters => setters.SetProperty(acc => acc.SessionId, "-"));
+
+                ctx.Accounts
+                    .Where(user => user.SessionId != "-")
+                    .ExecuteUpdate(userProp => userProp
+                        .SetProperty(property => property.SessionId, "-"));
 
                 // todo: add flag in config for debug account usage.
                 Logger.Print("Verifying debug account integrity...", LogEntryType.Process);

@@ -102,11 +102,16 @@ namespace WoW.Realmserver.Network
 
                 using (var ctx = new RealmContext())
                 {
-                    RelationalQueryableExtensions
-                        .ExecuteDelete(
-                            ctx.Characters
-                                .Where(account => account.AccountId == session.Account.Id)
-                                .Where(character => character.CharacterId == characterData.CharacterId));
+                    ctx.Characters
+                        .Where(character => character.AccountId == session.Account.Id)
+                        .Where(character => character.CharacterId == characterData.CharacterId)
+                        .ExecuteDelete();
+
+                    //RelationalQueryableExtensions
+                    //    .ExecuteDelete(
+                    //        ctx.Characters
+                    //            .Where(account => account.AccountId == session.Account.Id)
+                    //            .Where(character => character.CharacterId == characterData.CharacterId));
                 }
 
                 if (isSuccess)
@@ -433,25 +438,38 @@ namespace WoW.Realmserver.Network
                         // todo: test if session.Character is tracked after setting the reference.
                         // Could just do SaveChanges() here?
 
-                        RelationalQueryableExtensions
-                        .ExecuteUpdate(
-                            ctx.Characters
-                                .Where(character => character.CharacterId == session.Character.CharacterId && character.AccountId == session.Account.Id), 
-                                setters => setters
-                                    .SetProperty(c => c.XPosition, session.Entity.Position.X)
-                                    .SetProperty(c => c.YPosition, session.Entity.Position.Y)
-                                    .SetProperty(c => c.MapId, session.Character.MapId)
-                                    .SetProperty(c => c.Direction, session.Character.Direction));
+                        ctx.Characters
+                            .Where(character => character.CharacterId == session.Character.CharacterId && character.AccountId == session.Account.Id)
+                            .ExecuteUpdate(characterProp => characterProp
+                                .SetProperty(characterProp => characterProp.XPosition, session.Entity.Position.X)
+                                .SetProperty(characterProp => characterProp.YPosition, session.Entity.Position.Y)
+                                .SetProperty(characterProp => characterProp.MapId, session.Character.MapId)
+                                .SetProperty(characterProp => characterProp.Direction, session.Character.Direction));
+
+                        //RelationalQueryableExtensions
+                        //.ExecuteUpdate(
+                        //    ctx.Characters
+                        //        .Where(character => character.CharacterId == session.Character.CharacterId && character.AccountId == session.Account.Id), 
+                        //        setters => setters
+                        //            .SetProperty(c => c.XPosition, session.Entity.Position.X)
+                        //            .SetProperty(c => c.YPosition, session.Entity.Position.Y)
+                        //            .SetProperty(c => c.MapId, session.Character.MapId)
+                        //            .SetProperty(c => c.Direction, session.Character.Direction));
                     }
 
                     using (var aCtx = new AuthContext())
                     {
-                        RelationalQueryableExtensions
-                        .ExecuteUpdate(
-                            aCtx.Accounts
-                                .Where(account => account.Id == session.Account.Id),
-                                setters => setters
-                                    .SetProperty(acc => acc.SessionId, "-"));
+                        aCtx.Accounts
+                            .Where(account => account.Id == session.Account.Id)
+                            .ExecuteUpdate(accountProp => accountProp
+                                .SetProperty(accountProp => accountProp.SessionId, "-"));
+
+                        //RelationalQueryableExtensions
+                        //.ExecuteUpdate(
+                        //    aCtx.Accounts
+                        //        .Where(account => account.Id == session.Account.Id),
+                        //        setters => setters
+                        //            .SetProperty(acc => acc.SessionId, "-"));
                     }
                 }
 

@@ -13,7 +13,7 @@ namespace WoW.Database
     public static class EnvironmentContext
     {
         /// <summary>
-        /// A copy of ConfigurationManager.AppSettings.
+        /// A copy of ConfigurationManager.AppSettings, often shared from an external library. In the case, WoW.Realmserver.
         /// </summary>
         public static NameValueCollection AppSettings;
 
