@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoW.Database.Models.Realm
+namespace WoW.Database.Models.Realm.Items
 {
     /// <summary>
     /// Describes a game item in the database.
@@ -25,7 +25,7 @@ namespace WoW.Database.Models.Realm
         public string Inventory_ModelId { get; set; }
 
         /// <summary>
-        /// The image seen in the game world, if any. This would often apply to some armor pieces, weapon, etc.
+        /// The image seen in the game world, if any. This would often apply to some armor pieces, weapons, etc.
         /// </summary>
         [Column("rendered_modelid")]
         public string Rendered_ModelId { get; set; }
@@ -42,13 +42,14 @@ namespace WoW.Database.Models.Realm
 
     public enum ItemType
     {
-        Quest_Reward,
-        Quest_Requirement,
+        QuestRequirement,
+        Book,
+        Consumable,
+        Container,
         Weapon_1H, Weapon_2H,
         Ammo_Arrow,
         Ammo_Bullet,
         Ammo_Thrown,
-        Book,
         Armor_Head,
         Armor_Shoulder,
         Armor_Chest,
@@ -60,7 +61,5 @@ namespace WoW.Database.Models.Realm
         Accessory_Finger,
         Accessory_Trinket,
         Accessory_Neck,
-        Consumable,
-        Storage_Small
     }
 }

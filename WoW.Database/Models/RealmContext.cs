@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models.Realm;
 using WoW.Database.Models.Realm.Character;
 using WoW.Database.Models.Realm.Chat;
+using WoW.Database.Models.Realm.Items;
 
 namespace WoW.Database.Models
 {
@@ -27,14 +29,18 @@ namespace WoW.Database.Models
 
         public DbSet<CharacterRaceSpawn> RaceSpawns { get; set; }
 
+        public DbSet<Item> Items { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string hostname = EnvironmentContext.AppSettings["db_hostname"];
-            string password = EnvironmentContext.AppSettings["db_password"];
-            string uid = "root";
-            string db = EnvironmentContext.AppSettings["database"];
+            //string hostname = EnvironmentContext.AppSettings["db_hostname"];
+            //string password = EnvironmentContext.AppSettings["db_password"];
+            //string uid = "root";
+            //string db = EnvironmentContext.AppSettings["database"];
 
-            optionsBuilder.UseMySql($"server={hostname};uid={uid};pwd={password};database={db}", ServerVersion.AutoDetect($"server={hostname};uid={uid};pwd={password};database={db}"));
+            optionsBuilder.UseMySql("server=localhost;uid=root;pwd=1111;database=wpp_realm;", ServerVersion.AutoDetect("server=localhost;uid=root;pwd=1111;database=wpp_realm;"));
+
+            //optionsBuilder.UseMySql($"server={hostname};uid={uid};pwd={password};database={db}", ServerVersion.AutoDetect($"server={hostname};uid={uid};pwd={password};database={db}"));
         }
     }
 }

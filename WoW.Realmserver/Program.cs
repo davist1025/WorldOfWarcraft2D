@@ -61,6 +61,8 @@ namespace WoW.Realmserver
 
             Logger.Print("Initializing database...", LogEntryType.Process);
             EnvironmentContext.AppSettings = ConfigurationManager.AppSettings;
+
+            Logger.Print("Verifying racial spawn locations...", LogEntryType.Process);
             using (var ctx = new RealmContext())
             {
                 Entity mapEntity = null;
