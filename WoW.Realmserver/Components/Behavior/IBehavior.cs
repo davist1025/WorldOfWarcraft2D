@@ -23,6 +23,6 @@ namespace WoW.Realmserver.Components.Behavior
         public void SetParent(NpcControllerComponent parent)
             => Controller = parent;
 
-        public virtual void OnTargeted(WorldSessionComponent session) { }
+        public virtual void OnTargeted(PlayerComponent session) { }
     }
 }

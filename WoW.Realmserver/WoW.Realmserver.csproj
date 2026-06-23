@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Player\" />
     <Folder Include="Content\Data\Tiled\" />
   </ItemGroup>
 

@@ -149,7 +149,7 @@ namespace WoW.Realmserver
 
                         if (account != null)
                         {
-                            WorldSessionComponent newSession = new WorldSessionComponent(account);
+                            PlayerComponent newSession = new PlayerComponent(account);
                             Entity newEntity = Scene.CreateEntity(Guid.NewGuid().ToString());
                             newEntity.Tag = (int)ActorType.Networked;
                             newEntity.AddComponent(newSession);

@@ -41,7 +41,7 @@ namespace WoW.Realmserver.Network
                     .Any(c => c.NameOrPhrase.ToLower().Equals(characterData.Name) || characterData.Name.ToLower().StartsWith(c.NameOrPhrase.ToLower()));
 
                 RealmClient_CreateCharacter.Result creationResult = RealmClient_CreateCharacter.Result.NameInUse;
-                WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+                PlayerComponent session = (peer.Tag as Entity).GetComponent<PlayerComponent>();
 
                 if (characterNameIsRestricted)
                     creationResult = RealmClient_CreateCharacter.Result.NameBanned;
@@ -94,7 +94,7 @@ namespace WoW.Realmserver.Network
         public static void OnPlayerDeleteCharacter(ClientRealm_DeleteCharacter characterData, NetPeer peer)
         {
             var entity = peer.Tag as Entity;
-            var session = entity?.GetComponent<WorldSessionComponent>();
+            var session = entity?.GetComponent<PlayerComponent>();
 
             if (session != null)
             {
@@ -131,7 +131,7 @@ namespace WoW.Realmserver.Network
         /// <param name="peer"></param>
         public static void OnPlayerRequestCharacters(ClientRealm_RequestCharacterList reqList, NetPeer peer)
         {
-            WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+            PlayerComponent session = (peer.Tag as Entity).GetComponent<PlayerComponent>();
             SendCharactersTo(session.Account.Id, peer);
         }
         #endregion
@@ -147,7 +147,7 @@ namespace WoW.Realmserver.Network
         public static void OnPlayerJoinWorld(ClientRealm_TransferWorld join, NetPeer peer)
         {
             Entity thisEntity = peer.Tag as Entity;
-            WorldSessionComponent thisSession = thisEntity.GetComponent<WorldSessionComponent>();
+            PlayerComponent thisSession = thisEntity.GetComponent<PlayerComponent>();
             var processorComponents = CoreHeadless.Scene.FindComponentsOfType<TiledMapProcessor>();
 
             using (var ctx = new RealmContext())
@@ -182,7 +182,7 @@ namespace WoW.Realmserver.Network
 
             var allSessionsExceptThis = Program
                 .Scene
-                .FindComponentsOfType<WorldSessionComponent>()
+                .FindComponentsOfType<PlayerComponent>()
                 .Where(session => session.Account.Id != thisSession.Account.Id)
                 .ToList();
 
@@ -246,7 +246,7 @@ namespace WoW.Realmserver.Network
         public static void OnPlayerMove(ClientRealm_Movement movement, NetPeer peer)
         {
             var entity = peer.Tag as Entity;
-            var session = entity.GetComponent<WorldSessionComponent>();
+            var session = entity.GetComponent<PlayerComponent>();
 
             session.QueueMovementUpdate(new ClientMovementUpdate(movement.VelocityX, movement.VelocityY, movement.DeltaTime, movement.Sequence));
 
@@ -259,7 +259,7 @@ namespace WoW.Realmserver.Network
         /// <param name="peer"></param>
         public static void OnPlayerChat(ChatMessageObject newChat, NetPeer peer)
         {
-            WorldSessionComponent session = (peer.Tag as Entity).GetComponent<WorldSessionComponent>();
+            PlayerComponent session = (peer.Tag as Entity).GetComponent<PlayerComponent>();
 
             string unformattedMessage = newChat.Input;
             ChatChannelType channel = newChat.Channel;
@@ -368,7 +368,7 @@ namespace WoW.Realmserver.Network
         /// <param name="peer"></param>
         /// <param name="commandHandlerId"></param>
         /// <param name="args"></param>
-        private static void ExecuteCommand(WorldSessionComponent bySession, NetPeer peer, string commandHandlerId, string[] args)
+        private static void ExecuteCommand(PlayerComponent bySession, NetPeer peer, string commandHandlerId, string[] args)
         {
             var handlerFunc = typeof(CommandHandler)
                 .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
@@ -381,7 +381,7 @@ namespace WoW.Realmserver.Network
         public static void OnTabTargetRequest(NetPeer peer)
         {
             Entity playerEntity = (peer.Tag as Entity);
-            WorldSessionComponent session = playerEntity.GetComponent<WorldSessionComponent>();
+            PlayerComponent session = playerEntity.GetComponent<PlayerComponent>();
 
             // todo: add different target types for tabbing to (player, aggressive NPCs, etc)
             // i.e: check for NPCs which have the "IsAggressive" flag, hostile players, etc.
@@ -427,7 +427,7 @@ namespace WoW.Realmserver.Network
             if (peer.Tag is Entity)
             {
                 var entity = peer.Tag as Entity;
-                var session = entity.GetComponent<WorldSessionComponent>();
+                var session = entity.GetComponent<PlayerComponent>();
                 Logger.Print($"Player ({session.Character.Name}) has left the game world.", LogEntryType.Network);
 
                 // save world position.
@@ -496,7 +496,7 @@ namespace WoW.Realmserver.Network
         private static void SendWhoList(NetPeer accountOwner)
         {
             var entity = accountOwner.Tag as Entity;
-            string[] onlineCharacters = Program.Scene.FindComponentsOfType<WorldSessionComponent>().Select(session => session.Character.Name).ToArray();
+            string[] onlineCharacters = Program.Scene.FindComponentsOfType<PlayerComponent>().Select(session => session.Character.Name).ToArray();
 
             RealmClient_WhoCommand whoPacket = new RealmClient_WhoCommand()
             {
