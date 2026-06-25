@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,6 +15,8 @@ namespace WoW.Database.Migrations
                 name: "character_bag_index",
                 columns: table => new
                 {
+                    entry_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     account_id = table.Column<int>(type: "int", nullable: false),
                     character_id = table.Column<int>(type: "int", nullable: false),
                     bag_slot_index = table.Column<int>(type: "int", nullable: false),
@@ -21,6 +24,7 @@ namespace WoW.Database.Migrations
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_character_bag_index", x => x.entry_id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -28,6 +32,9 @@ namespace WoW.Database.Migrations
                 name: "character_bag_inventory",
                 columns: table => new
                 {
+                    entry_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    account_id = table.Column<int>(type: "int", nullable: false),
                     character_id = table.Column<int>(type: "int", nullable: false),
                     bag_slot_index = table.Column<int>(type: "int", nullable: false),
                     bag_space_index = table.Column<int>(type: "int", nullable: false),
@@ -36,6 +43,7 @@ namespace WoW.Database.Migrations
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_character_bag_inventory", x => x.entry_id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
         }

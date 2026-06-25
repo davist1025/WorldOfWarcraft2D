@@ -20,7 +20,6 @@ namespace WoW.Realmserver.Components
     {
         public Account Account;
         public PlayerCharacter Character;
-        public InventoryComponent Inventory;
 
         private SubpixelVector2 _subPixelMovement;
         private CircleCollider _collider;
@@ -99,7 +98,6 @@ namespace WoW.Realmserver.Components
             //Flags.SetFlagExclusive(ref _collider.PhysicsLayer, 1);
             //_collider.SetRadius(8f);
             _mover = Entity.AddComponent<Mover>();
-            Inventory = Entity.AddComponent<InventoryComponent>();
 
             Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
         }

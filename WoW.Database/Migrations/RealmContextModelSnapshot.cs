@@ -239,6 +239,13 @@ namespace WoW.Database.Migrations
 
             modelBuilder.Entity("WoW.Database.Models.Realm.Items.CharacterBagIndex", b =>
                 {
+                    b.Property<int>("EntryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("entry_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EntryId"));
+
                     b.Property<int>("AccountId")
                         .HasColumnType("int")
                         .HasColumnName("account_id");
@@ -255,11 +262,24 @@ namespace WoW.Database.Migrations
                         .HasColumnType("int")
                         .HasColumnName("character_id");
 
+                    b.HasKey("EntryId");
+
                     b.ToTable("character_bag_index");
                 });
 
             modelBuilder.Entity("WoW.Database.Models.Realm.Items.CharacterBagInventory", b =>
                 {
+                    b.Property<int>("EntryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("entry_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EntryId"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int")
+                        .HasColumnName("account_id");
+
                     b.Property<int>("BagSlotIndex")
                         .HasColumnType("int")
                         .HasColumnName("bag_slot_index");
@@ -279,6 +299,8 @@ namespace WoW.Database.Migrations
                     b.Property<int>("ItemStackCount")
                         .HasColumnType("int")
                         .HasColumnName("item_stack_count");
+
+                    b.HasKey("EntryId");
 
                     b.ToTable("character_bag_inventory");
                 });

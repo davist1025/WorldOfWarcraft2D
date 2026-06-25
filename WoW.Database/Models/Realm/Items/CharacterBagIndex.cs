@@ -13,9 +13,13 @@ namespace WoW.Database.Models.Realm.Items
     /// Defines which bags are equipped.
     /// </summary>
     [Table("character_bag_index")]
-    [Keyless]
     public class CharacterBagIndex
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("entry_id")]
+        public int EntryId { get; set; }
+
         [Column("account_id")]
         public int AccountId { get; set; }
 

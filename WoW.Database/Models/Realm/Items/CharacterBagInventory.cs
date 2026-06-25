@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,16 @@ namespace WoW.Database.Models.Realm.Items
     /// Defines items held in any given bag on a character.
     /// </summary>
     [Table("character_bag_inventory")]
-    [Keyless]
     public class CharacterBagInventory
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("entry_id")]
+        public int EntryId { get; set; }
+
+        [Column("account_id")]
+        public int AccountId { get; set; }
+
         [Column("character_id")]
         public int CharacterId { get; set; }
 

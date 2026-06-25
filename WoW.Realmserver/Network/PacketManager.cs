@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using WoW.Database.Models;
 using WoW.Database.Models.Realm.Character;
 using WoW.Database.Models.Realm.Chat;
+using WoW.Database.Models.Realm.Items;
 using WoW.Framework.Logging;
 using WoW.Network.Objects;
 using WoW.Network.Packets.Client;
@@ -78,10 +79,21 @@ namespace WoW.Realmserver.Network
                         YPosition = mapPosition.Y,
                         Direction = 3
                     };
+
+                    var newDefaultBag = new CharacterBagIndex()
+                    {
+                        AccountId = session.Account.Id,
+                        CharacterId = newCharacter.CharacterId,
+                        BagSlotIndex = 0,
+                        BagItemId = 2
+                    };
+
                     ctx.Add(newCharacter);
+                    ctx.CharacterBags.Add(newDefaultBag);
                     ctx.SaveChanges();
 
                     Logger.Print($"Account (id={session.Account.Id}) has created a new character ({newCharacter.Name}).", LogEntryType.Network);
+                    Logger.Print($"Created a new default bag for account (id={session.Account.Id} under character name ({newCharacter.Name}).", LogEntryType.Debug);
                 }
 
                 Program.Send(peer, new RealmClient_CreateCharacter() { CreationResult = creationResult });

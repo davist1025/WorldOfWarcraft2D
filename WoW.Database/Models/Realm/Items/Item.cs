@@ -46,10 +46,8 @@ namespace WoW.Database.Models.Realm.Items
 
     public enum ItemType
     {
-        QuestRequirement,
-        Book,
         Consumable,
-        Container,
+        Bag,
         Weapon_1H, Weapon_2H,
         Ammo_Arrow,
         Ammo_Bullet,
