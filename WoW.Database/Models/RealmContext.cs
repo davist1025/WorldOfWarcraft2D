@@ -30,17 +30,20 @@ namespace WoW.Database.Models
         public DbSet<CharacterRaceSpawn> RaceSpawns { get; set; }
 
         public DbSet<Item> Items { get; set; }
+        public DbSet<CharacterBagIndex> CharacterBags { get; set; }
+        public DbSet<CharacterBagInventory> CharacterBagInventories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // PROD
             //string hostname = EnvironmentContext.AppSettings["db_hostname"];
             //string password = EnvironmentContext.AppSettings["db_password"];
             //string uid = "root";
             //string db = EnvironmentContext.AppSettings["database"];
-
-            optionsBuilder.UseMySql("server=localhost;uid=root;pwd=1111;database=wpp_realm;", ServerVersion.AutoDetect("server=localhost;uid=root;pwd=1111;database=wpp_realm;"));
-
             //optionsBuilder.UseMySql($"server={hostname};uid={uid};pwd={password};database={db}", ServerVersion.AutoDetect($"server={hostname};uid={uid};pwd={password};database={db}"));
+
+            // FOR LOCAL/DEV 
+            optionsBuilder.UseMySql("server=localhost;uid=root;pwd=1111;database=wpp_realm;", ServerVersion.AutoDetect("server=localhost;uid=root;pwd=1111;database=wpp_realm;"));
         }
     }
 }

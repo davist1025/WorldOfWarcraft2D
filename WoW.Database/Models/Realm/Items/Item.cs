@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,13 +23,13 @@ namespace WoW.Database.Models.Realm.Items
         /// Utilized by the end-user to define what image to draw in the player's inventory.
         /// </summary>
         [Column("inventory_modelid")]
-        public string Inventory_ModelId { get; set; }
+        public string? Model_UI { get; set; }
 
         /// <summary>
         /// The image seen in the game world, if any. This would often apply to some armor pieces, weapons, etc.
         /// </summary>
         [Column("rendered_modelid")]
-        public string Rendered_ModelId { get; set; }
+        public string? Model_Rendered { get; set; }
 
         [Column("name")]
         public string Name { get; set; }
@@ -38,6 +39,9 @@ namespace WoW.Database.Models.Realm.Items
 
         [Column("itemtype_id")]
         public ItemType Descriptor { get; set; }
+
+        [Column("is_stackable")]
+        public bool IsStackable { get; set; }
     }
 
     public enum ItemType

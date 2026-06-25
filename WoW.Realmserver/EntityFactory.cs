@@ -122,26 +122,5 @@ namespace WoW.Realmserver
                 return null;
             }
         }
-
-        /// <summary>
-        /// Loads a singular reference of every individual item in the game.
-        /// </summary>
-        /// <returns></returns>
-        public static List<Entity> LoadAllItems()
-        {
-            List<Entity> globalItems = new List<Entity>();
-
-            using (var ctx = new RealmContext())
-            {
-                var items = ctx.Items.ToArray();
-
-                for (int i = 0; i < items.Length; i ++)
-                {
-                    var item = items[i];
-                    var newItemEntity = new Entity($"{item.Id}_{item.Name.Replace(" ", "")}");
-                    newItemEntity.AddComponent(new ItemComponent(item));
-                }
-            }
-        }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WoW.Database.Models;
 
@@ -10,9 +11,11 @@ using WoW.Database.Models;
 namespace WoW.Database.Migrations
 {
     [DbContext(typeof(RealmContext))]
-    partial class RealmContextModelSnapshot : ModelSnapshot
+    [Migration("20260625023329_UpdateItemDefinition")]
+    partial class UpdateItemDefinition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,52 +240,6 @@ namespace WoW.Database.Migrations
                     b.ToTable("chat_command_children");
                 });
 
-            modelBuilder.Entity("WoW.Database.Models.Realm.Items.CharacterBagIndex", b =>
-                {
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int")
-                        .HasColumnName("account_id");
-
-                    b.Property<int>("BagItemId")
-                        .HasColumnType("int")
-                        .HasColumnName("bag_item_id");
-
-                    b.Property<int>("BagSlotIndex")
-                        .HasColumnType("int")
-                        .HasColumnName("bag_slot_index");
-
-                    b.Property<int>("CharacterId")
-                        .HasColumnType("int")
-                        .HasColumnName("character_id");
-
-                    b.ToTable("character_bag_index");
-                });
-
-            modelBuilder.Entity("WoW.Database.Models.Realm.Items.CharacterBagInventory", b =>
-                {
-                    b.Property<int>("BagSlotIndex")
-                        .HasColumnType("int")
-                        .HasColumnName("bag_slot_index");
-
-                    b.Property<int>("BagSpaceIndex")
-                        .HasColumnType("int")
-                        .HasColumnName("bag_space_index");
-
-                    b.Property<int>("CharacterId")
-                        .HasColumnType("int")
-                        .HasColumnName("character_id");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int")
-                        .HasColumnName("item_id");
-
-                    b.Property<int>("ItemStackCount")
-                        .HasColumnType("int")
-                        .HasColumnName("item_stack_count");
-
-                    b.ToTable("character_bag_inventory");
-                });
-
             modelBuilder.Entity("WoW.Database.Models.Realm.Items.Item", b =>
                 {
                     b.Property<int>("Id")
@@ -306,10 +263,12 @@ namespace WoW.Database.Migrations
                         .HasColumnName("is_stackable");
 
                     b.Property<string>("Model_Rendered")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("rendered_modelid");
 
                     b.Property<string>("Model_UI")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("inventory_modelid");
 
