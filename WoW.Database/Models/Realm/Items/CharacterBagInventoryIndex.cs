@@ -13,7 +13,7 @@ namespace WoW.Database.Models.Realm.Items
     /// Defines items held in any given bag on a character.
     /// </summary>
     [Table("character_bag_inventory")]
-    public class CharacterBagInventory
+    public class CharacterBagInventoryIndex
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

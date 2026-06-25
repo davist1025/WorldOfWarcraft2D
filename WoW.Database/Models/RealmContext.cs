@@ -31,7 +31,7 @@ namespace WoW.Database.Models
 
         public DbSet<Item> Items { get; set; }
         public DbSet<CharacterBagIndex> CharacterBags { get; set; }
-        public DbSet<CharacterBagInventory> CharacterBagInventories { get; set; }
+        public DbSet<CharacterBagInventoryIndex> CharacterBagInventories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

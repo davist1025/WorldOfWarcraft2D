@@ -88,8 +88,19 @@ namespace WoW.Realmserver.Network
                         BagItemId = 2
                     };
 
+                    var newInventoryIndex = new CharacterBagInventoryIndex()
+                    {
+                        AccountId = session.Account.Id,
+                        CharacterId = newCharacter.CharacterId,
+                        BagSlotIndex = 0,
+                        BagSpaceIndex = 0,
+                        ItemId = 1,
+                        ItemStackCount = 1
+                    };
+
                     ctx.Add(newCharacter);
                     ctx.CharacterBags.Add(newDefaultBag);
+                    ctx.CharacterBagInventories.Add(newInventoryIndex);
                     ctx.SaveChanges();
 
                     Logger.Print($"Account (id={session.Account.Id}) has created a new character ({newCharacter.Name}).", LogEntryType.Network);
