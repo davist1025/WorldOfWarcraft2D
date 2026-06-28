@@ -14,6 +14,7 @@ using WoW.Database;
 using WoW.Database.Models;
 using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
+using WoW.Database.Models.Realm.Items;
 using WoW.Framework.Logging;
 using WoW.Network;
 using WoW.Network.Objects;
@@ -36,6 +37,7 @@ namespace WoW.Realmserver
         public const float TickRate = 0.1f;
 
         public static Queue<PendingPlayer> PendingPlayers = new Queue<PendingPlayer>();
+        public static List<Entity> ItemReferences = new List<Entity>();
 
         public Program()
         {
@@ -62,11 +64,11 @@ namespace WoW.Realmserver
             Logger.Print("Initializing database...", LogEntryType.Process);
             EnvironmentContext.AppSettings = ConfigurationManager.AppSettings;
 
-            Logger.Print("Verifying racial spawn locations...", LogEntryType.Process);
             using (var ctx = new RealmContext())
             {
                 Entity mapEntity = null;
 
+                Logger.Print("Verifying racial spawn locations...", LogEntryType.Process);
                 if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)ActorRaceType.Human))
                 {
                     mapEntity = Scene.FindEntity("elwynn_forest");
@@ -91,6 +93,19 @@ namespace WoW.Realmserver
                         Y = 50f,
                     });
                 }
+
+                Logger.Print("Loading all items...", LogEntryType.Process);
+
+                var items = ctx.Items.ToList();
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var item = items[i];
+                    var itemEntityRef = Scene.CreateEntity($"{item.Id}_{item.Name.ToLower()}");
+                    var itemComponent = itemEntityRef.AddComponent(new ItemComponent(item));
+
+                    ItemReferences.Add(itemEntityRef);
+                }
+                Logger.Print($"Loaded {ItemReferences.Count} items.", LogEntryType.Debug);
 
                 ctx.SaveChanges();
             }

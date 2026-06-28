@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nez;
+using Nez.Console;
 using Nez.ImGuiTools;
 using Nez.Sprites;
 using Nez.Tiled;
@@ -55,6 +56,7 @@ namespace WoW.Client
         public static bool ShouldShowEscapeMenu = false;
         public static bool ShouldShowGMChat = false;
         public static bool ShouldShowWhoMenu = false;
+        public static bool ShowShowBackpack = false;
 
         public Game1() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
         {

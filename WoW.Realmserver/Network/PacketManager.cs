@@ -110,7 +110,7 @@ namespace WoW.Realmserver.Network
                 Program.Send(peer, new RealmClient_CreateCharacter() { CreationResult = creationResult });
 
                 if (creationResult == RealmClient_CreateCharacter.Result.Success)
-                    SendCharactersTo(session.Account.Id, peer);
+                    SendCharactersTo(session.Account.Id, peer); // todo: include bag info in networked character data
             }
         }
 
@@ -119,7 +119,7 @@ namespace WoW.Realmserver.Network
             var entity = peer.Tag as Entity;
             var session = entity?.GetComponent<PlayerComponent>();
 
-            if (session != null)
+            if (session != null) // why/when would session be null here?
             {
                 bool isSuccess = false;
 

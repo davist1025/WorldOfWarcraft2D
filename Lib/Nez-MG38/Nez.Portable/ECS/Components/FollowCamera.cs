@@ -180,22 +180,31 @@ namespace Nez
 			{
 				// todo: LerpedPosition doesn't work here if the game is just booting up.
 				// Setting it to "Transform.Position", moving, and then changing to LerpedPosition makes it work.
-				var targetX = _targetEntity.Transform.Position.X;
-				var targetY = _targetEntity.Transform.Position.Y;
+				Vector2 lerp = Vector2.Zero;
+
+				Vector2 targetPosition = Vector2.Zero;
+
+				if (_targetEntity.Transform.LerpedPosition != Vector2.Zero)
+				{
+					lerp = Vector2.Lerp(_targetEntity.Transform.LerpedPosition, _targetEntity.Transform.Position, 1f);
+					targetPosition = lerp;
+				}
+				else
+					targetPosition = (_targetEntity.Transform.LerpedPosition == Vector2.Zero) ? _targetEntity.Transform.Position : _targetEntity.Transform.LerpedPosition;
 
 				if (_entitySize != Vector2.Zero)
 				{
-					targetX += _entitySize.X / 2f;
-					targetY += _entitySize.Y / 2f;
+					targetPosition.X += _entitySize.X / 2f;
+					targetPosition.Y += _entitySize.Y / 2f;
 				}
 
 				// x-axis
-				if (_worldSpaceDeadzone.X > targetX || _worldSpaceDeadzone.X < targetX)
-					_desiredPositionDelta.X = targetX - _worldSpaceDeadzone.X;
+				if (_worldSpaceDeadzone.X > targetPosition.X || _worldSpaceDeadzone.X < targetPosition.X)
+					_desiredPositionDelta.X = targetPosition.X - _worldSpaceDeadzone.X;
 
 				// y-axis
-				if (_worldSpaceDeadzone.Y < targetY || _worldSpaceDeadzone.Y > targetY)
-					_desiredPositionDelta.Y = targetY - _worldSpaceDeadzone.Y;
+				if (_worldSpaceDeadzone.Y < targetPosition.Y || _worldSpaceDeadzone.Y > targetPosition.Y)
+					_desiredPositionDelta.Y = targetPosition.Y - _worldSpaceDeadzone.Y;
 			}
 			else
 			{

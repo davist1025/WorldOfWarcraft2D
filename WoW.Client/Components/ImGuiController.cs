@@ -297,7 +297,6 @@ namespace WoW.Client.Components
                             ImGui.Text($"{controller.Name}");
                             ImGui.Text($"{Global.SessionId}");
                             ImGui.Text($"Map Id: {Game1.ActiveMapId}");
-
                             ImGui.End();
                         }
                     }
@@ -431,6 +430,17 @@ namespace WoW.Client.Components
 
                                 ImGui.EndChild();
                             }
+
+                            ImGui.End();
+                        }
+
+                        if (Game1.ShowShowBackpack)
+                        {
+                            var backpackWindowSize = new System.Numerics.Vector2(50f, 150f);
+                            ImGui.SetNextWindowSize(backpackWindowSize);
+                            ImGui.Begin("Backpack", ImGuiWindowFlags.NoResize);
+
+
 
                             ImGui.End();
                         }
