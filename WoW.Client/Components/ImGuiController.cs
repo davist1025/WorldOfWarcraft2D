@@ -438,9 +438,10 @@ namespace WoW.Client.Components
                         {
                             var backpackWindowSize = new System.Numerics.Vector2(50f, 150f);
                             ImGui.SetNextWindowSize(backpackWindowSize);
-                            ImGui.Begin("Backpack", ImGuiWindowFlags.NoResize);
+                            ImGui.Begin("Inventory", ImGuiWindowFlags.NoResize);
 
-
+                            // tab control for each bag.
+                            // todo: implement inventory bag gui after adding components and data.
 
                             ImGui.End();
                         }
