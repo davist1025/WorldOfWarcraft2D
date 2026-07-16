@@ -10,7 +10,7 @@ namespace WoW.Database
     /// <summary>
     /// Basically a global object to hold and access data.
     /// </summary>
-    public static class EnvironmentContext
+    public static class EFCoreContext
     {
         /// <summary>
         /// A copy of ConfigurationManager.AppSettings, often shared from an external library. In the case, WoW.Realmserver.
@@ -18,6 +18,6 @@ namespace WoW.Database
         public static NameValueCollection AppSettings;
 
         public static string GetContextConnectionString()
-            => $"server={AppSettings["hostname"]};uid={AppSettings["uid"]};pwd={AppSettings["password"]};database={AppSettings["database"]}";
+            => $"server={AppSettings["db_hostname"]};uid={AppSettings["uid"]};pwd={AppSettings["db_password"]};database={AppSettings["database"]}";
     }
 }

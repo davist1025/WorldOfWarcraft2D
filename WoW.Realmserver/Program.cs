@@ -44,25 +44,15 @@ namespace WoW.Realmserver
             Console.Title = "Realmserver";
             TiledMapLoader.IsHeadless = true;
             Scene.IsHeadless = true;
-
             IsFixedTimeStep = true;
+
             Scene = new WorldScene();
-
             Content = new WorldContentManager();
-
-            Network = new NetworkController();
-            Network.OnProcessorSubscribe += ProcessorSubscription;
-            Network.OnClientDisconnect += ClientDisconnection;
-            Network.StartServer(ConfigurationManager.AppSettings["hostname"], Convert.ToInt32(ConfigurationManager.AppSettings["port"]));
 
             // load content.
             Content.LoadTiled();
 
-            // todo: ensurecreated for testing.
-            // data doesn't need to persist across test runs, and can be initialized on startup.
-
-            Logger.Print("Initializing database...", LogEntryType.Process);
-            EnvironmentContext.AppSettings = ConfigurationManager.AppSettings;
+            EFCoreContext.AppSettings = ConfigurationManager.AppSettings;
 
             using (var ctx = new RealmContext())
             {
@@ -110,46 +100,18 @@ namespace WoW.Realmserver
                 ctx.SaveChanges();
             }
 
+            Global.Network = new NetworkManager(new NetworkEventListener());
+            Global.Network.StartServer(ConfigurationManager.AppSettings["hostname"].Split(":"));
+
             while (true)
-            {
-                Network.Poll();
                 Tick();
-            }
-        }
-
-        private void ClientDisconnection(NetPeer peer, DisconnectInfo info)
-        {
-            PacketManager.OnClientDisconnected(peer, info);
-        }
-
-        private void ProcessorSubscription()
-        {
-            Network.Processor.RegisterNestedType<Vector2Serializable>();
-            Network.Processor.SubscribeReusable<ClientRealm_Movement, NetPeer>((movement, peer) => PacketManager.OnPlayerMove(movement, peer));
-
-            Network.Processor.SubscribeReusable<ClientRealm_TransferLogon, NetPeer>((transfer, peer) => PacketManager.OnPlayerTransferToRealm(transfer, peer));
-
-            //Network.Processor.SubscribeNetSerializable<AuthRealm_SessionVerification, NetPeer>((session, peer) => PacketManager.OnAuthSessionVerification(session, peer));
-
-            Network.Processor.SubscribeReusable<ClientRealm_CreateCharacter, NetPeer>((request, peer) => PacketManager.OnPlayerCreateCharacter(request, peer));
-
-            // this is where we will send the connecting client everything they need to play.
-            // we will also update all players on the client's MapId that there is a new player.
-            Network.Processor.SubscribeReusable<ClientRealm_TransferWorld, NetPeer>((transfer, peer) => PacketManager.OnPlayerJoinWorld(transfer, peer));
-
-            Network.Processor.SubscribeReusable<ClientRealm_DeleteCharacter, NetPeer>((deletion, peer) => PacketManager.OnPlayerDeleteCharacter(deletion, peer));
-
-            // not entirely sure if this packet is necessary.
-            Network.Processor.SubscribeReusable<ClientRealm_RequestCharacterList, NetPeer>((req, peer) => PacketManager.OnPlayerRequestCharacters(req, peer));
-
-            Network.Processor.SubscribeReusable<ClientRealm_TabTarget, NetPeer>((req, peer) => PacketManager.OnTabTargetRequest(peer));
-
-            Network.Processor.SubscribeReusable<ChatMessageObject, NetPeer>((newChat, peer) => PacketManager.OnPlayerChat(newChat, peer));
         }
 
         public override void Update(float deltaTime)
         {
             DeltaTime = deltaTime;
+
+            Global.Network.Update();
             Scene.Update();
 
             using (var authCtx = new AuthContext())
@@ -172,7 +134,8 @@ namespace WoW.Realmserver
 
                             Logger.Print($"Pending connection w/ Account ({account.Username}) has been verified.", LogEntryType.Network);
 
-                            PacketManager.SendCharactersTo(newSession.Account.Id, newPendingConnection.Connection);
+                            // todo: send characters to verified connection.
+                            //PacketManager.SendCharactersTo(newSession.Account.Id, newPendingConnection.Connection);
                         }
                     }
                 }

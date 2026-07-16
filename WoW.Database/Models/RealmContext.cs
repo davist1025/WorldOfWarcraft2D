@@ -35,15 +35,11 @@ namespace WoW.Database.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // PROD
-            //string hostname = EnvironmentContext.AppSettings["db_hostname"];
-            //string password = EnvironmentContext.AppSettings["db_password"];
-            //string uid = "root";
-            //string db = EnvironmentContext.AppSettings["database"];
-            //optionsBuilder.UseMySql($"server={hostname};uid={uid};pwd={password};database={db}", ServerVersion.AutoDetect($"server={hostname};uid={uid};pwd={password};database={db}"));
+            string connectionString = EFCoreContext.GetContextConnectionString();
 
-            // FOR LOCAL/DEV 
-            optionsBuilder.UseMySql("server=localhost;uid=root;pwd=1111;database=wpp_realm;", ServerVersion.AutoDetect("server=localhost;uid=root;pwd=1111;database=wpp_realm;"));
+            optionsBuilder
+                .UseMySql
+                (connectionString, ServerVersion.AutoDetect(connectionString));
         }
     }
 }
