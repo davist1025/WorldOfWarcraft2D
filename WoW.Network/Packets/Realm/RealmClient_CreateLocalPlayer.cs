@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiteNetLib.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +26,21 @@ namespace WoW.Network.Packets.Realm
         public string MapId { get; set; }
 
         // todo: statistics and attributes.
+    }
+
+    public struct InventoryData : INetSerializable
+    {
+        public InventoryData()
+        {
+
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace WoW.Framework.Logging
 {
     public static class Logger
     {
-        private static bool _isLoggingDebug = true;
+        public static bool IsLoggingDebug = true;
         private static bool _isLoggingToFile = true;
         private static bool _isLoggingToConsole = true;
 
@@ -34,7 +34,10 @@ namespace WoW.Framework.Logging
             fullLog.Append(logType);
             fullLog.Append(obj.ToString());
 
-            Console.WriteLine(fullLog.ToString());
+            if (_logType == LogEntryType.Debug && IsLoggingDebug)
+                Console.WriteLine(fullLog.ToString());
+            else
+                Console.WriteLine(fullLog.ToString());
         }
 
         private static string PrintTime() => $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} | ";

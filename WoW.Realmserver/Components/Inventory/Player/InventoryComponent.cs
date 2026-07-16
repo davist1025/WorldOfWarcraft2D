@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models;
+using WoW.Database.Models.Realm.Items;
 
 namespace WoW.Realmserver.Components.Inventory.Player
 {
@@ -18,13 +19,14 @@ namespace WoW.Realmserver.Components.Inventory.Player
 
         public override void OnAddedToEntity()
         {
+            List<CharacterBagIndex> characterBags;
+
             using (var ctx = new RealmContext())
             {
                 // Get all bags for this character.
-                var thisCharacterBags = ctx.CharacterBags.Where(c => c.CharacterId == Entity.GetComponent<PlayerComponent>().Character.CharacterId);
+                characterBags = ctx.CharacterBags.Where(c => c.CharacterId == Entity.GetComponent<PlayerComponent>().Character.CharacterId).ToList();
 
-                // Init a new bag for each row.
-                foreach (var row in thisCharacterBags)
+                foreach (var row in characterBags)
                 {
                     var inventoryBag = new InventoryBag(row.BagSlotIndex, row.BagItemId);
                     // Get all items contained within this bag.

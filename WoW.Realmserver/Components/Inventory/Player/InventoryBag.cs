@@ -7,6 +7,9 @@ using WoW.Database.Models.Realm.Items;
 
 namespace WoW.Realmserver.Components.Inventory.Player
 {
+    /// <summary>
+    /// Defines an inventory bag for a given player. 
+    /// </summary>
     public class InventoryBag
     {
         public int SlotIndex { get; private set; }

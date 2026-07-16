@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace WoW.Client.Content
 {
+    [Obsolete("Being repurposed with the codebase cleanup starting 7/14.")]
     public class GameConfiguration
     {
         [JsonProperty("keyboard_map")]
@@ -36,8 +37,9 @@ namespace WoW.Client.Content
                 var objData = JsonConvert.DeserializeObject<GameConfiguration>(File.ReadAllText("./game.config"));
                 objData.ControlHandlers = new Dictionary<ControlMap, EventHandler>()
                 {
-                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
-                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu }
+                    //{ ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
+                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu },
+                    { ControlMap.Backpack_Main, (s, o) => Game1.ShowShowBackpack = !Game1.ShowShowBackpack }
                 };
                 return objData;
             }
@@ -48,13 +50,15 @@ namespace WoW.Client.Content
                 KeyboardControlMap = new Dictionary<ControlMap, Keys>()
                 {
                     { ControlMap.TabTarget, Keys.Tab },
-                    { ControlMap.EscapeMenu, Keys.Escape }
+                    { ControlMap.EscapeMenu, Keys.Escape },
+                    { ControlMap.Backpack_Main, Keys.B }
                 },
 
                 ControlHandlers = new Dictionary<ControlMap, EventHandler>()
                 {
-                    { ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
-                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu }
+                    //{ ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
+                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu },
+                    { ControlMap.Backpack_Main, (s, o) => Game1.ShowShowBackpack = !Game1.ShowShowBackpack }
                 }
             };
             config.Save();
@@ -66,5 +70,6 @@ namespace WoW.Client.Content
     {
         TabTarget,
         EscapeMenu,
+        Backpack_Main
     }
 }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
 using WoW.Network.Packets.Realm;
+using WoW.Realmserver.Components.Inventory.Player;
 using WoW.Realmserver.Data;
 using static WoW.Framework.Utils;
 
@@ -20,6 +21,7 @@ namespace WoW.Realmserver.Components
     {
         public Account Account;
         public PlayerCharacter Character;
+        public InventoryComponent Inventory;
 
         private SubpixelVector2 _subPixelMovement;
         private CircleCollider _collider;
@@ -91,6 +93,9 @@ namespace WoW.Realmserver.Components
             }
         }
 
+        /// <summary>
+        /// Initialize all necessary components for a player to play the game.
+        /// </summary>
         public void InitializeGameComponents()
         {
             //_collider = Entity.AddComponent<CircleCollider>();
@@ -98,6 +103,7 @@ namespace WoW.Realmserver.Components
             //Flags.SetFlagExclusive(ref _collider.PhysicsLayer, 1);
             //_collider.SetRadius(8f);
             _mover = Entity.AddComponent<Mover>();
+            Inventory = Entity.AddComponent<InventoryComponent>();
 
             Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
         }

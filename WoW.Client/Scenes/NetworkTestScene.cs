@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Components.GUI;
 using WoW.Client.Components.NPC;
 using WoW.Network.Objects;
 using WoW.Network.Packets;
@@ -31,7 +32,8 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
-            CreateEntity("gui").AddComponent(new ImGuiController());
+            //CreateEntity("gui").AddComponent(new ImGuiController());
+            CreateEntity("gui").AddComponent<ImGuiGameManagerComponent>();
         }
 
         public void CreateLocalPlayer(RealmClient_CreateLocalPlayer thePlayer)

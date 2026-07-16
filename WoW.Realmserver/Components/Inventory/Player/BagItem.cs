@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace WoW.Realmserver.Components.Inventory.Player
 {
+    /// <summary>
+    /// Defines an item within any given bag.
+    /// </summary>
     public class BagItem
     {
         public int BagSpaceIndex { get; private set; }

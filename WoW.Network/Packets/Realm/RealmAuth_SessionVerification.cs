@@ -11,6 +11,7 @@ namespace WoW.Network.Packets.Realm
     /// 
     /// Requests verification on the given session id.
     /// </summary>
+    [Obsolete("Unused 7/14")]
     public class RealmAuth_SessionVerification
     {
         public string SessionId { get; set; }

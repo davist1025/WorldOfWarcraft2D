@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Components;
+using WoW.Client.Components.GUI;
 
 namespace WoW.Client.Scenes
 {
@@ -15,7 +15,7 @@ namespace WoW.Client.Scenes
             AddRenderer(new RenderLayerRenderer(0, 50));
             AddRenderer(new ScreenSpaceRenderer(1, 100));
 
-            CreateEntity("gui").AddComponent<ImGuiController>();
+            CreateEntity("gui").AddComponent<ImGuiMainMenuManagerComponent>();
 
             //CreateEntity("ui").AddComponent<TestUIRendererComponent>();
         }

@@ -10,6 +10,7 @@ using static WoW.Framework.Utils;
 
 namespace WoW.Network.Packets.Authentication
 {
+    [Obsolete("Unused 7/14.")]
     public class AuthRealm_SessionVerification : INetSerializable
     {
         public AccountMetadataObject User;

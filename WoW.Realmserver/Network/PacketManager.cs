@@ -181,7 +181,7 @@ namespace WoW.Realmserver.Network
 
                 thisSession.Character = activeCharacter;
             }
-            thisEntity.SetPosition(thisSession.Character.XPosition, thisSession.Character.YPosition);
+
             thisSession.InitializeGameComponents();
             //var collider = thisEntity.GetComponent<CircleCollider>();
 
@@ -451,7 +451,7 @@ namespace WoW.Realmserver.Network
             {
                 var entity = peer.Tag as Entity;
                 var session = entity.GetComponent<PlayerComponent>();
-                Logger.Print($"Player ({session.Character.Name}) has left the game world.", LogEntryType.Network);
+                Logger.Print($"({session.Character.Name.ToUpper()}) has left the game world.", LogEntryType.Network);
 
                 // save world position.
                 if (session.Character != null)

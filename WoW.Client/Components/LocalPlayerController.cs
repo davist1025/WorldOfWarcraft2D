@@ -113,15 +113,16 @@ namespace WoW.Client.Components
 
                 ApplyInput(_movementInput);
 
-                var movementUpdatePacket = new ClientRealm_Movement()
-                {
-                    VelocityX = _movementInput.X,
-                    VelocityY = _movementInput.Y,
-                    Sequence = _sequenceCounter++,
-                    DeltaTime = Time.DeltaTime
-                };
-                _unprocessedInput.Add(movementUpdatePacket);
-                Global.Network.SendToServer(movementUpdatePacket);
+                // todo: send movement packet.
+                //var movementUpdatePacket = new ClientRealm_Movement()
+                //{
+                //    VelocityX = _movementInput.X,
+                //    VelocityY = _movementInput.Y,
+                //    Sequence = _sequenceCounter++,
+                //    DeltaTime = Time.DeltaTime
+                //};
+                //_unprocessedInput.Add(movementUpdatePacket);
+                //Global.Network.SendToServer(movementUpdatePacket);
             }
 
             if (_movementInput == Vector2.Zero)

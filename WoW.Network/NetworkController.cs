@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace WoW.Network
 {
+    [Obsolete("Being removed as of 7/14.")]
     /// <summary>
     /// The home of the NetManager. Can be utilized by client and server(s).
     /// </summary>
@@ -26,7 +27,7 @@ namespace WoW.Network
         public Action<NetPeer, DisconnectInfo> OnClientDisconnect;
         public Action<NetPeer> OnPeerConnect;
 
-        private NetManager _manager;
+        private NetManager _manager; 
 
         public NetworkController()
         {

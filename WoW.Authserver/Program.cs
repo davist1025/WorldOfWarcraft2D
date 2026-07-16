@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -30,13 +31,9 @@ namespace WoW.Authserver
 
     internal class Program
     {
-        public static NetworkController Network;
-
         public Program()
         {
             Console.Title = "Authserver";
-
-            // git test.
 
             using (var ctx = new AuthContext())
             {
@@ -98,12 +95,11 @@ namespace WoW.Authserver
                 Logger.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogEntryType.Process);
             }
 
-            Network = new NetworkController();
-            Network.OnProcessorSubscribe += ProcessorSubscription;
-            Network.StartServer(port: 8070);
+            Global.Network = new NetworkManager(new NetworkEventListener());
+            Global.Network.StartServer(ConfigurationManager.AppSettings["hostname"].Split(":"));
 
             while (true)
-                Network.Poll();
+                Global.Network.Update();
         }
 
         /// <summary>
@@ -111,9 +107,10 @@ namespace WoW.Authserver
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [Obsolete("Being removed as of 7/14.")]
         public void ProcessorSubscription()
         {
-            Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
+            //Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
         }
 
         static void Main(string[] args)

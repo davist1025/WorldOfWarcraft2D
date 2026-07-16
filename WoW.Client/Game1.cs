@@ -17,7 +17,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using WoW.Client.Components;
+using WoW.Client.Components.GUI;
 using WoW.Client.Content;
+using WoW.Client.Network;
 using WoW.Client.Scenes;
 using WoW.Framework;
 using WoW.Network;
@@ -67,23 +69,7 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
-            Global.Network = new NetworkController();
-            Global.Network.OnProcessorSubscribe += ProcessorSubscription;
-
-            // dictates specifc activity that should occur upon a successful connection attempt to a given server.
-            Global.Network.OnPeerConnect += (peer) =>
-            {
-                switch (Global.OnlineState)
-                {
-                    case GameNetworkState.Auth_LoggingIn:
-                        string[] loginInfo = Core.Scene.FindEntity("gui").GetComponent<ImGuiController>().GetLogin().Split(':');
-                        Global.Network.SendToServer(PacketManager.CreateLogonPacket(loginInfo[0], loginInfo[1]));
-                        break;
-                    case GameNetworkState.Realm:
-                        Global.Network.SendToServer(new ClientRealm_TransferLogon() { SessionId = Global.SessionId });
-                        break;
-                }
-            };
+            Global.Network = new NetworkManager(new NetworkEventListener());
             Global.Network.StartClient();
 
             /*
@@ -131,62 +117,11 @@ namespace WoW.Client
             Scene = new LogonScene();
         }
 
-        /// <summary>
-        /// Subscribes all manner of objects to the network processor.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ProcessorSubscription()
-        {
-            Global.Network.Processor.RegisterNestedType<Vector2Serializable>();
-            Global.Network.Processor.SubscribeReusable<RealmClient_Disconnect>((newDisconenct) => PacketManager.OnPlayerDisconnect(newDisconenct));
-
-            Global.Network.Processor.SubscribeReusable<AuthClient_LogonCode>((AuthCodeType) => PacketManager.OnLogonResponse(AuthCodeType));
-
-            Global.Network.Processor.SubscribeReusable<AuthClient_Logon>((logon) => PacketManager.OnLogonSuccess(logon));
-
-            Global.Network.Processor.SubscribeNetSerializable<AuthClient_Realm>((realmlist) => PacketManager.OnRealmlist(realmlist));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_CreateCharacter>((response) => PacketManager.OnCreateCharacter(response));
-
-            Global.Network.Processor.SubscribeNetSerializable<RealmClient_PlayerCharacters>((characters) => PacketManager.OnCharacterList(characters));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_CreateLocalPlayer>((thePlayer) => PacketManager.OnLocalPlayer(thePlayer));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_MovementStateValidation>((result) =>
-            {
-                var localController = Global.Player.GetComponent<LocalPlayerController>();
-                localController.LastServerCalculation = result.ServerCalculation.ToVector2XNA();
-
-                var animator = Global.Player.GetComponent<SpriteAnimator>();
-                animator.LastNetworkPosition = result.ServerCalculation.ToVector2XNA();
-
-                localController.ProcessInputValidation(result);
-            });
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_CreateNetPlayer>((newPlayer) => PacketManager.OnNetworkPlayer(newPlayer));
-
-            // mostly an empty packet. open to suggestions or later implementation :P
-            Global.Network.Processor.SubscribeReusable<RealmClient_EnterWorld>((worldParams) => PacketManager.OnEnterWorld(worldParams));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_MovementStateChange>((serverNetUpdate) => PacketManager.OnPlayerPositionUpdate(serverNetUpdate));
-
-            Global.Network.Processor.SubscribeNetSerializable<RealmClient_CreateNPC>((newNpc) => PacketManager.OnNPC(newNpc));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_WhoCommand>((whoList) => PacketManager.OnWho(whoList));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_SetTarget>((target) => PacketManager.OnSetTarget(target));
-
-            Global.Network.Processor.SubscribeReusable<RealmClient_Teleport>((teleport) => PacketManager.OnTeleport(teleport));
-
-            Global.Network.Processor.SubscribeReusable<ChatMessageObject>((newChat) => PacketManager.OnChat(newChat));
-        }
-
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
 
-            Global.Network.Poll();
+            Global.Network.Update();
         }
 
         /// <summary>
@@ -195,11 +130,11 @@ namespace WoW.Client
         public static void Disconnect()
         {
             var gui = Core.Scene.FindEntity("gui");
-            var component = gui.GetComponent<ImGuiController>();
-            component.Characters.Clear();
-            component.Realmlist.Clear();
+            Global.Characters.Clear();
+            Global.Realmlist.Clear();
             Global.Network.Disconnect();
-            Global.OnlineState = GameNetworkState.Offline;
+            //Global.Network.Disconnect();
+            Global.PeerState = GameNetworkState.Offline;
         }
 
         protected override void OnExiting(object sender, EventArgs args)
