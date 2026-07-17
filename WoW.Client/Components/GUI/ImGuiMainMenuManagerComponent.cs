@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Network.Objects;
 using WoW.Network.Packets.Client;
+using static WoW.Client.Global;
 using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components.GUI

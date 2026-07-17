@@ -97,13 +97,14 @@ namespace WoW.Realmserver.Components.Behavior.Default
 
                 Controller.Mover.Move(new Vector2(1f) * direction, out var _);
 
-                Program.SendToAll(new RealmClient_MovementStateChange()
-                {
-                    // todo: send simulated direction so the client can replicate animations?
-                    Id = Controller.Metadata.Uid,
-                    ResultX = Controller.Entity.Position.X,
-                    ResultY = Controller.Entity.Position.Y
-                });
+                // todo: [roam behavior] send movement changes to all players in this processor.
+                //Program.SendToAll(new RealmClient_MovementStateChange()
+                //{
+                //    // todo: send simulated direction so the client can replicate animations?
+                //    Id = Controller.Metadata.Uid,
+                //    ResultX = Controller.Entity.Position.X,
+                //    ResultY = Controller.Entity.Position.Y
+                //});
 
                 if (Vector2.Distance(Controller.Entity.Position, nextPoint) <= 1.0f)
                 {

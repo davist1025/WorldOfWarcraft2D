@@ -30,10 +30,8 @@ namespace WoW.Realmserver
 {
     internal class Program : CoreHeadless
     {
-        public static NetworkController Network;
         public static WorldContentManager Content;
 
-        public static float DeltaTime = 0f;
         public const float TickRate = 0.1f;
 
         public static Queue<PendingPlayer> PendingPlayers = new Queue<PendingPlayer>();
@@ -109,8 +107,7 @@ namespace WoW.Realmserver
 
         public override void Update(float deltaTime)
         {
-            DeltaTime = deltaTime;
-
+            Global.DeltaTime = deltaTime;
             Global.Network.Update();
             Scene.Update();
 
@@ -142,50 +139,50 @@ namespace WoW.Realmserver
             }
         }
 
-        public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-            => Network.Processor.Send(peer, packet, delivery);
+        //public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        //    => Network.Processor.Send(peer, packet, delivery);
 
-        /// <summary>
-        /// Used to send an object which is not readily recognized by LNL.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="peer"></param>
-        /// <param name="packet"></param>
-        /// <param name="delivery"></param>
-        public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-            => Network.Processor.SendNetSerializable(peer, packet, delivery);
+        ///// <summary>
+        ///// Used to send an object which is not readily recognized by LNL.
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="peer"></param>
+        ///// <param name="packet"></param>
+        ///// <param name="delivery"></param>
+        //public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+        //    => Network.Processor.SendNetSerializable(peer, packet, delivery);
 
-        public static void SendSerializable<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-            => SendSerializable(Network.GetAllPeers().Where(peer => (peer.Tag as Entity).Name.ToLower().Equals(gObjectId)).First(), packet);
+        //public static void SendSerializable<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
+        //    => SendSerializable(Network.GetAllPeers().Where(peer => (peer.Tag as Entity).Name.ToLower().Equals(gObjectId)).First(), packet);
 
-        public static void SendToExcept<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        {
-            var peersExcept = Network.GetAllPeers().Where(p => !(p.Tag as Entity).Name.Equals(gObjectId)).ToArray();
+        //public static void SendToExcept<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        //{
+        //    var peersExcept = Network.GetAllPeers().Where(p => !(p.Tag as Entity).Name.Equals(gObjectId)).ToArray();
 
-            for (int i = 0; i < peersExcept.Length; i++)
-                Send(peersExcept[i], packet, delivery);
-        }
+        //    for (int i = 0; i < peersExcept.Length; i++)
+        //        Send(peersExcept[i], packet, delivery);
+        //}
 
-        public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        {
-            if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
-                Logger.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogEntryType.Error);
-            else
-            {
-                var peer = Network.GetAllPeers().Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
+        //public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        //{
+        //    if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
+        //        Logger.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogEntryType.Error);
+        //    else
+        //    {
+        //        var peer = Network.GetAllPeers().Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
 
-                if (peer != null)
-                    Send(peer, packet, delivery);
-            }
-        }
+        //        if (peer != null)
+        //            Send(peer, packet, delivery);
+        //    }
+        //}
 
-        public static void SendToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        {
-            var allPeers = Network.GetAllPeers();
+        //public static void SendToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
+        //{
+        //    var allPeers = Network.GetAllPeers();
 
-            for (int i = 0; i < allPeers.Count; i++)
-                Send(allPeers[i], packet, delivery);
-        }
+        //    for (int i = 0; i < allPeers.Count; i++)
+        //        Send(allPeers[i], packet, delivery);
+        //}
 
         static void Main(string[] args)
             => new Program();

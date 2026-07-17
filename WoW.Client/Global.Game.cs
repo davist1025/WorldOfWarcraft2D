@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Nez;
 using Nez.Tiled;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,7 @@ namespace WoW.Client
 
         public static Dictionary<string, Texture2D> InterfaceSprites;
         public static TmxMap[] Maps;
+
+        public static Entity _Player; // todo: [Global._Player] rename to "Player" as cleanup progresses.
     }
 }

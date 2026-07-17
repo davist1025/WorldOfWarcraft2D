@@ -33,7 +33,7 @@ namespace WoW.Database.Models.Auth
         public string? Email { get; set; }
 
         [Column("session_id", TypeName = "varchar(32)")]
-        public string? SessionId { get; set; }
+        public string SessionId { get; set; }
 
         [Column("user_security")]
         public int SecurityLevel { get; set; }

@@ -47,31 +47,31 @@ namespace WoW.Authserver
 
                 // todo: add flag in config for debug account usage.
                 Logger.Print("Verifying debug account integrity...", LogEntryType.Process);
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("ADMIN")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "admin".ToUpper(),
+                        Username = "ADMIN",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("123")),
                         SecurityLevel = (int)AccountSecurityType.Administrator
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("gamemaster")))
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("GAMEMASTER")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "gamemaster".ToUpper(),
+                        Username = "GAMEMASTER",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("456")),
                         SecurityLevel = (int)AccountSecurityType.Gamemaster
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("player")))
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("PLAYER")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "player".ToUpper(),
+                        Username = "PLAYER",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("789")),
                         SecurityLevel = (int)AccountSecurityType.Player
                     });
@@ -100,17 +100,6 @@ namespace WoW.Authserver
 
             while (true)
                 Global.Network.Update();
-        }
-
-        /// <summary>
-        /// Subscribes all manner of objects to the network processor.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        [Obsolete("Being removed as of 7/14.")]
-        public void ProcessorSubscription()
-        {
-            //Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
         }
 
         static void Main(string[] args)

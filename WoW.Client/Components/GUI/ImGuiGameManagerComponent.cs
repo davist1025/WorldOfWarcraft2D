@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Network.Objects;
+using static WoW.Client.Global;
 
 namespace WoW.Client.Components.GUI
 {

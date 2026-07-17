@@ -12,6 +12,22 @@ namespace WoW.Client
 {
     public partial class Global
     {
+        public enum GameNetworkState
+        {
+            Offline,
+            Auth_LoggingIn,
+            Auth_Banned,
+            Auth_Invalid,
+            Auth_IsOnline,
+            Auth_Realmlist,
+            Realm,
+            Realm_Characters,
+            Realm_CreateCharacter,
+            Realm_CharacterNameInvalid,
+            LoadingWorld,
+            World
+        }
+
         /// <summary>
         /// The network peer. 
         /// 

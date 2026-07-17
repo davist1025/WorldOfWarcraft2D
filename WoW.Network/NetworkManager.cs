@@ -28,8 +28,7 @@ namespace WoW.Network
         #region Auth logon response codes
         SMSG_AUTH_LOGON_SUCCESS = 0x00, // argon2 verified.
         SMSG_AUTH_LOGON_PASSWORD = 0x01, // incorrect password.
-        SMSG_AUTH_LOGON_NOTFOUND = 0x02, // invalid username.
-        SMSG_AUTH_LOGON_MISMATCH = 0x03, // game/server version mismatch.
+        SMSG_AUTH_LOGON_MISMATCH = 0x02, // game/server version mismatch.
         #endregion
 
         SMSG_AUTH_REALMLIST = 0x02, // realmlist
@@ -115,6 +114,15 @@ namespace WoW.Network
             _netManager.FirstPeer.Send(writer, deliveryMethod);
             Logger.Print($"Sent OpCode: {(PacketOpCode)writer.Data[0]} w/ length: {writer.Data.Length} to the server.", Utils.LogEntryType.Debug);
         }
-        // todo: send functions.
+
+        /// <summary>
+        /// Send data to one client directly.
+        /// </summary>
+        /// <param name="peer"></param>
+        /// <param name="deliveryMethod"></param>
+        public void SendToClient(NetPeer peer, NetDataWriter writer, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            peer.Send(writer, deliveryMethod);
+        }
     }
 }

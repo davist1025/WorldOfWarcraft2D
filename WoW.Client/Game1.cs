@@ -29,25 +29,10 @@ using WoW.Network.Packets.Authentication;
 using WoW.Network.Packets.Authenticcation;
 using WoW.Network.Packets.Client;
 using WoW.Network.Packets.Realm;
+using static WoW.Client.Global;
 
 namespace WoW.Client
 {
-    public enum GameNetworkState
-    {
-        Offline,
-        Auth_LoggingIn,
-        Auth_Banned,
-        Auth_Invalid,
-        Auth_IsOnline,
-        Auth_Realmlist,
-        Realm,
-        Realm_Characters,
-        Realm_CreateCharacter,
-        Realm_CharacterNameInvalid,
-        LoadingWorld,
-        World
-    }
-
     public class Game1 : Core
     {
         public static string ActiveMapId { get; set; }
@@ -113,6 +98,11 @@ namespace WoW.Client
                 { "merchant_bag_icon", Core.Content.LoadTexture("Content/Data/UI/merchant_loot_bag_img.png") }
             };
             Mouse.SetCursor(MouseCursor.FromTexture2D(Global.InterfaceSprites["hand1_mouse"], 0, 0));
+
+            // create the player object.
+            // this will get added to the scene later.
+            Global._Player = new Entity("thePlayer");
+            Global._Player.AddComponent<NetFootprintComponent>();
 
             Scene = new LogonScene();
         }

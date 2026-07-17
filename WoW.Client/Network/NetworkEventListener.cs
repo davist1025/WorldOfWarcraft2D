@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using Nez;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Components;
 using WoW.Client.Components.GUI;
 using WoW.Framework.Logging;
+using WoW.Network;
+using static WoW.Client.Global;
 
 namespace WoW.Client.Network
 {
@@ -25,7 +29,13 @@ namespace WoW.Client.Network
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            // todo: process incoming packets.
+            PacketOpCode opCode = (PacketOpCode)reader.GetByte();
+
+            switch (opCode)
+            {
+                case PacketOpCode.SMSG_AUTH_LOGON: NetPacketManager.ReadLogonResponse(reader); break;
+                case PacketOpCode.SMSG_AUTH_REALMLIST: NetPacketManager.ReadRealmlist(reader);  break;
+            }
         }
 
         /// <summary>
@@ -45,6 +55,14 @@ namespace WoW.Client.Network
                     var login = imguiManager.GetLogin();
 
                     NetPacketManager.BuildLogon(login.Split(":"));
+                    break;
+                case GameNetworkState.Realm:
+                    NetDataWriter writer = new NetDataWriter(true);
+                    writer.Put((byte)PacketOpCode.CMSG_REALM_CONNECT);
+
+                    NetFootprintComponent myFootprint = Global._Player.GetComponent<NetFootprintComponent>();
+                    writer.Put(myFootprint.SessionId);
+                    Global.Network.SendToServer(writer);
                     break;
             }
             // todo: send packet depending on state.

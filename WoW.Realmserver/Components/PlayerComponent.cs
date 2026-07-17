@@ -49,7 +49,7 @@ namespace WoW.Realmserver.Components
 
                 var vector = new Vector2(inputStateChange.X, inputStateChange.Y);
 
-                _moveDirection = Convert.ToSingle(ConfigurationManager.AppSettings["default_player_movement_speed"]) * Program.DeltaTime * vector;
+                _moveDirection = Convert.ToSingle(ConfigurationManager.AppSettings["default_player_movement_speed"]) * Global.DeltaTime * vector;
                 _moveDirection.Round();
 
                 //_mover.CalculateMovement(ref _moveDirection, out var res);
@@ -62,11 +62,12 @@ namespace WoW.Realmserver.Components
                 {
                     _tickAccumulator = 0f;
 
-                    Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation()
-                    {
-                        ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y),
-                        Sequence = _lastProcessedSequence
-                    });
+                    // todo: [player component] send reconciliation.
+                    //Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation()
+                    //{
+                    //    ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y),
+                    //    Sequence = _lastProcessedSequence
+                    //});
                 }
 
                 if (vector.X < 0f) Character.Direction = (int)ActorAnimationDirection.West;
@@ -77,19 +78,20 @@ namespace WoW.Realmserver.Components
 
                 if (vector.Y < 0f) Character.Direction = (int)ActorAnimationDirection.North;
 
-                Program.SendToExcept(Entity.Name,
-                    new RealmClient_MovementStateChange()
-                    {
-                        Id = Entity.Name,
-                        ResultX = Entity.Transform.Position.X,
-                        ResultY = Entity.Transform.Position.Y,
-                        IsColliding = false, // hack: temporary
-                        //ColliderNormal = (_isColliding) ? new Vector2Serializable(res.Normal.X, res.Normal.Y) : new Vector2Serializable(0f, 0f),
-                        MovementX = vector.X,
-                        MovementY = vector.Y,
-                        Direction = Character.Direction,
-                        IsTeleportUpdate = false
-                    }, DeliveryMethod.Unreliable);
+                // todo: [player component] send move change to all other players
+                //Program.SendToExcept(Entity.Name,
+                //    new RealmClient_MovementStateChange()
+                //    {
+                //        Id = Entity.Name,
+                //        ResultX = Entity.Transform.Position.X,
+                //        ResultY = Entity.Transform.Position.Y,
+                //        IsColliding = false, // hack: temporary
+                //        //ColliderNormal = (_isColliding) ? new Vector2Serializable(res.Normal.X, res.Normal.Y) : new Vector2Serializable(0f, 0f),
+                //        MovementX = vector.X,
+                //        MovementY = vector.Y,
+                //        Direction = Character.Direction,
+                //        IsTeleportUpdate = false
+                //    }, DeliveryMethod.Unreliable);
             }
         }
 

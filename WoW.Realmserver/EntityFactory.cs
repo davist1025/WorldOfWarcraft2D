@@ -114,8 +114,9 @@ namespace WoW.Realmserver
 
                     var allPlayersInProc = tiledProcessorForMapId.Creatures.Where(creature => creature.HasComponent<PlayerComponent>()).ToArray();
 
-                    foreach (var player in allPlayersInProc)
-                        Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
+                    // todo: [entity factory] send new Entity spawn
+                    //foreach (var player in allPlayersInProc)
+                    //    Program.SendSerializable(player.Name, new RealmClient_CreateNPC() { Metadata = serializedNpc });
 
                     return newNpcEntity;
                 }

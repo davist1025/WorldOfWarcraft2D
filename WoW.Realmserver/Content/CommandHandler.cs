@@ -72,7 +72,8 @@ namespace WoW.Realmserver.Content
                 Channel = ChatChannelType.Server
             };
 
-            Program.SendToAll(newServerMessage);
+            // todo: [command handler] send server message.
+            //Program.SendToAll(newServerMessage);
 
             // todo: re-implement server messages!
             //RealmClient_Chat serverMessage = new RealmClient_Chat();
@@ -108,13 +109,14 @@ namespace WoW.Realmserver.Content
 
             if (characterToSummon != null)
             {
-                Program.SendToAll(new RealmClient_Teleport()
-                {
-                    WorldId = characterToSummon.Entity.Name,
-                    MapId = session.Character.MapId,
-                    X = session.Entity.Position.X,
-                    Y = session.Entity.Position.Y
-                });
+                // todo: [command handler] send teleport to all players.
+                //Program.SendToAll(new RealmClient_Teleport()
+                //{
+                //    WorldId = characterToSummon.Entity.Name,
+                //    MapId = session.Character.MapId,
+                //    X = session.Entity.Position.X,
+                //    Y = session.Entity.Position.Y
+                //});
 
                 var allMapProcessors = Program.Scene.FindComponentsOfType<TiledMapProcessor>();
                 var thisProcessor = allMapProcessors.Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
@@ -137,16 +139,17 @@ namespace WoW.Realmserver.Content
                     // send the current positions of all players in the summoned map since we don't send input updates outside of the players' map.
                     foreach (var player in playersInNewProcessor)
                     {
-                        Program.SendTo(characterToSummon.Entity.Name,
-                            new RealmClient_MovementStateChange()
-                            {
-                                Id = player.Name,
-                                ResultX = player.Transform.Position.X,
-                                ResultY = player.Transform.Position.Y,
-                                MovementX = 0f,
-                                MovementY = 0f,
-                                IsTeleportUpdate = true
-                            }, DeliveryMethod.ReliableOrdered);
+                        // todo: [command handler] send summon to player being summoned
+                        //Program.SendTo(characterToSummon.Entity.Name,
+                        //    new RealmClient_MovementStateChange()
+                        //    {
+                        //        Id = player.Name,
+                        //        ResultX = player.Transform.Position.X,
+                        //        ResultY = player.Transform.Position.Y,
+                        //        MovementX = 0f,
+                        //        MovementY = 0f,
+                        //        IsTeleportUpdate = true
+                        //    }, DeliveryMethod.ReliableOrdered);
                     }
 
                     // send all NPCs to this summoned player.
@@ -156,11 +159,13 @@ namespace WoW.Realmserver.Content
                     {
                         var component = npc.GetComponent<NpcControllerComponent>();
 
-                        Program.SendSerializable(characterToSummon.Entity.Name,
-                            new RealmClient_CreateNPC()
-                            {
-                                Metadata = component.Metadata
-                            });
+                        // todo: [command handler] send all npcs in the new TiledProcessor to this summoned player.
+
+                        //Program.SendSerializable(characterToSummon.Entity.Name,
+                        //    new RealmClient_CreateNPC()
+                        //    {
+                        //        Metadata = component.Metadata
+                        //    });
                     }
                 }
             }

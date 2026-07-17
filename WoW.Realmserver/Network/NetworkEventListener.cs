@@ -27,7 +27,10 @@ namespace WoW.Realmserver.Network
         {
             PacketOpCode packetId = (PacketOpCode)reader.GetByte();
 
-
+            switch (packetId)
+            {
+                case PacketOpCode.CMSG_REALM_CONNECT: NetPacketManager.ReadSessionTransfer(peer, reader, deliveryMethod); break;
+            }
         }
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)

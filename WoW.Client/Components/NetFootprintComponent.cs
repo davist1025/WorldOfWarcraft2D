@@ -14,6 +14,20 @@ namespace WoW.Client.Components
     /// </summary>
     internal class NetFootprintComponent : Component
     {
-        // todo: finish NetFootprintComponent.
+        /// <summary>
+        /// The client's account name.
+        /// </summary>
+        public string AccountName { get; private set; }
+
+        /// <summary>
+        /// The client's unique session id.
+        /// </summary>
+        public string SessionId { get; private set; }
+
+        public void Create(string accountName, string sessionId)
+        {
+            AccountName = accountName;
+            SessionId = sessionId;
+        }
     }
 }
