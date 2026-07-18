@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WoW.Database.Models;
 using WoW.Framework.Logging;
 using WoW.Realmserver.Components;
+using WoW.Realmserver.Network;
 using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver
@@ -28,15 +29,15 @@ namespace WoW.Realmserver
                     {
                         var accountData = ctx.Accounts.Where(account => account.SessionId.Equals(sessionId)).Single();
 
-                        PlayerComponent newPlayer = new PlayerComponent(accountData);
+                        SessionComponent newSession = new SessionComponent(accountData);
                         Entity newPlayerEntity = CreateEntity($"{accountData.Username}({accountData.SessionId})");
-                        newPlayerEntity.AddComponent(newPlayer);
+                        newPlayerEntity.AddComponent(newSession);
                         newPlayerEntity.Tag = (int)ActorType.Networked;
                         peer.Tag = newPlayerEntity;
 
-                        Logger.Print($"Enqeued user ({accountData.Username}) with session id ({accountData.SessionId}) has successfully transfered.", LogEntryType.Debug);
+                        Logger.Print($"Enqueued user ({accountData.Username}) with session id ({accountData.SessionId}) has successfully transferred.", LogEntryType.Debug);
 
-                        // todo: send character list.
+                        NetPacketManager.BuildCharacterList(accountData.Id, peer);
                     }
                 }
             }

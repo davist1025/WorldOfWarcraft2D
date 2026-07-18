@@ -17,7 +17,7 @@ using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Components
 {
-    public class PlayerComponent : Component, IUpdatable
+    public class SessionComponent : Component, IUpdatable
     {
         public Account Account;
         public PlayerCharacter Character;
@@ -37,7 +37,7 @@ namespace WoW.Realmserver.Components
         public List<Entity> AvailableTargets = new List<Entity>();
         public int TargetIndex = -1;
 
-        public PlayerComponent(Account user)
+        public SessionComponent(Account user)
             => Account = user;
 
         public void Update()

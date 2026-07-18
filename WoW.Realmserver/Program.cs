@@ -110,79 +110,7 @@ namespace WoW.Realmserver
             Global.DeltaTime = deltaTime;
             Global.Network.Update();
             Scene.Update();
-
-            using (var authCtx = new AuthContext())
-            {
-                if (PendingPlayers.TryDequeue(out var newPendingConnection))
-                {
-                    var sessionId = newPendingConnection.SessionId;
-
-                    if (authCtx.Accounts.Any(x => x.SessionId == sessionId)) ;
-                    {
-                        Account account = authCtx.Accounts.FirstOrDefault(a => a.SessionId.ToLower().Equals(sessionId));
-
-                        if (account != null)
-                        {
-                            PlayerComponent newSession = new PlayerComponent(account);
-                            Entity newEntity = Scene.CreateEntity(Guid.NewGuid().ToString());
-                            newEntity.Tag = (int)ActorType.Networked;
-                            newEntity.AddComponent(newSession);
-                            newPendingConnection.Connection.Tag = newEntity;
-
-                            Logger.Print($"Pending connection w/ Account ({account.Username}) has been verified.", LogEntryType.Network);
-
-                            // todo: send characters to verified connection.
-                            //PacketManager.SendCharactersTo(newSession.Account.Id, newPendingConnection.Connection);
-                        }
-                    }
-                }
-            }
         }
-
-        //public static void Send<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        //    => Network.Processor.Send(peer, packet, delivery);
-
-        ///// <summary>
-        ///// Used to send an object which is not readily recognized by LNL.
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="peer"></param>
-        ///// <param name="packet"></param>
-        ///// <param name="delivery"></param>
-        //public static void SendSerializable<T>(NetPeer peer, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-        //    => Network.Processor.SendNetSerializable(peer, packet, delivery);
-
-        //public static void SendSerializable<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : INetSerializable
-        //    => SendSerializable(Network.GetAllPeers().Where(peer => (peer.Tag as Entity).Name.ToLower().Equals(gObjectId)).First(), packet);
-
-        //public static void SendToExcept<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        //{
-        //    var peersExcept = Network.GetAllPeers().Where(p => !(p.Tag as Entity).Name.Equals(gObjectId)).ToArray();
-
-        //    for (int i = 0; i < peersExcept.Length; i++)
-        //        Send(peersExcept[i], packet, delivery);
-        //}
-
-        //public static void SendTo<T>(string gObjectId, T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        //{
-        //    if (packet.GetType().IsAssignableTo(typeof(INetSerializable)))
-        //        Logger.Print("Failed to send packet: Attempting to send a NetSerialized packet through a non-serializable channel; packet may arrive incomplete.", LogEntryType.Error);
-        //    else
-        //    {
-        //        var peer = Network.GetAllPeers().Where(p => (p.Tag as Entity).Name.ToLower().Equals(gObjectId)).FirstOrDefault();
-
-        //        if (peer != null)
-        //            Send(peer, packet, delivery);
-        //    }
-        //}
-
-        //public static void SendToAll<T>(T packet, DeliveryMethod delivery = DeliveryMethod.ReliableOrdered) where T : class, new()
-        //{
-        //    var allPeers = Network.GetAllPeers();
-
-        //    for (int i = 0; i < allPeers.Count; i++)
-        //        Send(allPeers[i], packet, delivery);
-        //}
 
         static void Main(string[] args)
             => new Program();

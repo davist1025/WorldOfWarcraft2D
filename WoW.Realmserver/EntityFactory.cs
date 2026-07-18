@@ -112,7 +112,7 @@ namespace WoW.Realmserver
                         controllerForNpc.AddBehavior((IBehavior)Activator.CreateInstance(behaviorTypeToInit));
                     }
 
-                    var allPlayersInProc = tiledProcessorForMapId.Creatures.Where(creature => creature.HasComponent<PlayerComponent>()).ToArray();
+                    var allPlayersInProc = tiledProcessorForMapId.Creatures.Where(creature => creature.HasComponent<SessionComponent>()).ToArray();
 
                     // todo: [entity factory] send new Entity spawn
                     //foreach (var player in allPlayersInProc)

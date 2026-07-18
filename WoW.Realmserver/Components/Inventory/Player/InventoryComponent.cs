@@ -24,7 +24,7 @@ namespace WoW.Realmserver.Components.Inventory.Player
             using (var ctx = new RealmContext())
             {
                 // Get all bags for this character.
-                characterBags = ctx.CharacterBags.Where(c => c.CharacterId == Entity.GetComponent<PlayerComponent>().Character.CharacterId).ToList();
+                characterBags = ctx.CharacterBags.Where(c => c.CharacterId == Entity.GetComponent<SessionComponent>().Character.CharacterId).ToList();
 
                 foreach (var row in characterBags)
                 {

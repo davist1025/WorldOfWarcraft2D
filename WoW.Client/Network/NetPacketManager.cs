@@ -96,6 +96,37 @@ namespace WoW.Client.Network
             Global.PeerState = Global.GameNetworkState.Auth_Realmlist;
         }
 
+        /// <summary>
+        /// Handles the character list data from the server. This function also allows for rendering of the character list.
+        /// </summary>
+        /// <param name="reader"></param>
+        public static void ReadCharacterList(NetDataReader reader)
+        {
+            int count = reader.GetInt();
+
+            Logger.Print($"Receiving data for {count} character(s).", Framework.Utils.LogEntryType.Debug);
+
+            List<CharacterMetadataObject> characters = new List<CharacterMetadataObject>();
+
+            for (int i = 0; i < count; i++)
+            {
+                string name = reader.GetString();
+                int id = reader.GetInt();
+                int raceId = reader.GetInt();
+                int hairId = reader.GetInt();
+                string mapId = reader.GetString();
+                float xPos = reader.GetFloat();
+                float yPos = reader.GetFloat();
+                int direction = reader.GetInt();
+
+                characters.Add(
+                    new CharacterMetadataObject(id, name, (Framework.Utils.ActorRaceType)raceId, hairId, mapId: mapId));
+
+                Global.Characters = characters;
+                Global.PeerState = Global.GameNetworkState.Realm_Characters;
+            }
+        }
+
         #endregion
     }
 }

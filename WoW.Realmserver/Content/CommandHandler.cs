@@ -34,7 +34,7 @@ namespace WoW.Realmserver.Content
     public class CommandHandler
     {
         [CommandHandler("NpcCommand_Add")]
-        public static void NpcCommand_Add(string[] commandParams, PlayerComponent session, NetPeer peer)
+        public static void NpcCommand_Add(string[] commandParams, SessionComponent session, NetPeer peer)
         {
             // X, Y params should be optional.
             /*
@@ -52,7 +52,7 @@ namespace WoW.Realmserver.Content
         }
 
         [CommandHandler("ServerCommand_SendMessage")]
-        public static void ServerCommand_SendMessage(string[] message, PlayerComponent session, NetPeer peer)
+        public static void ServerCommand_SendMessage(string[] message, SessionComponent session, NetPeer peer)
         {
             string fullMsg = "";
 
@@ -89,7 +89,7 @@ namespace WoW.Realmserver.Content
         /// <param name="session"></param>
         /// <param name="peer"></param>
         [CommandHandler("PlayerActionCommand_Summon")]
-        public static void PlayerActionCommand_Summon(string[] data, PlayerComponent session, NetPeer peer)
+        public static void PlayerActionCommand_Summon(string[] data, SessionComponent session, NetPeer peer)
         {
             string characterName = "";
 
@@ -103,7 +103,7 @@ namespace WoW.Realmserver.Content
 
             // todo: crash here if none are found. catch this exception or determine the return value and handle accordingly.
             var characterToSummon = Program.Scene
-                .FindComponentsOfType<PlayerComponent>()
+                .FindComponentsOfType<SessionComponent>()
                 .Where(s => s.Account.Id != session.Account.Id && s.Character.Name.ToLower().Equals(characterName.ToLower()))
                 .Single();
 
@@ -133,7 +133,7 @@ namespace WoW.Realmserver.Content
 
                     // this feels crash-prone.
                     var playersInNewProcessor = newProcessor.Creatures
-                        .Where(creature => creature.HasComponent<PlayerComponent>() && !creature.Name.ToLower().Equals(characterToSummon.Entity.Name.ToLower()))
+                        .Where(creature => creature.HasComponent<SessionComponent>() && !creature.Name.ToLower().Equals(characterToSummon.Entity.Name.ToLower()))
                         .ToArray();
 
                     // send the current positions of all players in the summoned map since we don't send input updates outside of the players' map.
