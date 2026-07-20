@@ -37,7 +37,7 @@ namespace WoW.Realmserver
 
                         Logger.Print($"Enqueued user ({accountData.Username}) with session id ({accountData.SessionId}) has successfully transferred.", LogEntryType.Debug);
 
-                        NetPacketManager.BuildCharacterList(accountData.Id, peer);
+                        NetPacketManager.BuildCharacterList(newSession, peer);
                     }
                 }
             }

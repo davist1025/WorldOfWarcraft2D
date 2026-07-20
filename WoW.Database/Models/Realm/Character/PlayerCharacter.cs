@@ -18,7 +18,7 @@ namespace WoW.Database.Models.Realm.Character
         public int AccountId { get; set; }
 
         [Column("character_id")]
-        public int CharacterId { get; set; }
+        public int Id { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

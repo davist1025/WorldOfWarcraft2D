@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Framework.Logging;
 
 namespace WoW.Client.Components
 {
@@ -40,7 +41,7 @@ namespace WoW.Client.Components
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             _renderer.Color = Color.MonoGameOrange;
 
-
+            Logger.Print($"Entering world w/ character: ({Global.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
         }
 
         public void Update()

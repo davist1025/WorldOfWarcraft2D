@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Scenes;
 using WoW.Framework.Logging;
 using WoW.Framework.Network.Container;
 using static WoW.Framework.Network.NetworkManager;
@@ -43,6 +44,20 @@ namespace WoW.Client.Network
             /*
              * ex: game version, OS, etc?
              */ 
+
+            Global.Network.SendToServer(writer);
+        }
+
+        /// <summary>
+        /// Builds and sends a packet dictating which character we would like to play on.
+        /// </summary>
+        public static void BuildEnterWorld(CharacterContainer selectedCharacter)
+        {
+            Logger.Print($"Attempting to play on character: ({selectedCharacter.Name})", LogEntryType.Debug);
+
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.CMSG_REALM_ENTER_WORLD);
+            writer.Put(selectedCharacter.Id);
 
             Global.Network.SendToServer(writer);
         }
@@ -127,6 +142,13 @@ namespace WoW.Client.Network
             }
         }
 
+        public static void ReadEnterWorld(NetDataReader reader)
+        {
+            int index = reader.GetInt();
+            Global.SetSelectedCharacter(index);
+
+            Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
+        }
         #endregion
     }
 }

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Network;
 using WoW.Client.Scenes;
 using WoW.Framework.Network.Container;
 using static WoW.Client.Global;
@@ -172,6 +173,7 @@ namespace WoW.Client.Components.GUI
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
                                     Global.PeerState = GameNetworkState.LoadingWorld;
+                                    NetPacketManager.BuildEnterWorld(character);
                                     // todo: send world transfer.
                                     //Global.Network.SendToServer(new ClientRealm_TransferWorld() { LocalCharacterId = character.Id });
                                 }

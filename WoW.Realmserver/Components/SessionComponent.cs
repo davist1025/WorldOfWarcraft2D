@@ -12,6 +12,7 @@ using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
 using WoW.Realmserver.Components.Inventory.Player;
 using WoW.Realmserver.Data;
+using WoW.Realmserver.Network;
 using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Components
@@ -19,7 +20,9 @@ namespace WoW.Realmserver.Components
     public class SessionComponent : Component, IUpdatable
     {
         public Account Account;
-        public PlayerCharacter Character;
+        public List<PlayerCharacter> Characters;
+        private int _selectedCharacterIndex = -1;
+
         public InventoryComponent Inventory;
 
         private SubpixelVector2 _subPixelMovement;
@@ -69,13 +72,13 @@ namespace WoW.Realmserver.Components
                     //});
                 }
 
-                if (vector.X < 0f) Character.Direction = (int)ActorAnimationDirection.West;
+                if (vector.X < 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.West;
 
-                if (vector.X > 0f) Character.Direction = (int)ActorAnimationDirection.East;
+                if (vector.X > 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.East;
 
-                if (vector.Y > 0f) Character.Direction = (int)ActorAnimationDirection.South;
+                if (vector.Y > 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.South;
 
-                if (vector.Y < 0f) Character.Direction = (int)ActorAnimationDirection.North;
+                if (vector.Y < 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.North;
 
                 // todo: [player component] send move change to all other players
                 //Program.SendToExcept(Entity.Name,
@@ -106,10 +109,21 @@ namespace WoW.Realmserver.Components
             _mover = Entity.AddComponent<Mover>();
             Inventory = Entity.AddComponent<InventoryComponent>();
 
-            Entity.SetPosition(new Vector2(Character.XPosition, Character.YPosition));
+            Entity.SetPosition(new Vector2(Characters[_selectedCharacterIndex].XPosition, Characters[_selectedCharacterIndex].YPosition));
         }
 
-        public void QueueMovementUpdate(ClientMovementUpdate moveUpdate)
-            => _movementUpdates.Enqueue(moveUpdate);
+        /// <summary>
+        /// Called from <see cref="NetPacketManager.ReadEnterWorld(NetPeer, NetPacketReader, DeliveryMethod)"/>
+        /// </summary>
+        /// <param name="index"></param>
+        public void SetSelectedCharacter(int index)
+            => _selectedCharacterIndex = index;
+
+        /// <summary>
+        /// Returns the character this player is currently using.
+        /// </summary>
+        /// <returns></returns>
+        public PlayerCharacter GetSelectedCharacter()
+            => Characters[_selectedCharacterIndex];
     }
 }

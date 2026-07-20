@@ -36,6 +36,7 @@ namespace WoW.Client.Network
                 case PacketOpCode.SMSG_AUTH_LOGON: NetPacketManager.ReadLogonResponse(reader); break;
                 case PacketOpCode.SMSG_AUTH_REALMLIST: NetPacketManager.ReadRealmlist(reader);  break;
                 case PacketOpCode.SMSG_REALM_CHARACTER_LIST: NetPacketManager.ReadCharacterList(reader); break;
+                case PacketOpCode.SMSG_REALM_ENTER_WORLD: NetPacketManager.ReadEnterWorld(reader); break;
             }
         }
 
