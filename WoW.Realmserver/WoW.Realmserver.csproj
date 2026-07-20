@@ -25,7 +25,6 @@
     <ProjectReference Include="..\Lib\Nez-MG38\Nez.Portable\Nez.MG38.csproj" />
     <ProjectReference Include="..\WoW.Database\WoW.Database.csproj" />
     <ProjectReference Include="..\WoW.Framework\WoW.Framework.csproj" />
-    <ProjectReference Include="..\WoW.Network\WoW.Network.csproj" />
   </ItemGroup>
 
   <ItemGroup>

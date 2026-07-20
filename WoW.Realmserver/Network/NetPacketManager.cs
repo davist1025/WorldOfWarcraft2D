@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using WoW.Database.Models;
 using WoW.Database.Models.Realm.Character;
 using WoW.Framework.Logging;
-using WoW.Network;
+using static WoW.Framework.Network.NetworkManager;
 
 namespace WoW.Realmserver.Network
 {

@@ -8,11 +8,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network.Objects;
-using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
-using static WoW.Framework.Utils;
+using WoW.Framework;
+using WoW.Framework.Network.Container;
 
 namespace WoW.Realmserver.Content
 {
@@ -46,8 +45,6 @@ namespace WoW.Realmserver.Content
              */
             int npcId = Convert.ToInt32(commandParams[0]);
 
-            EntityFactory.CreateNPC(npcId, session.Character.MapId, session.Entity.Transform.Position, true);
-
                 // todo: send invalid id response.
         }
 
@@ -66,13 +63,8 @@ namespace WoW.Realmserver.Content
                     fullMsg += $"{part} ";
             }
 
-            ChatMessageObject newServerMessage = new ChatMessageObject()
-            {
-                Input = $"{fullMsg}",
-                Channel = ChatChannelType.Server
-            };
 
-            // todo: [command handler] send server message.
+            // todo: [command handler] send server message + chat message container.
             //Program.SendToAll(newServerMessage);
 
             // todo: re-implement server messages!
@@ -153,20 +145,19 @@ namespace WoW.Realmserver.Content
                     }
 
                     // send all NPCs to this summoned player.
-                    var npcsInNewProcessor = newProcessor.Creatures.Where(creature => creature.HasComponent<NpcControllerComponent>()).ToArray();
+                    //var npcsInNewProcessor = newProcessor.Creatures.Where(creature => creature.HasComponent<NpcControllerComponent>()).ToArray();
 
-                    foreach (var npc in npcsInNewProcessor)
-                    {
-                        var component = npc.GetComponent<NpcControllerComponent>();
+                    //foreach (var npc in npcsInNewProcessor)
+                    //{
 
-                        // todo: [command handler] send all npcs in the new TiledProcessor to this summoned player.
+                    //    // todo: [command handler] send all npcs in the new TiledProcessor to this summoned player.
 
-                        //Program.SendSerializable(characterToSummon.Entity.Name,
-                        //    new RealmClient_CreateNPC()
-                        //    {
-                        //        Metadata = component.Metadata
-                        //    });
-                    }
+                    //    //Program.SendSerializable(characterToSummon.Entity.Name,
+                    //    //    new RealmClient_CreateNPC()
+                    //    //    {
+                    //    //        Metadata = component.Metadata
+                    //    //    });
+                    //}
                 }
             }
         }

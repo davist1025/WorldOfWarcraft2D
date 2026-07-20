@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network.Packets;
-using WoW.Network.Packets.Realm;
 using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
@@ -31,15 +29,15 @@ namespace WoW.Client.Components
 
         private bool _isInMap = false;
 
-        public NetPlayerController(RealmClient_CreateNetPlayer networkPlayer)
-        {
-            // todo: can 'RemoteCharacter' be used here?
-            Name = networkPlayer.Name;
-            RaceId = networkPlayer.RaceId;
-            HairId = networkPlayer.HairId;
-            MapId = networkPlayer.MapId;
-            Direction = (ActorAnimationDirection)networkPlayer.Direction;
-        }
+        //public NetPlayerController(RealmClient_CreateNetPlayer networkPlayer)
+        //{
+        //    // todo: can 'RemoteCharacter' be used here?
+        //    Name = networkPlayer.Name;
+        //    RaceId = networkPlayer.RaceId;
+        //    HairId = networkPlayer.HairId;
+        //    MapId = networkPlayer.MapId;
+        //    Direction = (ActorAnimationDirection)networkPlayer.Direction;
+        //}
 
         public override void OnAddedToEntity()
         {

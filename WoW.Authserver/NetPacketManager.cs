@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using WoW.Database.Models;
 using WoW.Framework;
 using WoW.Framework.Logging;
-using WoW.Network;
+using static WoW.Framework.Network.NetworkManager;
 
 namespace WoW.Authserver
 {

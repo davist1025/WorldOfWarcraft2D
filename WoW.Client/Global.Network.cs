@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network;
-using WoW.Network.Objects;
+using WoW.Framework.Network;
+using WoW.Framework.Network.Container;
 
 namespace WoW.Client
 {
@@ -15,6 +15,9 @@ namespace WoW.Client
         public enum GameNetworkState
         {
             Offline,
+            Offline_Realm,
+            Offline_Characters,
+            Offline_World,
             Auth_LoggingIn,
             Auth_Banned,
             Auth_Invalid,
@@ -40,11 +43,10 @@ namespace WoW.Client
         public static Entity Player;
         public static string Username;
         public static string SessionId;
-        public static RealmserverMetadataObject LastRealm;
 
 
-        public static List<RealmserverMetadataObject> Realmlist = new List<RealmserverMetadataObject>();
-        public static List<CharacterMetadataObject> Characters = new List<CharacterMetadataObject>();
+        public static List<RealmserverContainer> Realmlist = new List<RealmserverContainer>();
+        public static List<CharacterContainer> Characters = new List<CharacterContainer>();
 
         /// <summary>
         /// Is set by the game server.

@@ -7,8 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
 using WoW.Framework.Logging;
-using WoW.Network;
-using WoW.Network.Objects;
+using WoW.Framework.Network.Container;
+using static WoW.Framework.Network.NetworkManager;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client.Network
 {
@@ -57,14 +58,13 @@ namespace WoW.Client.Network
         public static void ReadLogonResponse(NetDataReader reader)
         {
             PacketOpCode logonCode = (PacketOpCode)reader.GetByte();
-            NetFootprintComponent myFootprint = Global._Player.GetComponent<NetFootprintComponent>();
 
             switch (logonCode)
             {
                 case PacketOpCode.SMSG_AUTH_LOGON_SUCCESS:
+                    NetFootprintComponent myFootprint = Global._Player.AddComponent<NetFootprintComponent>();
                     string sessionId = reader.GetString();
                     string accountName = reader.GetString();
-
                     myFootprint.Create(accountName, sessionId);
 
                     Logger.Print($"Logged in successfully.", Framework.Utils.LogEntryType.Debug);
@@ -86,7 +86,7 @@ namespace WoW.Client.Network
                 string hostname = reader.GetString();
                 int port = reader.GetInt();
 
-                RealmserverMetadataObject newRealm = new RealmserverMetadataObject(name, hostname, port);
+                RealmserverContainer newRealm = new RealmserverContainer(name, hostname, port);
                 Global.Realmlist.Add(newRealm);
             }
 
@@ -106,7 +106,7 @@ namespace WoW.Client.Network
 
             Logger.Print($"Receiving data for {count} character(s).", Framework.Utils.LogEntryType.Debug);
 
-            List<CharacterMetadataObject> characters = new List<CharacterMetadataObject>();
+            List<CharacterContainer> characters = new List<CharacterContainer>();
 
             for (int i = 0; i < count; i++)
             {
@@ -120,7 +120,7 @@ namespace WoW.Client.Network
                 int direction = reader.GetInt();
 
                 characters.Add(
-                    new CharacterMetadataObject(id, name, (Framework.Utils.ActorRaceType)raceId, hairId, mapId: mapId));
+                    new CharacterContainer(name, id, (ActorRaceType)raceId, hairId, mapId: mapId, xPos, yPos, (ActorAnimationDirection)direction));
 
                 Global.Characters = characters;
                 Global.PeerState = Global.GameNetworkState.Realm_Characters;

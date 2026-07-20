@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
-using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components.Inventory.Player;
 using WoW.Realmserver.Data;
 using static WoW.Framework.Utils;

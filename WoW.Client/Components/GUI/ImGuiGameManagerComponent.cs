@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network.Objects;
+using WoW.Framework.Network.Container;
 using static WoW.Client.Global;
 
 namespace WoW.Client.Components.GUI
@@ -20,7 +20,7 @@ namespace WoW.Client.Components.GUI
         private string _chatInput = "";
         private int _chatChannelIndex = 0;
         private string[] _chatChannels;
-        public List<ChatMessageObject> ChatHistory = new List<ChatMessageObject>();
+        public List<ChatMessageContainer> ChatHistory = new List<ChatMessageContainer>();
 
         public override void OnAddedToEntity()
         {
@@ -37,14 +37,15 @@ namespace WoW.Client.Components.GUI
             switch (Global.PeerState)
             {
                 case GameNetworkState.World:
-                    var thePlayerController = Entity.Scene.FindComponentOfType<LocalPlayerController>();
+                    var thePlayerController = Entity.Scene.FindComponentOfType<MyPlayerControllerComponent>();
 
                     if (ImGui.Begin("information", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize))
                     {
-                        ImGui.Text($"{thePlayerController.Name}");
-                        ImGui.Text($"{Global.SessionId}");
-                        ImGui.Text($"Map Id: {Game1.ActiveMapId}");
-                        ImGui.End();
+                        // todo: [gui] recreate the information window.
+                        //ImGui.Text($"{thePlayerController.Name}");
+                        //ImGui.Text($"{Global.SessionId}");
+                        //ImGui.Text($"Map Id: {Game1.ActiveMapId}");
+                        //ImGui.End();
                     }
                     break;
             }

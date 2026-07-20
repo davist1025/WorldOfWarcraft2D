@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using WoW.Client.Components;
 using WoW.Client.Components.GUI;
 using WoW.Framework.Logging;
-using WoW.Network;
 using static WoW.Client.Global;
+using static WoW.Framework.Network.NetworkManager;
 
 namespace WoW.Client.Network
 {

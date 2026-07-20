@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Content;
+using WoW.Client.Scenes;
 
 namespace WoW.Client
 {

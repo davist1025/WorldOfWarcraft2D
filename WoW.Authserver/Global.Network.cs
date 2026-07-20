@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network;
+using WoW.Framework.Network;
 
 namespace WoW.Authserver
 {

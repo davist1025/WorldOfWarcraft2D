@@ -27,15 +27,6 @@ namespace WoW.Framework
             Mage,
         }
 
-        public enum ActorStatisticType
-        {
-            STR = 1,
-            AGI,
-            INT,
-            STA,
-            SP,
-        }
-
         public enum ActorType
         {
             Local,

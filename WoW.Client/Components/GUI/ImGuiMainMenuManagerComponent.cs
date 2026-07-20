@@ -9,8 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network.Objects;
-using WoW.Network.Packets.Client;
+using WoW.Client.Scenes;
+using WoW.Framework.Network.Container;
 using static WoW.Client.Global;
 using static WoW.Framework.Utils;
 
@@ -62,7 +62,8 @@ namespace WoW.Client.Components.GUI
 
                     if (NezImGui.CenteredButton("Offline", 0.6f))
                     {
-                        // todo: [main menu component] add offline mode support.
+                        // todo: [offline mode] load offline realm data (json, binary, sqllite?)
+                        Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
                     }
 
                     if (NezImGui.CenteredButton("About", 0.6f))
@@ -106,14 +107,13 @@ namespace WoW.Client.Components.GUI
 
                         for (int i = 0; i < Global.Realmlist.Count; i++)
                         {
-                            RealmserverMetadataObject realmserver = Global.Realmlist[i];
+                            RealmserverContainer realmserver = Global.Realmlist[i];
 
                             if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
                                     Global.PeerState = GameNetworkState.Realm;
-                                    Game1.LastConnectedRealm = realmserver;
 
                                     // todo: save last used realm for auto-connection later.
                                     //Game1.Network.Disconnect();
@@ -164,7 +164,7 @@ namespace WoW.Client.Components.GUI
 
                         for (int i = 0; i < Global.Characters.Count; i++)
                         {
-                            CharacterMetadataObject character = Global.Characters[i];
+                            CharacterContainer character = Global.Characters[i];
 
                             if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
@@ -180,9 +180,9 @@ namespace WoW.Client.Components.GUI
                             ImGui.SameLine();
                             ImGui.Text($"{character.Name}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.Race}");
+                            ImGui.Text($"{character.RaceId}");
                             ImGui.NextColumn();
-                            ImGui.Text($"{character.Hair}");
+                            ImGui.Text($"{character.HairId}");
                             ImGui.NextColumn();
                         }
                         ImGui.Columns(1);
@@ -277,6 +277,9 @@ namespace WoW.Client.Components.GUI
                     ImGui.Begin("", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoCollapse);
                     ImGui.Text("Entering world...");
                     ImGui.End();
+                    break;
+
+                case GameNetworkState.Offline_Realm:
                     break;
             }
         }

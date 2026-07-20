@@ -14,9 +14,7 @@ using WoW.Database.Models;
 using WoW.Database.Models.Auth;
 using WoW.Framework;
 using WoW.Framework.Logging;
-using WoW.Network;
-using WoW.Network.Packets.Client;
-using WoW.Network.Packets.Realm;
+using WoW.Framework.Network;
 using static WoW.Framework.Utils;
 
 namespace WoW.Authserver

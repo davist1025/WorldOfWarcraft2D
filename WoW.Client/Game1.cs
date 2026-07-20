@@ -22,13 +22,7 @@ using WoW.Client.Content;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
 using WoW.Framework;
-using WoW.Network;
-using WoW.Network.Objects;
-using WoW.Network.Packets;
-using WoW.Network.Packets.Authentication;
-using WoW.Network.Packets.Authenticcation;
-using WoW.Network.Packets.Client;
-using WoW.Network.Packets.Realm;
+using WoW.Framework.Network;
 using static WoW.Client.Global;
 
 namespace WoW.Client
@@ -36,9 +30,6 @@ namespace WoW.Client
     public class Game1 : Core
     {
         public static string ActiveMapId { get; set; }
-        public static RealmserverMetadataObject LastConnectedRealm;
-
-        public static NetworkTestScene NetworkScene;
 
         public static bool ShouldShowEscapeMenu = false;
         public static bool ShouldShowGMChat = false;
@@ -62,8 +53,6 @@ namespace WoW.Client
              * We need to set ClientNetwork's connection state at the same time we set this so the packet flow doesn't crash the client or server.
              */
 
-            Global.Config = GameConfiguration.Load();
-
             base.Initialize();
 
             IsFixedTimeStep = true;
@@ -79,7 +68,6 @@ namespace WoW.Client
                 Debug.Log($"Loaded {Global.Maps[i].Properties["id"]}");
             }
 
-            NetworkScene = new NetworkTestScene();
             var guiManager = new ImGuiManager()
             {
                 ShowCoreWindow = false,
@@ -102,7 +90,6 @@ namespace WoW.Client
             // create the player object.
             // this will get added to the scene later.
             Global._Player = new Entity("thePlayer");
-            Global._Player.AddComponent<NetFootprintComponent>();
 
             Scene = new LogonScene();
         }
@@ -123,15 +110,12 @@ namespace WoW.Client
             Global.Characters.Clear();
             Global.Realmlist.Clear();
             Global.Network.Disconnect();
-            //Global.Network.Disconnect();
             Global.PeerState = GameNetworkState.Offline;
         }
 
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
-
-            Global.Config.Save();
         }
     }
 }
