@@ -13,6 +13,25 @@ namespace WoW.Client
 {
     public partial class Global
     {
+        public enum GameEventType
+        {
+            LocalPlayerMoved
+        }
+
+        public struct GameEventsComparer : IEqualityComparer<GameEventType>
+        {
+            public bool Equals(GameEventType x, GameEventType y)
+            {
+                return x == y;
+            }
+
+
+            public int GetHashCode(GameEventType obj)
+            {
+                return (int)obj;
+            }
+        }
+
         public static GameConfiguration Config;
 
         public static Dictionary<string, Texture2D> InterfaceSprites;

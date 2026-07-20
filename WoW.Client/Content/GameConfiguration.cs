@@ -38,8 +38,8 @@ namespace WoW.Client.Content
                 objData.ControlHandlers = new Dictionary<ControlMap, EventHandler>()
                 {
                     //{ ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
-                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu },
-                    { ControlMap.Backpack_Main, (s, o) => Game1.ShowShowBackpack = !Game1.ShowShowBackpack }
+                    { ControlMap.EscapeMenu, (s, o) => ClientCore.ShouldShowEscapeMenu = !ClientCore.ShouldShowEscapeMenu },
+                    { ControlMap.Backpack_Main, (s, o) => ClientCore.ShowShowBackpack = !ClientCore.ShowShowBackpack }
                 };
                 return objData;
             }
@@ -57,8 +57,8 @@ namespace WoW.Client.Content
                 ControlHandlers = new Dictionary<ControlMap, EventHandler>()
                 {
                     //{ ControlMap.TabTarget, (s, o) => PacketManager.SendTabTargetRequest() },
-                    { ControlMap.EscapeMenu, (s, o) => Game1.ShouldShowEscapeMenu = !Game1.ShouldShowEscapeMenu },
-                    { ControlMap.Backpack_Main, (s, o) => Game1.ShowShowBackpack = !Game1.ShowShowBackpack }
+                    { ControlMap.EscapeMenu, (s, o) => ClientCore.ShouldShowEscapeMenu = !ClientCore.ShouldShowEscapeMenu },
+                    { ControlMap.Backpack_Main, (s, o) => ClientCore.ShowShowBackpack = !ClientCore.ShowShowBackpack }
                 }
             };
             config.Save();

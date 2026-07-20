@@ -3,7 +3,7 @@ using System.Text;
 
 try
 {
-    using var game = new WoW.Client.Game1();
+    using var game = new WoW.Client.ClientCore();
     game.Run();
 }
 catch (Exception ex)

@@ -7,6 +7,7 @@ using Nez;
 using Nez.Console;
 using Nez.ImGuiTools;
 using Nez.Sprites;
+using Nez.Systems;
 using Nez.Tiled;
 using System;
 using System.Collections;
@@ -27,7 +28,7 @@ using static WoW.Client.Global;
 
 namespace WoW.Client
 {
-    public class Game1 : Core
+    public class ClientCore : Core
     {
         public static string ActiveMapId { get; set; }
 
@@ -36,7 +37,9 @@ namespace WoW.Client
         public static bool ShouldShowWhoMenu = false;
         public static bool ShowShowBackpack = false;
 
-        public Game1() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
+        public static Emitter<GameEventType> GameEmitter;
+
+        public ClientCore() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
         {
             IsMouseVisible = true;
             PauseOnFocusLost = false;

@@ -205,7 +205,7 @@ namespace WoW.Client.Components.GUI
                     }
 
                     if (NezImGui.CenteredButton("Disconnect", 0.6f))
-                        Game1.Disconnect();
+                        ClientCore.Disconnect();
 
                     ImGui.End();
                     break;
