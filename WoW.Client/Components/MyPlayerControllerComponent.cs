@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Utils;
 using WoW.Framework.Logging;
 
 namespace WoW.Client.Components
@@ -25,6 +26,8 @@ namespace WoW.Client.Components
 
         private PrototypeSpriteRenderer _renderer;
 
+        private GameEventsManager _eventManager;
+
         public override void OnAddedToEntity()
         {
             _xAxis = new VirtualIntegerAxis();
@@ -41,20 +44,23 @@ namespace WoW.Client.Components
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             _renderer.Color = Color.MonoGameOrange;
 
-            Logger.Print($"Entering world w/ character: ({Global.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
+            _eventManager = Core.GetGlobalManager<GameEventsManager>();
         }
 
         public void Update()
         {
             _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
 
-            var moveDirection = 100f * Time.DeltaTime * _movementInput;
-            moveDirection.Round();
+            if (_movementInput != Vector2.Zero)
+            {
+                var moveDirection = 100f * Time.DeltaTime * _movementInput;
+                moveDirection.Round();
 
-            _subPixelMovement.Update(ref moveDirection);
-            _mover.ApplyMovement(moveDirection);
+                _subPixelMovement.Update(ref moveDirection);
+                _mover.ApplyMovement(moveDirection);
 
-            // todo: make an emitter, similar to Core.Emitter, for game-spricifc events.
+                _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
+            }
         }
     }
 }
