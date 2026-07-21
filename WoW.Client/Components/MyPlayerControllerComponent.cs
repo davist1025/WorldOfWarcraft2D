@@ -53,13 +53,13 @@ namespace WoW.Client.Components
 
             if (_movementInput != Vector2.Zero)
             {
+                _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
+
                 var moveDirection = 100f * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
 
                 _subPixelMovement.Update(ref moveDirection);
                 _mover.ApplyMovement(moveDirection);
-
-                _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
             }
         }
     }

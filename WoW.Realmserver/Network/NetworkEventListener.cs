@@ -31,6 +31,7 @@ namespace WoW.Realmserver.Network
             {
                 case PacketOpCode.CMSG_REALM_CONNECT: NetPacketManager.ReadSessionTransfer(peer, reader); break;
                 case PacketOpCode.CMSG_REALM_ENTER_WORLD: NetPacketManager.ReadEnterWorld(peer, reader); break;
+                case PacketOpCode.CMSG_REALM_MOVE: NetPacketManager.ReadMovementUpdate(peer, reader, deliveryMethod); break;
             }
         }
 

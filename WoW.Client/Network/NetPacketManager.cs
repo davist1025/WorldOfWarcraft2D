@@ -1,4 +1,6 @@
-﻿using LiteNetLib.Utils;
+﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using Microsoft.Xna.Framework;
 using Nez;
 using System;
 using System.Collections.Generic;
@@ -60,6 +62,20 @@ namespace WoW.Client.Network
             writer.Put(selectedCharacter.Id);
 
             Global.Network.SendToServer(writer);
+        }
+
+        /// <summary>
+        /// Builds and sends a packet for local player movement updates (you!)
+        /// </summary>
+        /// <param name="input"></param>
+        public static void BuildMovementUpdate(Vector2 input)
+        {
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.CMSG_REALM_MOVE);
+            writer.Put(input.X);
+            writer.Put(input.Y);
+
+            Global.Network.SendToServer(writer, DeliveryMethod.Unreliable);
         }
 
         #endregion
@@ -146,6 +162,7 @@ namespace WoW.Client.Network
         {
             int index = reader.GetInt();
             Global.SetSelectedCharacter(index);
+            Global.PeerState = Global.GameNetworkState.World;
 
             Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
         }

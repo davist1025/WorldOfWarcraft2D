@@ -54,6 +54,17 @@ namespace WoW.Realmserver.Network
 
             BuildEnterWorld(playerSession, peer);
         }
+
+        public static void ReadMovementUpdate(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            float xAxis = reader.GetFloat();
+            float yAxis = reader.GetFloat();
+
+            Entity playerEntity = (Entity)peer.Tag;
+            SessionComponent playerSession = playerEntity.GetComponent<SessionComponent>();
+
+            Logger.Print($"({playerSession.GetSelectedCharacter().Name}) is moving w/ input: (X:{xAxis}-Y:{yAxis})", Framework.Utils.LogEntryType.Debug);
+        }
         #endregion
 
         #region Writers

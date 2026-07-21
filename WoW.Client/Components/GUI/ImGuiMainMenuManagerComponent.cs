@@ -174,8 +174,6 @@ namespace WoW.Client.Components.GUI
                                 {
                                     Global.PeerState = GameNetworkState.LoadingWorld;
                                     NetPacketManager.BuildEnterWorld(character);
-                                    // todo: send world transfer.
-                                    //Global.Network.SendToServer(new ClientRealm_TransferWorld() { LocalCharacterId = character.Id });
                                 }
                             }
 

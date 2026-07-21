@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Network;
 using WoW.Framework.Logging;
 using static WoW.Client.Global;
 
@@ -30,8 +31,8 @@ namespace WoW.Client.Utils
 
         public void OnLocalPlayerMoved(object sender, Vector2 input)
         {
-            // todo: send packets.
-            Logger.Print($"Player moved: {input}", Framework.Utils.LogEntryType.Debug);
+            if (Global.PeerState == GameNetworkState.World)
+                NetPacketManager.BuildMovementUpdate(input);
         }
 
         #endregion
