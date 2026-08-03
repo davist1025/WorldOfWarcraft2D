@@ -33,7 +33,7 @@ namespace WoW.Client.Content
             return texture;
         }
 
-        public void LoadEngineTextures()
+        public void LoadGameTextures()
         {
             var mouseIcon = AddTexture("default_mouse", Core.Content.LoadTexture("Content/Data/UI/hand1_mouse.png"));
         }

@@ -73,7 +73,7 @@ namespace WoW.Client.Components
                 if (serverInputOut != Vector2.Zero)
                 {
                     Vector2 movement = new Vector2(serverInputOut.X, serverInputOut.Y);
-                    var velocity = Global.Speed * Time.DeltaTime * movement;
+                    var velocity = 100f * Time.DeltaTime * movement;
                     velocity.Round();
 
                     if (movement.X < 0f)

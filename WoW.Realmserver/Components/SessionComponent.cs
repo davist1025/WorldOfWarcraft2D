@@ -10,90 +10,67 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
+using WoW.Framework.Logging;
+using WoW.Framework.Shared.Components;
 using WoW.Realmserver.Components.Inventory.Player;
-using WoW.Realmserver.Data;
 using WoW.Realmserver.Network;
 using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Components
 {
+    public enum SessionState
+    {
+        OnCharacterList,
+        OnRealm
+    }
+
     public class SessionComponent : Component, IUpdatable
     {
         public Account Account;
         public List<PlayerCharacter> Characters;
+
+        /// <summary>
+        /// The <see cref="NetPeer.Id"/> of this Session. This gets set when the player successfully transfers to the realmserver.
+        /// </summary>
+        public int NetworkId;
+        public SessionState NetworkState = SessionState.OnCharacterList;
+
         private int _selectedCharacterIndex = -1;
 
         public InventoryComponent Inventory;
 
         private SubpixelVector2 _subPixelMovement;
-        private CircleCollider _collider;
         private Mover _mover;
-
-        private bool _isColliding = false;
         private Vector2 _moveDirection = Vector2.Zero;
+        private SpeedComponent _speedComponent;
 
-        private float _tickAccumulator = 0f;
-        private long _lastProcessedSequence = 0;
-        private Queue<ClientMovementUpdate> _movementUpdates = new Queue<ClientMovementUpdate>();
-
-        public List<Entity> AvailableTargets = new List<Entity>();
-        public int TargetIndex = -1;
+        private Queue<Vector2> _movementUpdates = new Queue<Vector2>();
 
         public SessionComponent(Account user)
             => Account = user;
 
         public void Update()
         {
-            if (_movementUpdates.TryDequeue(out var inputStateChange))
+            if (NetworkState == SessionState.OnRealm)
             {
-                _tickAccumulator += inputStateChange.DeltaTime;
-                _lastProcessedSequence = inputStateChange.Sequence;
-
-                var vector = new Vector2(inputStateChange.X, inputStateChange.Y);
-
-                _moveDirection = Convert.ToSingle(ConfigurationManager.AppSettings["default_player_movement_speed"]) * Global.DeltaTime * vector;
-                _moveDirection.Round();
-
-                //_mover.CalculateMovement(ref _moveDirection, out var res);
-                _subPixelMovement.Update(ref _moveDirection);
-                _mover.ApplyMovement(_moveDirection);
-
-                //_isColliding = (res.Collider != null) ? true : false;
-
-                if (_tickAccumulator >= Program.TickRate)
+                if (_mover == null)
                 {
-                    _tickAccumulator = 0f;
-
-                    // todo: [player component] send reconciliation.
-                    //Program.SendTo(Entity.Name, new RealmClient_MovementStateValidation()
-                    //{
-                    //    ServerCalculation = new Vector2Serializable(Entity.Transform.Position.X, Entity.Transform.Position.Y),
-                    //    Sequence = _lastProcessedSequence
-                    //});
+                    Logger.Print($"'{Account.Username}' has not had their game components initialized.", LogEntryType.Fatal);
+                    Entity.Destroy();
                 }
 
-                if (vector.X < 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.West;
+                if (_movementUpdates.Count > 0)
+                {
+                    Vector2 input = _movementUpdates.Dequeue();
 
-                if (vector.X > 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.East;
+                    var moveDirection = _speedComponent.Speed * Global.DeltaTime * input;
+                    moveDirection.Round();
 
-                if (vector.Y > 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.South;
+                    _subPixelMovement.Update(ref moveDirection);
+                    _mover.ApplyMovement(moveDirection);
 
-                if (vector.Y < 0f) Characters[_selectedCharacterIndex].Direction = (int)ActorAnimationDirection.North;
-
-                // todo: [player component] send move change to all other players
-                //Program.SendToExcept(Entity.Name,
-                //    new RealmClient_MovementStateChange()
-                //    {
-                //        Id = Entity.Name,
-                //        ResultX = Entity.Transform.Position.X,
-                //        ResultY = Entity.Transform.Position.Y,
-                //        IsColliding = false, // hack: temporary
-                //        //ColliderNormal = (_isColliding) ? new Vector2Serializable(res.Normal.X, res.Normal.Y) : new Vector2Serializable(0f, 0f),
-                //        MovementX = vector.X,
-                //        MovementY = vector.Y,
-                //        Direction = Character.Direction,
-                //        IsTeleportUpdate = false
-                //    }, DeliveryMethod.Unreliable);
+                    Logger.Print($"'{GetSelectedCharacter().Name}' has moved to: {Entity.Position.X}:{Entity.Position.Y}.", LogEntryType.Debug);
+                }
             }
         }
 
@@ -102,12 +79,10 @@ namespace WoW.Realmserver.Components
         /// </summary>
         public void InitializeGameComponents()
         {
-            //_collider = Entity.AddComponent<CircleCollider>();
-            //Flags.SetFlagExclusive(ref _collider.CollidesWithLayers, 10);
-            //Flags.SetFlagExclusive(ref _collider.PhysicsLayer, 1);
-            //_collider.SetRadius(8f);
+            // todo: [session] create collider component.
             _mover = Entity.AddComponent<Mover>();
             Inventory = Entity.AddComponent<InventoryComponent>();
+            _speedComponent = Entity.GetComponent<SpeedComponent>();
 
             Entity.SetPosition(new Vector2(Characters[_selectedCharacterIndex].XPosition, Characters[_selectedCharacterIndex].YPosition));
         }
@@ -117,7 +92,7 @@ namespace WoW.Realmserver.Components
         /// </summary>
         /// <param name="index"></param>
         public void SetSelectedCharacter(int index)
-            => _selectedCharacterIndex = index;
+            => _selectedCharacterIndex = index - 1;
 
         /// <summary>
         /// Returns the character this player is currently using.
@@ -125,5 +100,12 @@ namespace WoW.Realmserver.Components
         /// <returns></returns>
         public PlayerCharacter GetSelectedCharacter()
             => Characters[_selectedCharacterIndex];
+
+        public void EnqueuePositionChange(Vector2 input)
+        {
+            Logger.Print($"Queueing movement update for '{GetSelectedCharacter().Name}'.", LogEntryType.Debug);
+            _movementUpdates.Enqueue(input);
+        }
+
     }
 }

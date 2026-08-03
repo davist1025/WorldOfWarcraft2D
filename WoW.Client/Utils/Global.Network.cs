@@ -41,24 +41,7 @@ namespace WoW.Client
         public static GameNetworkState PeerState = GameNetworkState.Offline;
 
         public static Entity Player;
-        public static string Username;
-        public static string SessionId;
-
 
         public static List<RealmserverContainer> Realmlist = new List<RealmserverContainer>();
-        public static List<CharacterContainer> Characters = new List<CharacterContainer>();
-        private static int _selectedCharacterIndex = -1;
-
-        /// <summary>
-        /// Is set by the game server.
-        /// todo: [player speed] create a component for this.
-        /// </summary>
-        public static float Speed = 1f;
-
-        public static void SetSelectedCharacter(int index)
-            => _selectedCharacterIndex = index;
-
-        public static CharacterContainer GetSelectedCharacter()
-            => Characters[_selectedCharacterIndex];
     }
 }

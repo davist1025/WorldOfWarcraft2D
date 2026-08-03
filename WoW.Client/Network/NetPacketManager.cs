@@ -2,6 +2,7 @@
 using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.BitmapFonts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ using WoW.Client.Components;
 using WoW.Client.Scenes;
 using WoW.Framework.Logging;
 using WoW.Framework.Network.Container;
+using WoW.Framework.Shared;
+using WoW.Framework.Shared.Components;
 using static WoW.Framework.Network.NetworkManager;
 using static WoW.Framework.Utils;
 
@@ -53,13 +56,13 @@ namespace WoW.Client.Network
         /// <summary>
         /// Builds and sends a packet dictating which character we would like to play on.
         /// </summary>
-        public static void BuildEnterWorld(CharacterContainer selectedCharacter)
+        public static void BuildEnterWorld(CharacterContainer character)
         {
-            Logger.Print($"Attempting to play on character: ({selectedCharacter.Name})", LogEntryType.Debug);
+            Logger.Print($"Attempting to play on character: ({character.Name})", LogEntryType.Debug);
 
             NetDataWriter writer = new NetDataWriter(true);
             writer.Put((byte)PacketOpCode.CMSG_REALM_ENTER_WORLD);
-            writer.Put(selectedCharacter.Id);
+            writer.Put(character.Id);
 
             Global.Network.SendToServer(writer);
         }
@@ -93,10 +96,10 @@ namespace WoW.Client.Network
             switch (logonCode)
             {
                 case PacketOpCode.SMSG_AUTH_LOGON_SUCCESS:
-                    NetFootprintComponent myFootprint = Global._Player.AddComponent<NetFootprintComponent>();
                     string sessionId = reader.GetString();
                     string accountName = reader.GetString();
-                    myFootprint.Create(accountName, sessionId);
+                    NetFootprintComponent myNetFootprint = new NetFootprintComponent(accountName, sessionId);
+                    Global._Player.AddComponent(myNetFootprint);
 
                     Logger.Print($"Logged in successfully.", Framework.Utils.LogEntryType.Debug);
                     break;
@@ -134,6 +137,7 @@ namespace WoW.Client.Network
         public static void ReadCharacterList(NetDataReader reader)
         {
             int count = reader.GetInt();
+            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
 
             Logger.Print($"Receiving data for {count} character(s).", Framework.Utils.LogEntryType.Debug);
 
@@ -152,19 +156,67 @@ namespace WoW.Client.Network
 
                 characters.Add(
                     new CharacterContainer(name, id, (ActorRaceType)raceId, hairId, mapId: mapId, xPos, yPos, (ActorAnimationDirection)direction));
-
-                Global.Characters = characters;
-                Global.PeerState = Global.GameNetworkState.Realm_Characters;
             }
+
+            footprint.SetCharacterList(characters);
+            footprint.SetSelectedCharacter(0);
+
+            Global.PeerState = Global.GameNetworkState.Realm_Characters;
         }
 
+        /// <summary>
+        /// Handles the server's "ok" to enter the game world.
+        /// </summary>
+        /// <param name="reader"></param>
         public static void ReadEnterWorld(NetDataReader reader)
         {
             int index = reader.GetInt();
-            Global.SetSelectedCharacter(index);
+            float x = reader.GetFloat();
+            float y = reader.GetFloat();
+            float defaultSpeed = reader.GetFloat();
+
+            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+            footprint.SetSelectedCharacter(index);
+            footprint.Entity.AddComponent(new SpeedComponent(defaultSpeed));
+
+            Global._Player.SetPosition(new Vector2(x, y));
             Global.PeerState = Global.GameNetworkState.World;
 
             Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
+        }
+
+        /// <summary>
+        /// Handles a new actor being created on the server.
+        /// </summary>
+        /// <param name="reader"></param>
+        public static void ReadNewActor(NetDataReader reader)
+        {
+            ActorType actorType = (ActorType)reader.GetInt();
+            Entity newNetworkedActor = null;
+
+            switch (actorType)
+            {
+                case ActorType.Player:
+                    int networkId = reader.GetInt();
+
+                    // character info.
+                    string name = reader.GetString(); // name
+                    int hairId = reader.GetInt(); // hair id
+                    int raceId =  reader.GetInt(); // race id
+                    string mapId = reader.GetString(); // map id
+                    float x = reader.GetFloat(); // x
+                    float y = reader.GetFloat(); // y
+
+                    newNetworkedActor = new Entity($"{name}");
+                    OnlinePlayerData playerData = new OnlinePlayerData(networkId, name, hairId, raceId, mapId, x, y);
+                    newNetworkedActor.AddComponent(new OnlinePlayerControllerComponent(playerData));
+
+                    Logger.Print($"'{name}' has joined the world!", LogEntryType.Network);
+                    break;
+            }
+
+            if (newNetworkedActor != null)
+                ClientCore.Scene.AddEntity(newNetworkedActor);
         }
         #endregion
     }

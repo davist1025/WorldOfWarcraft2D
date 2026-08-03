@@ -19,7 +19,6 @@ using WoW.Framework.Logging;
 using WoW.Framework.Network;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Content;
-using WoW.Realmserver.Data;
 using WoW.Realmserver.Network;
 using static WoW.Framework.Utils;
 
@@ -31,7 +30,6 @@ namespace WoW.Realmserver
 
         public const float TickRate = 0.1f;
 
-        public static Queue<PendingPlayer> PendingPlayers = new Queue<PendingPlayer>();
         public static List<Entity> ItemReferences = new List<Entity>();
 
         public Program()

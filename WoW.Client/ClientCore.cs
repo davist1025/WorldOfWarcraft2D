@@ -69,7 +69,7 @@ namespace WoW.Client
         {
             var assetManager = Core.GetGlobalManager<AssetManager>();
 
-            assetManager.LoadEngineTextures();
+            assetManager.LoadGameTextures();
             assetManager.LoadTiledMaps();
 
             Mouse.SetCursor(MouseCursor.FromTexture2D(assetManager.GetTexture("default_mouse"), 0, 0));
@@ -111,7 +111,10 @@ namespace WoW.Client
         public static void Disconnect()
         {
             var gui = Core.Scene.FindEntity("gui");
-            Global.Characters.Clear();
+
+            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+            footprint.Characters.Clear();
+
             Global.Realmlist.Clear();
             Global.Network.Disconnect();
             Global.PeerState = Global.GameNetworkState.Offline;

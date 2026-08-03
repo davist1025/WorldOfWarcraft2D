@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
@@ -22,22 +23,21 @@ namespace WoW.Client.Network
     /// </summary>
     internal class NetworkEventListener : INetEventListener
     {
+        private Dictionary<byte, Action<NetDataReader>> _packetHandlers;
+
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
         {
-            Nez.Debug.Log($"Latency Update: {latency}");
+            //Nez.Debug.Log($"Latency Update: {latency}");
         }
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             PacketOpCode opCode = (PacketOpCode)reader.GetByte();
 
-            switch (opCode)
-            {
-                case PacketOpCode.SMSG_AUTH_LOGON: NetPacketManager.ReadLogonResponse(reader); break;
-                case PacketOpCode.SMSG_AUTH_REALMLIST: NetPacketManager.ReadRealmlist(reader);  break;
-                case PacketOpCode.SMSG_REALM_CHARACTER_LIST: NetPacketManager.ReadCharacterList(reader); break;
-                case PacketOpCode.SMSG_REALM_ENTER_WORLD: NetPacketManager.ReadEnterWorld(reader); break;
-            }
+            if (_packetHandlers.ContainsKey((byte)opCode))
+                _packetHandlers[(byte)opCode]?.Invoke(reader);
+            else
+                Logger.Print($"No packet handler for OpCode '0x{opCode.ToString("X2")}' does not exist; packet will not be processed.", Framework.Utils.LogEntryType.Warning);
         }
 
         /// <summary>
@@ -49,6 +49,14 @@ namespace WoW.Client.Network
             Logger.Print($"Connected to server.", Framework.Utils.LogEntryType.Debug);
 
             Global.Peer = peer;
+            _packetHandlers = new Dictionary<byte, Action<NetDataReader>>
+            {
+                { (byte)PacketOpCode.SMSG_AUTH_LOGON, NetPacketManager.ReadLogonResponse },
+                { (byte)PacketOpCode.SMSG_AUTH_REALMLIST, NetPacketManager.ReadRealmlist },
+                { (byte)PacketOpCode.SMSG_REALM_CHARACTER_LIST, NetPacketManager.ReadCharacterList },
+                { (byte)PacketOpCode.SMSG_REALM_ENTER_WORLD, NetPacketManager.ReadEnterWorld },
+                { (byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR,  NetPacketManager.ReadNewActor },
+            };
 
             switch (Global.PeerState)
             {

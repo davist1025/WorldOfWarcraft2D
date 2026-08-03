@@ -29,12 +29,11 @@ namespace WoW.Framework
 
         public enum ActorType
         {
-            Local,
-            Networked,
+            Player,
             Mob
         }
 
-        public enum ActorFlagTypes
+        public enum ActorTypeFlags
         {
             None = -1
         }

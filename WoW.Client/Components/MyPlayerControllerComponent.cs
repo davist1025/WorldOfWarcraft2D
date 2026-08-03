@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Utils;
 using WoW.Framework.Logging;
+using WoW.Framework.Shared.Components;
 
 namespace WoW.Client.Components
 {
@@ -25,6 +26,7 @@ namespace WoW.Client.Components
         private Mover _mover;
 
         private PrototypeSpriteRenderer _renderer;
+        private SpeedComponent _speed;
 
         private GameEventsManager _eventManager;
 
@@ -45,6 +47,8 @@ namespace WoW.Client.Components
             _renderer.Color = Color.MonoGameOrange;
 
             _eventManager = Core.GetGlobalManager<GameEventsManager>();
+
+            _speed = Entity.GetComponent<SpeedComponent>();
         }
 
         public void Update()
@@ -55,7 +59,8 @@ namespace WoW.Client.Components
             {
                 _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
 
-                var moveDirection = 100f * Time.DeltaTime * _movementInput;
+                // todo: SpeedComponent is null here for offline mode. need to make a function to initialize everything for offline mode.
+                var moveDirection = _speed.Speed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
 
                 _subPixelMovement.Update(ref moveDirection);

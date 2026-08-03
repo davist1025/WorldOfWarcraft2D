@@ -45,7 +45,7 @@ namespace WoW.Framework.Network
 
             #endregion
 
-            SMSG_REALM_CREATE_ENTITY = 0x0B, // players (local and networked), npcs
+            SMSG_REALM_CREATE_ACTOR = 0x0B, // players (local and networked), npcs
             SMSG_REALM_DISCONNECT = 0x0C, // kick
             SMSG_REALM_ENTER_WORLD = 0x0D, // "enter world" confirmation with additional initial logon data
             SMSG_REALM_MOVE = 0x0E, // notify all necessary players of another's movement.
@@ -117,6 +117,26 @@ namespace WoW.Framework.Network
         public void SendToClient(NetPeer peer, NetDataWriter writer, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
         {
             peer.Send(writer, deliveryMethod);
+        }
+
+        /// <summary>
+        /// Sends data to all clients except for the one with the given unique network id.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="accountId"></param>
+        /// <param name="delivery"></param>
+        public void SendToAllExcept(NetDataWriter writer, int peerId = -1, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            if (peerId == -1)
+            {
+                Logger.Print($"Please provide a valid PeerId to exclude from this packet ({peerId}).", Utils.LogEntryType.Error);
+                return;
+            }
+
+            IEnumerable<NetPeer> allPeersExcludingOne = _netManager.ConnectedPeerList.Where(peer => peer.Id != peerId);
+
+            foreach (var peer in allPeersExcludingOne)
+                peer.Send(writer, deliveryMethod);
         }
     }
 }

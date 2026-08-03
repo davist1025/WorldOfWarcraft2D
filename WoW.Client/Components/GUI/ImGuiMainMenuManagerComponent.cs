@@ -61,16 +61,6 @@ namespace WoW.Client.Components.GUI
                         Global.Network.ConnectTo(ConfigurationManager.AppSettings["realmlist"].Split(":"));
                     }
 
-                    if (NezImGui.CenteredButton("Offline", 0.6f))
-                    {
-                        // todo: [offline mode] load offline realm data (json, binary, sqllite?)
-                        Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
-                    }
-
-                    if (NezImGui.CenteredButton("About", 0.6f))
-                    {
-                    }
-
                     if (NezImGui.CenteredButton("Quit", 0.6f))
                     {
                     }
@@ -153,7 +143,9 @@ namespace WoW.Client.Components.GUI
 
                     ImGui.Begin("characters", windowFlags);
 
-                    if (Global.Characters.Count > 0)
+                    NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+
+                    if (footprint.Characters.Count > 0)
                     {
                         ImGui.Columns(3);
                         ImGui.Text("Name");
@@ -163,13 +155,13 @@ namespace WoW.Client.Components.GUI
                         ImGui.Text("Hair");
                         ImGui.NextColumn();
 
-                        for (int i = 0; i < Global.Characters.Count; i++)
+                        for (int i = 0; i < footprint.Characters.Count; i++)
                         {
-                            CharacterContainer character = Global.Characters[i];
+                            CharacterContainer character = footprint.Characters[i];
 
                             if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
-                                _characterSelectIndex = i;
+                                footprint.SetSelectedCharacter(i);
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
                                     Global.PeerState = GameNetworkState.LoadingWorld;
