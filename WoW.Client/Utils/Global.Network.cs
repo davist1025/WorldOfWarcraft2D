@@ -39,9 +39,12 @@ namespace WoW.Client
         public static NetPeer Peer = null;
         public static NetworkManager Network;
         public static GameNetworkState PeerState = GameNetworkState.Offline;
+        public static string NetworkId = "-";
 
         public static Entity Player;
 
         public static List<RealmserverContainer> Realmlist = new List<RealmserverContainer>();
+
+        // todo: make a list of pending new actors to be added to the world scene.
     }
 }

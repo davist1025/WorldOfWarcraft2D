@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Newtonsoft.Json.Linq;
 using Nez;
 using Nez.ImGuiTools;
@@ -39,8 +40,15 @@ namespace WoW.Client.Components.GUI
                 case GameNetworkState.World:
                     var thePlayerController = Entity.Scene.FindComponentOfType<MyPlayerControllerComponent>();
 
-                    if (ImGui.Begin("information", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize))
+                    ImGui.SetNextWindowPos(new Vector2(10f).ToNumerics());
+                    ImGui.SetNextWindowBgAlpha(0.5f);
+                    if (ImGui.Begin("#information", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize))
                     {
+                        ImGui.Text("World of Warcraft 2D - Debug");
+                        ImGui.Separator();
+                        ImGui.Text($"{Global.NetworkId}");
+
+                        ImGui.End();
                         // todo: [gui] recreate the information window.
                         //ImGui.Text($"{thePlayerController.Name}");
                         //ImGui.Text($"{Global.SessionId}");

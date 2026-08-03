@@ -14,10 +14,5 @@ namespace WoW.Realmserver
     internal partial class Global
     {
         public static NetworkManager Network;
-
-        /// <summary>
-        /// A queue of players transferring from the authserver.
-        /// </summary>
-        public static Queue<Tuple<string, NetPeer>> Transfers = new Queue<Tuple<string, NetPeer>>();
     }
 }

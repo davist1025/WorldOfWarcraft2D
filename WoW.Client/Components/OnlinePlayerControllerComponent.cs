@@ -16,7 +16,7 @@ namespace WoW.Client.Components
     /// </summary>
     public class OnlinePlayerData
     {
-        public readonly int NetworkId;
+        public readonly string NetworkId;
         public readonly string CharacterName;
         public readonly int HairId;
         public readonly ActorRaceType Race;
@@ -24,7 +24,7 @@ namespace WoW.Client.Components
         public float X;
         public float Y;
 
-        public OnlinePlayerData(int networkId, string name, int hairId, int raceType, string mapId, float x, float y)
+        public OnlinePlayerData(string networkId, string name, int hairId, int raceType, string mapId, float x, float y)
         {
             NetworkId = networkId;
             CharacterName = name;
@@ -47,6 +47,7 @@ namespace WoW.Client.Components
         private SubpixelVector2 _subPixelMovement;
         private Mover _mover;
         private CircleCollider _circleCollider;
+        private SpriteRenderer _renderer;
 
         private Queue<Vector2> _movementUpdates = new Queue<Vector2>();
 
@@ -60,8 +61,10 @@ namespace WoW.Client.Components
             Entity.SetPosition(new Vector2(Data.X, Data.Y));
 
             _mover = Entity.AddComponent<Mover>();
-            // todo: collider.
+            _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
+            _renderer.Color = Color.Red;
 
+            Logger.Print($"'{Data.CharacterName}' has joined our world!", LogEntryType.Network);
         }
 
         public void Update()

@@ -173,6 +173,7 @@ namespace WoW.Client.Network
             int index = reader.GetInt();
             float x = reader.GetFloat();
             float y = reader.GetFloat();
+            string myNetworkId = reader.GetString();
             float defaultSpeed = reader.GetFloat();
 
             NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
@@ -181,6 +182,7 @@ namespace WoW.Client.Network
 
             Global._Player.SetPosition(new Vector2(x, y));
             Global.PeerState = Global.GameNetworkState.World;
+            Global.NetworkId = myNetworkId;
 
             Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
         }
@@ -191,13 +193,15 @@ namespace WoW.Client.Network
         /// <param name="reader"></param>
         public static void ReadNewActor(NetDataReader reader)
         {
-            ActorType actorType = (ActorType)reader.GetInt();
+            ActorType actorType = (ActorType)reader.GetByte();
             Entity newNetworkedActor = null;
+
+            Logger.Print("New actor!!", LogEntryType.Debug);
 
             switch (actorType)
             {
                 case ActorType.Player:
-                    int networkId = reader.GetInt();
+                    string networkId = reader.GetString();
 
                     // character info.
                     string name = reader.GetString(); // name
@@ -207,16 +211,24 @@ namespace WoW.Client.Network
                     float x = reader.GetFloat(); // x
                     float y = reader.GetFloat(); // y
 
-                    newNetworkedActor = new Entity($"{name}");
+                    newNetworkedActor = ClientCore.Scene.CreateEntity(networkId);
                     OnlinePlayerData playerData = new OnlinePlayerData(networkId, name, hairId, raceId, mapId, x, y);
                     newNetworkedActor.AddComponent(new OnlinePlayerControllerComponent(playerData));
-
-                    Logger.Print($"'{name}' has joined the world!", LogEntryType.Network);
                     break;
             }
+        }
 
-            if (newNetworkedActor != null)
-                ClientCore.Scene.AddEntity(newNetworkedActor);
+        public static void ReadMovementUpdate(NetDataReader reader)
+        {
+            string networkId = reader.GetString();
+            float x = reader.GetFloat();
+            float y = reader.GetFloat();
+
+            var onlinePlayer = ClientCore.Scene
+                .FindComponentsOfType<OnlinePlayerControllerComponent>()
+                .Where(player => string.Equals(player.Data.NetworkId, networkId, StringComparison.OrdinalIgnoreCase))
+                .Single();
+            onlinePlayer.EnqueuePositionChange(new Vector2(x, y));
         }
         #endregion
     }

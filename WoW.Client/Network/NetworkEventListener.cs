@@ -56,6 +56,7 @@ namespace WoW.Client.Network
                 { (byte)PacketOpCode.SMSG_REALM_CHARACTER_LIST, NetPacketManager.ReadCharacterList },
                 { (byte)PacketOpCode.SMSG_REALM_ENTER_WORLD, NetPacketManager.ReadEnterWorld },
                 { (byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR,  NetPacketManager.ReadNewActor },
+                { (byte)PacketOpCode.SMSG_REALM_MOVE, NetPacketManager.ReadMovementUpdate }
             };
 
             switch (Global.PeerState)

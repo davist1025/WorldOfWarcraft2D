@@ -136,7 +136,11 @@ namespace WoW.Framework.Network
             IEnumerable<NetPeer> allPeersExcludingOne = _netManager.ConnectedPeerList.Where(peer => peer.Id != peerId);
 
             foreach (var peer in allPeersExcludingOne)
+            {
+                Logger.Print($"Sending '{(PacketOpCode)writer.Data[0]}' to peer w/ id: '{peer.Id}'.", Utils.LogEntryType.Network);
+
                 peer.Send(writer, deliveryMethod);
+            }
         }
     }
 }

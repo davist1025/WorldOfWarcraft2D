@@ -32,7 +32,13 @@ namespace WoW.Realmserver.Components
         /// <summary>
         /// The <see cref="NetPeer.Id"/> of this Session. This gets set when the player successfully transfers to the realmserver.
         /// </summary>
-        public int NetworkId;
+        public int ServerId;
+
+        /// <summary>
+        /// A randomly generated string to differentiate this session from the rest.
+        /// </summary>
+        public string NetworkId;
+
         public SessionState NetworkState = SessionState.OnCharacterList;
 
         private int _selectedCharacterIndex = -1;

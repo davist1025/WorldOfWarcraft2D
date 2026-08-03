@@ -46,7 +46,8 @@ namespace WoW.Realmserver.Network
                     var accountData = ctx.Accounts.Where(account => account.SessionId.Equals(sessionId)).Single();
 
                     SessionComponent newSession = new SessionComponent(accountData);
-                    newSession.NetworkId = peer.Id;
+                    newSession.ServerId = peer.Id;
+                    newSession.NetworkId = Guid.NewGuid().ToString().Replace("-", "");
                     newSession.NetworkState = Components.SessionState.OnCharacterList;
                     Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{accountData.Username}({accountData.SessionId})");
                     newPlayerEntity.AddComponent(newSession);
@@ -96,7 +97,11 @@ namespace WoW.Realmserver.Network
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)PacketOpCode.SMSG_REALM_MOVE);
+            writer.Put(playerSession.NetworkId);
+            writer.Put(xAxis);
+            writer.Put(yAxis);
 
+            Global.Network.SendToAllExcept(writer, peer.Id, DeliveryMethod.Unreliable);
         }
         #endregion
 
@@ -153,6 +158,7 @@ namespace WoW.Realmserver.Network
             writer.Put(session.GetSelectedCharacter().Id);
             writer.Put(character.XPosition);
             writer.Put(character.YPosition);
+            writer.Put(session.NetworkId);
             writer.Put(session.GetComponent<SpeedComponent>().Speed);
 
             Logger.Print($"Confirmed the player's choice of character: ({session.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
@@ -175,8 +181,8 @@ namespace WoW.Realmserver.Network
             PlayerCharacter character = newSession.GetSelectedCharacter();
 
             writer.Put((byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR);
-
             writer.Put((byte)ActorType.Player);
+            writer.Put(newSession.NetworkId);
             writer.Put(character.Name);
             writer.Put(character.HairId);
             writer.Put(character.RaceId);
@@ -184,7 +190,7 @@ namespace WoW.Realmserver.Network
             writer.Put(character.XPosition);
             writer.Put(character.YPosition);
 
-            Global.Network.SendToAllExcept(writer, newSession.NetworkId);
+            Global.Network.SendToAllExcept(writer, newSession.ServerId);
         }
 
         /// <summary>
@@ -198,20 +204,20 @@ namespace WoW.Realmserver.Network
             List<SessionComponent> allOtherSessions = 
                 CoreHeadless.Scene
                 .FindComponentsOfType<SessionComponent>()
-                .Where(session => session.NetworkId != newSession.NetworkId)
+                .Where(session => session.ServerId != peer.Id)
                 .ToList();
 
             if (allOtherSessions.Count > 0)
             {
-                NetDataWriter writer = new NetDataWriter(true);
-
-                writer.Put((byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR);
-                writer.Put(allOtherSessions.Count);
-
                 for (int i = 0; i < allOtherSessions.Count; i++)
                 {
+                    NetDataWriter writer = new NetDataWriter(true);
+
+                    writer.Put((byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR);
                     var thisOtherSession = allOtherSessions[i];
                     var character = thisOtherSession.GetSelectedCharacter();
+
+                    Logger.Print($"Sending {character.Name} to {newSession.GetSelectedCharacter().Name}.", LogEntryType.Debug);
 
                     writer.Put((byte)ActorType.Player);
                     writer.Put(newSession.NetworkId);
@@ -221,9 +227,9 @@ namespace WoW.Realmserver.Network
                     writer.Put(character.MapId);
                     writer.Put(character.XPosition);
                     writer.Put(character.YPosition);
-                }
 
-                Global.Network.SendToClient(peer, writer);
+                    Global.Network.SendToClient(peer, writer);
+                }
             }
         }
 
