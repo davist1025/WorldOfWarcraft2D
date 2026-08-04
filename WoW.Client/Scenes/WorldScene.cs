@@ -18,7 +18,7 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
-            var thePlayer = AddEntity(Global._Player);
+            var thePlayer = AddEntity(Global.Player);
             thePlayer.AddComponent<MyPlayerControllerComponent>();
 
             Camera.Entity.AddComponent(new FollowCamera(thePlayer, Camera));

@@ -60,7 +60,7 @@ namespace WoW.Client
 
             // create the player object.
             // this will get added to the scene later.
-            Global._Player = new Entity("thePlayer");
+            Global.Player = new Entity("thePlayer");
 
             Scene = new LogonScene();
         }
@@ -112,7 +112,7 @@ namespace WoW.Client
         {
             var gui = Core.Scene.FindEntity("gui");
 
-            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
             footprint.Characters.Clear();
 
             Global.Realmlist.Clear();

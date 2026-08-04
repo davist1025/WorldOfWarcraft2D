@@ -100,7 +100,7 @@ namespace WoW.Client.Network
                     string sessionId = reader.GetString();
                     string accountName = reader.GetString();
                     NetFootprintComponent myNetFootprint = new NetFootprintComponent(accountName, sessionId);
-                    Global._Player.AddComponent(myNetFootprint);
+                    Global.Player.AddComponent(myNetFootprint);
 
                     Logger.Print($"Logged in successfully.", Framework.Utils.LogEntryType.Debug);
                     break;
@@ -138,7 +138,7 @@ namespace WoW.Client.Network
         public static void ReadCharacterList(NetDataReader reader)
         {
             int count = reader.GetInt();
-            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
 
             Logger.Print($"Receiving data for {count} character(s).", Framework.Utils.LogEntryType.Debug);
 
@@ -151,12 +151,10 @@ namespace WoW.Client.Network
                 int raceId = reader.GetInt();
                 int hairId = reader.GetInt();
                 string mapId = reader.GetString();
-                float xPos = reader.GetFloat();
-                float yPos = reader.GetFloat();
                 int direction = reader.GetInt();
 
                 characters.Add(
-                    new CharacterContainer(name, id, (ActorRaceType)raceId, hairId, mapId: mapId, xPos, yPos, (ActorAnimationDirection)direction));
+                    new CharacterContainer(name, id, (ActorRaceType)raceId, hairId, mapId: mapId, (ActorAnimationDirection)direction));
             }
 
             footprint.SetCharacterList(characters);
@@ -177,11 +175,11 @@ namespace WoW.Client.Network
             string myNetworkId = reader.GetString();
             float defaultSpeed = reader.GetFloat();
 
-            NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
             footprint.SetSelectedCharacter(index);
             footprint.Entity.AddComponent(new SpeedComponent(defaultSpeed));
 
-            Global._Player.SetPosition(new Vector2(x, y));
+            Global.Player.SetPosition(new Vector2(x, y));
             Global.PeerState = Global.GameNetworkState.World;
             Global.NetworkId = myNetworkId;
 

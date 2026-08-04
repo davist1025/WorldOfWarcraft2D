@@ -143,7 +143,7 @@ namespace WoW.Client.Components.GUI
 
                     ImGui.Begin("characters", windowFlags);
 
-                    NetFootprintComponent footprint = Global._Player.GetComponent<NetFootprintComponent>();
+                    NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
 
                     if (footprint.Characters.Count > 0)
                     {

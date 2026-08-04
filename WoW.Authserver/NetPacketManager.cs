@@ -1,6 +1,7 @@
 ﻿using Isopoh.Cryptography.Argon2;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +87,20 @@ namespace WoW.Authserver
                 // send the realmlist packet.
                 Global.Network.SendToClient(peer, realmlistWriter);
             }
+        }
+
+        public static void ReadClientDisconnection(NetDataReader reader)
+        {
+            string clientSessionId = reader.GetString();
+
+            using (var authCtx = new AuthContext())
+            {
+                var thisAccount = authCtx.Accounts.Single(account => string.Equals(account.SessionId.ToLower(), clientSessionId.ToLower()));
+                thisAccount.SessionId = "-";
+                authCtx.SaveChanges();
+            }
+
+            Logger.Print($"Client '{clientSessionId}' has disconnected.", Utils.LogEntryType.Network);
         }
 
         #endregion

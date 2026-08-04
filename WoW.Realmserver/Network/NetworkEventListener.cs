@@ -1,4 +1,6 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using Nez;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Framework;
 using WoW.Framework.Logging;
+using WoW.Realmserver.Components;
 using static WoW.Framework.Network.NetworkManager;
+using static WoW.Framework.Utils;
 
 namespace WoW.Realmserver.Network
 {
@@ -20,7 +24,7 @@ namespace WoW.Realmserver.Network
         public void OnConnectionRequest(ConnectionRequest request)
         {
             request.Accept(); // arbitrarily accept connections for now.
-            Logger.Print($"{request.RemoteEndPoint} is trying to connect to the realmserver...", Utils.LogEntryType.Debug);
+            Logger.Print($"{request.RemoteEndPoint} is trying to connect to the realmserver...", LogEntryType.Debug);
         }
 
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
@@ -45,6 +49,19 @@ namespace WoW.Realmserver.Network
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
+            var entity = peer.Tag as Entity;
+            var session = entity.GetComponent<SessionComponent>();
+
+            Logger.Print($"Player '{session.GetSelectedCharacter().Name}' has left the world!", LogEntryType.Network);
+
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.SMSG_REALM_DISCONNECT);
+            writer.Put(session.SessionId);
+
+            // tell the authserver this player has quit.
+            Global.Network.SendUnconnected(writer, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8070));
+
+            // todo: save character data (pos, mapid, etc).
         }
 
         #region Unused functions

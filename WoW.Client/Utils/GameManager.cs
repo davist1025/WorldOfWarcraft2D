@@ -18,10 +18,13 @@ namespace WoW.Client.Utils
     public class GameManager : GlobalManager
     {
         /// <summary>
-        /// Triggers it's subscription(s) whenever local player movement is != Vector2.Zero.
+        /// Triggers  whenever local player movement is != Vector2.Zero.
         /// </summary>
         public EventHandler<Vector2> LocalPlayerMoved;
 
+        /// <summary>
+        /// Triggers when a new actor has been sent to this client.
+        /// </summary>
         public EventHandler<Entity> NewActorRegistered;
 
         private Queue<Entity> _newActorQueue = new Queue<Entity>();

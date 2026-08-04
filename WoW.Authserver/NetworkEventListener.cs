@@ -35,6 +35,13 @@ namespace WoW.Authserver
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
         {
+            PacketOpCode packetId = (PacketOpCode)reader.GetByte();
+
+            // todo: check for validity against realmlist endpoints to ensure security. for now, we dont care :p
+            switch (packetId)
+            {
+                case PacketOpCode.SMSG_REALM_DISCONNECT: NetPacketManager.ReadClientDisconnection(reader); break;
+            }
         }
 
         public void OnPeerConnected(NetPeer peer)

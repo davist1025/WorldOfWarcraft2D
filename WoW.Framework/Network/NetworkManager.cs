@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Framework.Logging;
@@ -61,6 +62,7 @@ namespace WoW.Framework.Network
             _listener = listener;
 
             _netManager = new NetManager(listener);
+            _netManager.UnconnectedMessagesEnabled = true;
         }
 
         public void Update()
@@ -142,5 +144,18 @@ namespace WoW.Framework.Network
                 peer.Send(writer, deliveryMethod);
             }
         }
+
+        /// <summary>
+        /// Send an unconnected message to the given end point.
+        /// 
+        /// Useful for Realmserver -> Authserver transmissions.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="endPoint"></param>
+        public void SendUnconnected(NetDataWriter writer, IPEndPoint endPoint)
+        {
+            _netManager.SendUnconnectedMessage(writer, endPoint);
+        }
     }
 }
+

@@ -71,7 +71,7 @@ namespace WoW.Client.Network
                     NetDataWriter writer = new NetDataWriter(true);
                     writer.Put((byte)PacketOpCode.CMSG_REALM_CONNECT);
 
-                    NetFootprintComponent myFootprint = Global._Player.GetComponent<NetFootprintComponent>();
+                    NetFootprintComponent myFootprint = Global.Player.GetComponent<NetFootprintComponent>();
                     writer.Put(myFootprint.SessionId);
                     Global.Network.SendToServer(writer);
                     break;

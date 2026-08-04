@@ -39,6 +39,8 @@ namespace WoW.Realmserver.Components
         /// </summary>
         public string NetworkId;
 
+        public string SessionId;
+
         public SessionState NetworkState = SessionState.OnCharacterList;
 
         private int _selectedCharacterIndex = -1;

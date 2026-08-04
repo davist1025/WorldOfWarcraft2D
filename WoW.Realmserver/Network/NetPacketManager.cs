@@ -39,6 +39,7 @@ namespace WoW.Realmserver.Network
         {
             string sessionId = reader.GetString();
 
+            // todo: make this only accessible from the authserver?
             using (var ctx = new AuthContext())
             {
                 if (ctx.Accounts.Any(account => account.SessionId.Equals(sessionId)))
@@ -48,6 +49,7 @@ namespace WoW.Realmserver.Network
                     SessionComponent newSession = new SessionComponent(accountData);
                     newSession.ServerId = peer.Id;
                     newSession.NetworkId = Guid.NewGuid().ToString().Replace("-", "");
+                    newSession.SessionId = sessionId;
                     newSession.NetworkState = Components.SessionState.OnCharacterList;
                     Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{accountData.Username}({accountData.SessionId})");
                     newPlayerEntity.AddComponent(newSession);
@@ -135,8 +137,6 @@ namespace WoW.Realmserver.Network
                     writer.Put(thisCharacter.RaceId);
                     writer.Put(thisCharacter.HairId);
                     writer.Put(thisCharacter.MapId);
-                    writer.Put(thisCharacter.XPosition);
-                    writer.Put(thisCharacter.YPosition);
                     writer.Put(thisCharacter.Direction);
                 }
             }

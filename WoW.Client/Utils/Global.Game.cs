@@ -13,6 +13,6 @@ namespace WoW.Client
 {
     public partial class Global
     {
-        public static Entity _Player; // todo: [Global._Player] rename to "Player" as cleanup progresses.
+        public static Entity Player;
     }
 }
