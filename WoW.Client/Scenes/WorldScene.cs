@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
+using WoW.Client.Utils;
 
 namespace WoW.Client.Scenes
 {
@@ -13,6 +14,8 @@ namespace WoW.Client.Scenes
     /// </summary>
     internal class WorldScene : Scene
     {
+        private GameManager _gameManager;
+
         public override void Initialize()
         {
             var thePlayer = AddEntity(Global._Player);
@@ -21,11 +24,16 @@ namespace WoW.Client.Scenes
             Camera.Entity.AddComponent(new FollowCamera(thePlayer, Camera));
             Camera.Zoom = 0.5f;
             Camera.GetComponent<FollowCamera>().FollowLerp = 0.05f;
+
+            _gameManager = Core.GetGlobalManager<GameManager>();
         }
 
         public override void Update()
         {
             base.Update();
+
+            if (_gameManager.PopUntrackedActor(out var newActor))
+                AddEntity(newActor);
         }
     }
 }

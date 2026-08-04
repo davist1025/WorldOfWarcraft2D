@@ -76,7 +76,6 @@ namespace WoW.Client.Network
                     Global.Network.SendToServer(writer);
                     break;
             }
-            // todo: send packet depending on state.
         }
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

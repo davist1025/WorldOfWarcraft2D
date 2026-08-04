@@ -220,7 +220,7 @@ namespace WoW.Realmserver.Network
                     Logger.Print($"Sending {character.Name} to {newSession.GetSelectedCharacter().Name}.", LogEntryType.Debug);
 
                     writer.Put((byte)ActorType.Player);
-                    writer.Put(newSession.NetworkId);
+                    writer.Put(thisOtherSession.NetworkId);
                     writer.Put(character.Name);
                     writer.Put(character.HairId);
                     writer.Put(character.RaceId);

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components;
 using WoW.Client.Scenes;
+using WoW.Client.Utils;
 using WoW.Framework.Logging;
 using WoW.Framework.Network.Container;
 using WoW.Framework.Shared;
@@ -193,10 +194,10 @@ namespace WoW.Client.Network
         /// <param name="reader"></param>
         public static void ReadNewActor(NetDataReader reader)
         {
-            ActorType actorType = (ActorType)reader.GetByte();
             Entity newNetworkedActor = null;
+            var gameManager = Core.GetGlobalManager<GameManager>();
 
-            Logger.Print("New actor!!", LogEntryType.Debug);
+            ActorType actorType = (ActorType)reader.GetByte();
 
             switch (actorType)
             {
@@ -211,13 +212,21 @@ namespace WoW.Client.Network
                     float x = reader.GetFloat(); // x
                     float y = reader.GetFloat(); // y
 
-                    newNetworkedActor = ClientCore.Scene.CreateEntity(networkId);
+                    newNetworkedActor = new Entity(networkId);
                     OnlinePlayerData playerData = new OnlinePlayerData(networkId, name, hairId, raceId, mapId, x, y);
                     newNetworkedActor.AddComponent(new OnlinePlayerControllerComponent(playerData));
                     break;
             }
+
+            gameManager.NewActorRegistered?.Invoke(null, newNetworkedActor);
         }
 
+        /// <summary>
+        /// Handles an entity's movement update.
+        /// 
+        /// We only process input.
+        /// </summary>
+        /// <param name="reader"></param>
         public static void ReadMovementUpdate(NetDataReader reader)
         {
             string networkId = reader.GetString();

@@ -91,7 +91,7 @@ namespace WoW.Client
             };
             Core.RegisterGlobalManager(guiManager);
 
-            var gameEventsManager = new GameEventsManager();
+            var gameEventsManager = new GameManager();
             Core.RegisterGlobalManager(gameEventsManager);
 
             var assetManager = new AssetManager();

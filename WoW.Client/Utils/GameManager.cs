@@ -15,16 +15,21 @@ namespace WoW.Client.Utils
     /// <summary>
     /// Potentially globally used functions; typically emitted from some location.
     /// </summary>
-    public class GameEventsManager : GlobalManager
+    public class GameManager : GlobalManager
     {
         /// <summary>
         /// Triggers it's subscription(s) whenever local player movement is != Vector2.Zero.
         /// </summary>
         public EventHandler<Vector2> LocalPlayerMoved;
 
-        public GameEventsManager(bool subscribeDefaults = true)
+        public EventHandler<Entity> NewActorRegistered;
+
+        private Queue<Entity> _newActorQueue = new Queue<Entity>();
+
+        public GameManager(bool subscribeDefaults = true)
         {
             LocalPlayerMoved += OnLocalPlayerMoved;
+            NewActorRegistered += OnNewActorRegistered;
         }
 
         #region Default subscribers
@@ -35,6 +40,23 @@ namespace WoW.Client.Utils
                 NetPacketManager.BuildMovementUpdate(input);
         }
 
+        public void OnNewActorRegistered(object sender, Entity entity)
+        {
+            _newActorQueue.Enqueue(entity);
+        }
+
         #endregion
+
+        public bool PopUntrackedActor(out Entity entity)
+        {
+            if (_newActorQueue.TryDequeue(out var result))
+            {
+                entity = result;
+                return true;
+            }
+
+            entity = null;
+            return false;
+        }
     }
 }

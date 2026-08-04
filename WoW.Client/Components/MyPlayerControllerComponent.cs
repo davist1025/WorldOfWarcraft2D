@@ -28,7 +28,7 @@ namespace WoW.Client.Components
         private PrototypeSpriteRenderer _renderer;
         private SpeedComponent _speed;
 
-        private GameEventsManager _eventManager;
+        private GameManager _eventManager;
 
         public override void OnAddedToEntity()
         {
@@ -46,7 +46,7 @@ namespace WoW.Client.Components
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             _renderer.Color = Color.MonoGameOrange;
 
-            _eventManager = Core.GetGlobalManager<GameEventsManager>();
+            _eventManager = Core.GetGlobalManager<GameManager>();
 
             _speed = Entity.GetComponent<SpeedComponent>();
         }
