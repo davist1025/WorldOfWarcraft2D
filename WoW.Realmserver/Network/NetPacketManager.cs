@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Database.Models;
@@ -38,28 +39,60 @@ namespace WoW.Realmserver.Network
         public static void ReadSessionTransfer(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
         {
             string sessionId = reader.GetString();
+            peer.Tag = sessionId;
+
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.SMSG_REALM_SESSION_TRANSFER_AUTH);
+            writer.Put(sessionId);
+
+            Global.Network.SendUnconnected(writer, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8070));
 
             // todo: make this only accessible from the authserver?
-            using (var ctx = new AuthContext())
+            //using (var ctx = new AuthContext())
+            //{
+            //    if (ctx.Accounts.Any(account => account.SessionId.Equals(sessionId)))
+            //    {
+            //        var accountData = ctx.Accounts.Where(account => account.SessionId.Equals(sessionId)).Single();
+
+            //SessionComponent newSession = new SessionComponent(accountData);
+            //newSession.ServerId = peer.Id;
+            //newSession.NetworkId = Guid.NewGuid().ToString().Replace("-", "");
+            //newSession.SessionId = sessionId;
+            //newSession.NetworkState = Components.SessionState.OnCharacterList;
+            //Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{accountData.Username}({accountData.SessionId})");
+            //newPlayerEntity.AddComponent(newSession);
+            //newPlayerEntity.Tag = (int)ActorType.Player;
+            //peer.Tag = newPlayerEntity;
+
+            //Logger.Print($"Account '{accountData.Username}' with session id ({accountData.SessionId}) has successfully entered the realm.", LogEntryType.Debug);
+
+            //NetPacketManager.BuildCharacterList(newSession, peer);
+            //    }
+        }
+        
+        public static void ReadSessionTransferConfirmation(NetDataReader reader)
+        {
+            var isValidTransfer = reader.GetBool();
+
+            if (isValidTransfer)
             {
-                if (ctx.Accounts.Any(account => account.SessionId.Equals(sessionId)))
-                {
-                    var accountData = ctx.Accounts.Where(account => account.SessionId.Equals(sessionId)).Single();
+                int accountId = reader.GetInt();
+                string sessionid = reader.GetString();
 
-                    SessionComponent newSession = new SessionComponent(accountData);
-                    newSession.ServerId = peer.Id;
-                    newSession.NetworkId = Guid.NewGuid().ToString().Replace("-", "");
-                    newSession.SessionId = sessionId;
-                    newSession.NetworkState = Components.SessionState.OnCharacterList;
-                    Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{accountData.Username}({accountData.SessionId})");
-                    newPlayerEntity.AddComponent(newSession);
-                    newPlayerEntity.Tag = (int)ActorType.Player;
-                    peer.Tag = newPlayerEntity;
+                var peer = Global.Network.GetPeerWithTag(sessionid);
+                int serverId = peer.Id;
+                string networkId = Guid.NewGuid().ToString().Replace("-", "");
 
-                    Logger.Print($"Account '{accountData.Username}' with session id ({accountData.SessionId}) has successfully entered the realm.", LogEntryType.Debug);
+                Logger.Print($"Account '{accountId}' has entered the realmserver.", LogEntryType.Network);
 
-                    NetPacketManager.BuildCharacterList(newSession, peer);
-                }
+                SessionComponent newSession = new SessionComponent(accountId, serverId, networkId, sessionid);
+                newSession.NetworkState = Components.SessionState.OnCharacterList;
+                Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{newSession.AccountId}_{newSession.NetworkId}_{newSession.SessionId})");
+                newPlayerEntity.AddComponent(newSession);
+                newPlayerEntity.Tag = (int)ActorType.Player;
+                peer.Tag = newPlayerEntity;
+
+                NetPacketManager.BuildCharacterList(newSession, peer);
             }
         }
 
@@ -77,7 +110,7 @@ namespace WoW.Realmserver.Network
             playerSession.SetSelectedCharacter(characterId);
             playerSession.AddComponent(new SpeedComponent(Convert.ToSingle(ConfigurationManager.AppSettings["default_speed"])));
 
-            Logger.Print($"Account ({playerSession.Account.Username}) is attempting to use character: ({playerSession.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
+            Logger.Print($"Account '{playerSession.AccountId}' is attempting to use character: ({playerSession.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
 
             BuildEnterWorld(playerSession, peer);
         }
@@ -121,7 +154,7 @@ namespace WoW.Realmserver.Network
 
             using (var ctx = new RealmContext())
             {
-                List<PlayerCharacter> thisAccountCharacters = ctx.Characters.Where(character => character.AccountId == newSession.Account.Id).ToList();
+                List<PlayerCharacter> thisAccountCharacters = ctx.Characters.Where(character => character.AccountId == newSession.AccountId).ToList();
                 newSession.Characters = thisAccountCharacters;
 
                 var characterCount = thisAccountCharacters.Count;

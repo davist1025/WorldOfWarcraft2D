@@ -26,23 +26,28 @@ namespace WoW.Realmserver.Components
 
     public class SessionComponent : Component, IUpdatable
     {
-        public Account Account;
-        public List<PlayerCharacter> Characters;
+        /// <summary>
+        /// This player's account id. 
+        /// 
+        /// This is given to the realmserver by the authentication server.
+        /// </summary>
+        public int AccountId { get; init; }
 
         /// <summary>
         /// The <see cref="NetPeer.Id"/> of this Session. This gets set when the player successfully transfers to the realmserver.
         /// </summary>
-        public int ServerId;
+        public int ServerId { get; init; }
 
         /// <summary>
         /// A randomly generated string to differentiate this session from the rest.
         /// </summary>
-        public string NetworkId;
+        public string NetworkId { get; init; }
 
-        public string SessionId;
+        public string SessionId { get; init; }
 
         public SessionState NetworkState = SessionState.OnCharacterList;
 
+        public List<PlayerCharacter> Characters;
         private int _selectedCharacterIndex = -1;
 
         public InventoryComponent Inventory;
@@ -54,8 +59,13 @@ namespace WoW.Realmserver.Components
 
         private Queue<Vector2> _movementUpdates = new Queue<Vector2>();
 
-        public SessionComponent(Account user)
-            => Account = user;
+        public SessionComponent(int accountId, int serverId, string networkId, string sessionId) 
+        {
+            AccountId = accountId;
+            ServerId = serverId;
+            NetworkId = networkId;
+            SessionId = sessionId;
+        }
 
         public void Update()
         {
@@ -63,7 +73,7 @@ namespace WoW.Realmserver.Components
             {
                 if (_mover == null)
                 {
-                    Logger.Print($"'{Account.Username}' has not had their game components initialized.", LogEntryType.Fatal);
+                    Logger.Print($"Character '{GetSelectedCharacter().Name}' has not had their game components initialized.", LogEntryType.Fatal);
                     Entity.Destroy();
                 }
 

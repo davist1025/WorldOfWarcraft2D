@@ -41,6 +41,7 @@ namespace WoW.Authserver
             switch (packetId)
             {
                 case PacketOpCode.SMSG_REALM_DISCONNECT: NetPacketManager.ReadClientDisconnection(reader); break;
+                case PacketOpCode.SMSG_REALM_SESSION_TRANSFER_AUTH: NetPacketManager.ReadSessionTransferVerification(reader, remoteEndPoint); break;
             }
         }
 

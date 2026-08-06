@@ -34,7 +34,6 @@ namespace WoW.Framework.Network
             #endregion
 
             SMSG_AUTH_REALMLIST = 0x02, // realmlist
-            // todo: send an unconnected message for realm transfer protocol? not really sure if it's 100% necessary for the realm and auth to be in contact.
 
             SMSG_REALM_CHARACTER_CREATE = 0x0A, // parent packet to child response codes.
 
@@ -52,6 +51,9 @@ namespace WoW.Framework.Network
             SMSG_REALM_MOVE = 0x0E, // notify all necessary players of another's movement.
             SMSG_REALM_MOVE_RECONCILE = 0x0F, // movement correction.
             SMSG_REALM_CHARACTER_LIST = 0x10, // the player's character list within the main menu.
+
+            SMSG_REALM_SESSION_TRANSFER_AUTH = 0x11, // confirm the session transfer with the authentication server.
+            SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION = 0x12,
         }
 
         private INetEventListener _listener;
@@ -156,6 +158,8 @@ namespace WoW.Framework.Network
         {
             _netManager.SendUnconnectedMessage(writer, endPoint);
         }
+
+        public NetPeer GetPeerWithTag(object tag) => _netManager.ConnectedPeerList.Find(peer => peer.Tag.Equals(tag));
     }
 }
 

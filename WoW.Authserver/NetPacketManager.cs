@@ -103,6 +103,28 @@ namespace WoW.Authserver
             Logger.Print($"Client '{clientSessionId}' has disconnected.", Utils.LogEntryType.Network);
         }
 
+        public static void ReadSessionTransferVerification(NetDataReader reader, IPEndPoint remoteEndPoint)
+        {
+            string clientSessionId = reader.GetString();
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION);
+
+            using (var ctx = new AuthContext())
+            {
+                if (ctx.Accounts.Any(account => account.SessionId.Equals(clientSessionId)))
+                {
+                    var thisAccount = ctx.Accounts.Single(account => account.SessionId.Equals(clientSessionId));
+
+                    Logger.Print($"Account '{thisAccount.Id}' is sucessfully transferring to the given realmserver: {remoteEndPoint.ToString()}.", Utils.LogEntryType.Network);
+
+                    writer.Put(true);
+                    writer.Put(ctx.Accounts.Where(account => account.SessionId.Equals(clientSessionId)).Single().Id);
+                    writer.Put(clientSessionId);
+                }
+            }
+
+            Global.Network.SendUnconnected(writer, remoteEndPoint);
+        }
         #endregion
     }
 }

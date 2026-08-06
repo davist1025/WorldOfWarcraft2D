@@ -41,6 +41,12 @@ namespace WoW.Realmserver.Network
 
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
         {
+            PacketOpCode packetId = (PacketOpCode)reader.GetByte();
+
+            switch (packetId)
+            {
+                case PacketOpCode.SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION: NetPacketManager.ReadSessionTransferConfirmation(reader); break;
+            }
         }
 
         public void OnPeerConnected(NetPeer peer)
