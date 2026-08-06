@@ -32,6 +32,7 @@ namespace WoW.Client.Scenes
         {
             base.Update();
 
+            // add new entities to the world as soon as we can.
             if (_gameManager.PopUntrackedActor(out var newActor))
                 AddEntity(newActor);
         }

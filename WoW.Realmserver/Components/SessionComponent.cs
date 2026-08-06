@@ -12,7 +12,6 @@ using WoW.Database.Models.Auth;
 using WoW.Database.Models.Realm.Character;
 using WoW.Framework.Logging;
 using WoW.Framework.Shared.Components;
-using WoW.Realmserver.Components.Inventory.Player;
 using WoW.Realmserver.Network;
 using static WoW.Framework.Utils;
 
@@ -50,8 +49,6 @@ namespace WoW.Realmserver.Components
         public List<PlayerCharacter> Characters;
         private int _selectedCharacterIndex = -1;
 
-        public InventoryComponent Inventory;
-
         private SubpixelVector2 _subPixelMovement;
         private Mover _mover;
         private Vector2 _moveDirection = Vector2.Zero;
@@ -87,6 +84,8 @@ namespace WoW.Realmserver.Components
                     _subPixelMovement.Update(ref moveDirection);
                     _mover.ApplyMovement(moveDirection);
 
+                    GetSelectedCharacter().SetPosition(Entity.Position);
+
                     Logger.Print($"'{GetSelectedCharacter().Name}' has moved to: {Entity.Position.X}:{Entity.Position.Y}.", LogEntryType.Debug);
                 }
             }
@@ -99,7 +98,6 @@ namespace WoW.Realmserver.Components
         {
             // todo: [session] create collider component.
             _mover = Entity.AddComponent<Mover>();
-            Inventory = Entity.AddComponent<InventoryComponent>();
             _speedComponent = Entity.GetComponent<SpeedComponent>();
 
             Entity.SetPosition(new Vector2(Characters[_selectedCharacterIndex].XPosition, Characters[_selectedCharacterIndex].YPosition));

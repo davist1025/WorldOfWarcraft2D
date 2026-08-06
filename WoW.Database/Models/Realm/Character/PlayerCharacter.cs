@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -42,5 +43,13 @@ namespace WoW.Database.Models.Realm.Character
 
         [Column("animation_direction")]
         public int Direction { get; set; }
+
+        public Vector2 GetPosition() => new Vector2(XPosition, YPosition);
+
+        public void SetPosition(Vector2 position)
+        {
+            XPosition = position.X;
+            YPosition = position.Y;
+        }
     }
 }

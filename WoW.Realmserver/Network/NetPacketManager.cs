@@ -46,30 +46,12 @@ namespace WoW.Realmserver.Network
             writer.Put(sessionId);
 
             Global.Network.SendUnconnected(writer, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8070));
-
-            // todo: make this only accessible from the authserver?
-            //using (var ctx = new AuthContext())
-            //{
-            //    if (ctx.Accounts.Any(account => account.SessionId.Equals(sessionId)))
-            //    {
-            //        var accountData = ctx.Accounts.Where(account => account.SessionId.Equals(sessionId)).Single();
-
-            //SessionComponent newSession = new SessionComponent(accountData);
-            //newSession.ServerId = peer.Id;
-            //newSession.NetworkId = Guid.NewGuid().ToString().Replace("-", "");
-            //newSession.SessionId = sessionId;
-            //newSession.NetworkState = Components.SessionState.OnCharacterList;
-            //Entity newPlayerEntity = CoreHeadless.Scene.CreateEntity($"{accountData.Username}({accountData.SessionId})");
-            //newPlayerEntity.AddComponent(newSession);
-            //newPlayerEntity.Tag = (int)ActorType.Player;
-            //peer.Tag = newPlayerEntity;
-
-            //Logger.Print($"Account '{accountData.Username}' with session id ({accountData.SessionId}) has successfully entered the realm.", LogEntryType.Debug);
-
-            //NetPacketManager.BuildCharacterList(newSession, peer);
-            //    }
         }
         
+        /// <summary>
+        /// Handles a confirmation from the authentication server in regard to transfers to the realmserver.
+        /// </summary>
+        /// <param name="reader"></param>
         public static void ReadSessionTransferConfirmation(NetDataReader reader)
         {
             var isValidTransfer = reader.GetBool();
@@ -135,6 +117,7 @@ namespace WoW.Realmserver.Network
             writer.Put(playerSession.NetworkId);
             writer.Put(xAxis);
             writer.Put(yAxis);
+            // todo: player movement updates should probably be sent after they've moved on the server and should include their new position.
 
             Global.Network.SendToAllExcept(writer, peer.Id, DeliveryMethod.Unreliable);
         }
@@ -193,8 +176,6 @@ namespace WoW.Realmserver.Network
             writer.Put(character.YPosition);
             writer.Put(session.NetworkId);
             writer.Put(session.GetComponent<SpeedComponent>().Speed);
-
-            Logger.Print($"Confirmed the player's choice of character: ({session.GetSelectedCharacter().Name})", Framework.Utils.LogEntryType.Debug);
 
             Global.Network.SendToClient(peer, writer);
 

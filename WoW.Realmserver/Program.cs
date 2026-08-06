@@ -77,18 +77,19 @@ namespace WoW.Realmserver
                     });
                 }
 
-                Logger.Print("Loading all items...", LogEntryType.Process);
+                // todo: removed item loading for now.
+                //Logger.Print("Loading all items...", LogEntryType.Process);
 
-                var items = ctx.Items.ToList();
-                for (int i = 0; i < items.Count; i++)
-                {
-                    var item = items[i];
-                    var itemEntityRef = Scene.CreateEntity($"{item.Id}_{item.Name.ToLower()}");
-                    var itemComponent = itemEntityRef.AddComponent(new ItemComponent(item));
+                //var items = ctx.Items.ToList();
+                //for (int i = 0; i < items.Count; i++)
+                //{
+                //    var item = items[i];
+                //    var itemEntityRef = Scene.CreateEntity($"{item.Id}_{item.Name.ToLower()}");
+                //    var itemComponent = itemEntityRef.AddComponent(new ItemComponent(item));
 
-                    ItemReferences.Add(itemEntityRef);
-                }
-                Logger.Print($"Loaded {ItemReferences.Count} items.", LogEntryType.Debug);
+                //    ItemReferences.Add(itemEntityRef);
+                //}
+                //Logger.Print($"Loaded {ItemReferences.Count} items.", LogEntryType.Debug);
 
                 ctx.SaveChanges();
             }

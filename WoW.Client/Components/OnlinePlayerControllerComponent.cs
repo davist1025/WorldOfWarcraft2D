@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Framework.Logging;
+using WoW.Framework.Shared.Components;
 using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components
@@ -71,7 +72,12 @@ namespace WoW.Client.Components
         {
             if (_movementUpdates.TryDequeue(out Vector2 input))
             {
-                Logger.Print($"'{Data.CharacterName}' is moving!", LogEntryType.Debug);
+                // todo: have the realmserver send a speed for each player upon creating the actor.
+                var moveDirection = 100f * Time.DeltaTime * input;
+                moveDirection.Round();
+
+                _subPixelMovement.Update(ref moveDirection);
+                _mover.ApplyMovement(moveDirection);
             }
         }
 
