@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Network;
+using WoW.Client.Scenes;
 using WoW.Framework.Logging;
 using static WoW.Client.Global;
 
@@ -27,12 +28,15 @@ namespace WoW.Client.Utils
         /// </summary>
         public EventHandler<Entity> NewActorRegistered;
 
+        public EventHandler Disconnected;
+
         private Queue<Entity> _newActorQueue = new Queue<Entity>();
 
         public GameManager(bool subscribeDefaults = true)
         {
             LocalPlayerMoved += OnLocalPlayerMoved;
             NewActorRegistered += OnNewActorRegistered;
+            Disconnected += OnDisconnected;
         }
 
         #region Default subscribers
@@ -48,6 +52,10 @@ namespace WoW.Client.Utils
             _newActorQueue.Enqueue(entity);
         }
 
+        public void OnDisconnected(object sender, EventArgs e) 
+        {
+            Core.StartSceneTransition(new FadeTransition(() => new LogonScene()));
+        }
         #endregion
 
         public bool PopUntrackedActor(out Entity entity)

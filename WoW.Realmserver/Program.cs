@@ -66,16 +66,16 @@ namespace WoW.Realmserver
                     });
                 }
 
-                if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)ActorRaceType.Orc))
-                {
-                    ctx.RaceSpawns.Add(new CharacterRaceSpawn()
-                    {
-                        RaceId = (int)ActorRaceType.Orc,
-                        MapId = "valley_of_trials",
-                        X = 50f,
-                        Y = 50f,
-                    });
-                }
+                //if (!ctx.RaceSpawns.Any(spawn => spawn.RaceId == (int)ActorRaceType.Orc))
+                //{
+                //    ctx.RaceSpawns.Add(new CharacterRaceSpawn()
+                //    {
+                //        RaceId = (int)ActorRaceType.Orc,
+                //        MapId = "valley_of_trials",
+                //        X = 50f,
+                //        Y = 50f,
+                //    });
+                //}
 
                 // todo: removed item loading for now.
                 //Logger.Print("Loading all items...", LogEntryType.Process);

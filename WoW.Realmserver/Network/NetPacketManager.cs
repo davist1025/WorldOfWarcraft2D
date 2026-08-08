@@ -203,6 +203,7 @@ namespace WoW.Realmserver.Network
             writer.Put(character.MapId);
             writer.Put(character.XPosition);
             writer.Put(character.YPosition);
+            writer.Put(newSession.GetCharacterSpeed());
 
             Global.Network.SendToAllExcept(writer, newSession.ServerId);
         }
@@ -241,6 +242,7 @@ namespace WoW.Realmserver.Network
                     writer.Put(thisOtherCharacter.MapId);
                     writer.Put(thisOtherSession.Entity.Position.X);
                     writer.Put(thisOtherSession.Entity.Position.Y);
+                    writer.Put(thisOtherSession.GetCharacterSpeed());
 
                     Global.Network.SendToClient(peer, writer);
                 }

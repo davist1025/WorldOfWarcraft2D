@@ -123,5 +123,10 @@ namespace WoW.Realmserver.Components
             _movementUpdates.Enqueue(input);
         }
 
+        /// <summary>
+        /// Returns this individual character's movement speed.
+        /// </summary>
+        /// <returns></returns>
+        public float GetCharacterSpeed() => _speedComponent.Speed;
     }
 }

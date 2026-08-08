@@ -63,6 +63,7 @@ namespace WoW.Client.Components.GUI
 
                     if (NezImGui.CenteredButton("Quit", 0.6f))
                     {
+                        Core.Exit();
                     }
                     ImGui.End();
                     break;

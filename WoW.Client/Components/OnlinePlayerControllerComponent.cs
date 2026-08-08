@@ -24,8 +24,9 @@ namespace WoW.Client.Components
         public string MapId;
         public float X;
         public float Y;
+        public float MovementSpeed;
 
-        public OnlinePlayerData(string networkId, string name, int hairId, int raceType, string mapId, float x, float y)
+        public OnlinePlayerData(string networkId, string name, int hairId, int raceType, string mapId, float x, float y, float mvoementSpeed)
         {
             NetworkId = networkId;
             CharacterName = name;
@@ -34,6 +35,7 @@ namespace WoW.Client.Components
             MapId = mapId;
             X = x;
             Y = y;
+            MovementSpeed = mvoementSpeed;
         }
     }
 
@@ -49,6 +51,7 @@ namespace WoW.Client.Components
         private Mover _mover;
         private CircleCollider _circleCollider;
         private SpriteRenderer _renderer;
+        private SpeedComponent _speedComponent;
 
         private Queue<Vector2> _movementUpdates = new Queue<Vector2>();
 
@@ -65,6 +68,8 @@ namespace WoW.Client.Components
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
             _renderer.Color = Color.Red;
 
+            _speedComponent = new SpeedComponent(Data.MovementSpeed);
+
             Logger.Print($"'{Data.CharacterName}' has joined our world!", LogEntryType.Network);
         }
 
@@ -73,7 +78,7 @@ namespace WoW.Client.Components
             if (_movementUpdates.TryDequeue(out Vector2 input))
             {
                 // todo: have the realmserver send a speed for each player upon creating the actor.
-                var moveDirection = 100f * Time.DeltaTime * input;
+                var moveDirection = Data.MovementSpeed * Time.DeltaTime * input;
                 moveDirection.Round();
 
                 _subPixelMovement.Update(ref moveDirection);

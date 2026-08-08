@@ -83,6 +83,10 @@ namespace WoW.Realmserver.Network
 
                 Logger.Print($"'{session.GetSelectedCharacter().Name}' has been saved to the database.", LogEntryType.Debug);
             }
+
+            // finally, remove this player from the game.
+            // todo: might need to add a remove player queue since players could theoretically connect and join the world while a player is exiting.
+            entity.Destroy();
         }
 
         #region Unused functions

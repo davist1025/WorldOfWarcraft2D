@@ -209,9 +209,10 @@ namespace WoW.Client.Network
                     string mapId = reader.GetString(); // map id
                     float x = reader.GetFloat(); // x
                     float y = reader.GetFloat(); // y
+                    float movementSpeed = reader.GetFloat();
 
                     newNetworkedActor = new Entity(networkId);
-                    OnlinePlayerData playerData = new OnlinePlayerData(networkId, name, hairId, raceId, mapId, x, y);
+                    OnlinePlayerData playerData = new OnlinePlayerData(networkId, name, hairId, raceId, mapId, x, y, movementSpeed);
                     newNetworkedActor.AddComponent(new OnlinePlayerControllerComponent(playerData));
                     break;
             }
@@ -244,6 +245,16 @@ namespace WoW.Client.Network
         public static void ReadDisconnection(NetDataReader reader)
         {
             string sessionId = reader.GetString();
+            // todo: (disconnect called on our player) placeholder code.
+            //NetFootprintComponent myFootprint = 
+            //    (Global.PeerState == Global.GameNetworkState.World) ? Core.Scene.FindComponentOfType<NetFootprintComponent>() : null;
+
+            //// if we were in-game, we need to clear out our character list and other network variables.
+            //if (Global.PeerState == Global.GameNetworkState.World 
+            //    && myFootprint != null
+            //    && string.Equals(sessionId, myFootprint.SessionId, StringComparison.OrdinalIgnoreCase))
+            //    Core.GetGlobalManager<GameManager>().Disconnected?.Invoke(null, null);
+
             var onlinePlayer = Core.Scene.Entities.FindEntity(sessionId);
 
             if (onlinePlayer != null)
