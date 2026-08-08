@@ -85,7 +85,7 @@ namespace WoW.Client
                 ShowCoreWindow = false,
                 ShowDemoWindow = false,
                 ShowSceneGraphWindow = true,
-                ShowSeperateGameWindow = false,
+                ShowSeperateGameWindow  = false,
                 ShowMenuBar = false,
                 ShowStyleEditor = false,
             };

@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using Nez;
+using Nez.ECS.Headless;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Database.Models;
 using WoW.Framework;
 using WoW.Framework.Logging;
 using WoW.Realmserver.Components;
@@ -67,7 +69,20 @@ namespace WoW.Realmserver.Network
             // tell the authserver this player has quit.
             Global.Network.SendUnconnected(writer, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8070));
 
-            // todo: save character data (pos, mapid, etc).
+            // tell all players this player has quit.
+            NetDataWriter disconnectWriter = new NetDataWriter(true);
+            disconnectWriter.Put((byte)PacketOpCode.SMSG_REALM_DISCONNECT);
+            disconnectWriter.Put(session.NetworkId);
+            Global.Network.SendToAllExcept(disconnectWriter, peer.Id);
+
+            // update the character in the db.
+            using (var ctx = new RealmContext())
+            {
+                ctx.Characters.Update(session.GetSelectedCharacter());
+                ctx.SaveChanges();
+
+                Logger.Print($"'{session.GetSelectedCharacter().Name}' has been saved to the database.", LogEntryType.Debug);
+            }
         }
 
         #region Unused functions

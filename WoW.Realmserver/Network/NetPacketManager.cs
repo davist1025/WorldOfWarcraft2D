@@ -229,18 +229,18 @@ namespace WoW.Realmserver.Network
 
                     writer.Put((byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR);
                     var thisOtherSession = allOtherSessions[i];
-                    var character = thisOtherSession.GetSelectedCharacter();
+                    var thisOtherCharacter = thisOtherSession.GetSelectedCharacter();
 
-                    Logger.Print($"Sending {character.Name} to {newSession.GetSelectedCharacter().Name}.", LogEntryType.Debug);
+                    Logger.Print($"Sending {thisOtherCharacter.Name} to {newSession.GetSelectedCharacter().Name}.", LogEntryType.Debug);
 
                     writer.Put((byte)ActorType.Player);
                     writer.Put(thisOtherSession.NetworkId);
-                    writer.Put(character.Name);
-                    writer.Put(character.HairId);
-                    writer.Put(character.RaceId);
-                    writer.Put(character.MapId);
-                    writer.Put(character.XPosition);
-                    writer.Put(character.YPosition);
+                    writer.Put(thisOtherCharacter.Name);
+                    writer.Put(thisOtherCharacter.HairId);
+                    writer.Put(thisOtherCharacter.RaceId);
+                    writer.Put(thisOtherCharacter.MapId);
+                    writer.Put(thisOtherSession.Entity.Position.X);
+                    writer.Put(thisOtherSession.Entity.Position.Y);
 
                     Global.Network.SendToClient(peer, writer);
                 }

@@ -233,9 +233,24 @@ namespace WoW.Client.Network
 
             var onlinePlayer = ClientCore.Scene
                 .FindComponentsOfType<OnlinePlayerControllerComponent>()
-                .Where(player => string.Equals(player.Data.NetworkId, networkId, StringComparison.OrdinalIgnoreCase))
-                .Single();
+                .Single(player => string.Equals(player.Data.NetworkId, networkId, StringComparison.OrdinalIgnoreCase));
             onlinePlayer.EnqueuePositionChange(new Vector2(x, y));
+        }
+
+        /// <summary>
+        /// Received when the server detects a disconnection.
+        /// </summary>
+        /// <param name="reader"></param>
+        public static void ReadDisconnection(NetDataReader reader)
+        {
+            string sessionId = reader.GetString();
+            var onlinePlayer = Core.Scene.Entities.FindEntity(sessionId);
+
+            if (onlinePlayer != null)
+            {
+                Logger.Print($"'{onlinePlayer.GetComponent<OnlinePlayerControllerComponent>().Data.CharacterName}' has left the world!", LogEntryType.Network);
+                onlinePlayer.Destroy();
+            }
         }
         #endregion
     }
