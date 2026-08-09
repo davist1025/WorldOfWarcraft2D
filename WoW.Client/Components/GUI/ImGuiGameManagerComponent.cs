@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Components.Player;
 using WoW.Framework.Network.Container;
 using static WoW.Client.Global;
 

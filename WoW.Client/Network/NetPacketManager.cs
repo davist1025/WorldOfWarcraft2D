@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Components;
+using WoW.Client.Components.Player;
 using WoW.Client.Scenes;
 using WoW.Client.Utils;
 using WoW.Framework.Logging;

@@ -28,6 +28,9 @@ namespace WoW.Client.Utils
         /// </summary>
         public EventHandler<Entity> NewActorRegistered;
 
+        /// <summary>
+        /// Triggers when this client gets disconnected from the server, either by kick or otherwise.
+        /// </summary>
         public EventHandler Disconnected;
 
         private Queue<Entity> _newActorQueue = new Queue<Entity>();

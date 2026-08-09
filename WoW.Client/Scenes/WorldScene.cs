@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Client.Components;
+using WoW.Client.Components.Player;
 using WoW.Client.Utils;
 
 namespace WoW.Client.Scenes

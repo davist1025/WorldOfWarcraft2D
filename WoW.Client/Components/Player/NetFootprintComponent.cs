@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Framework.Network.Container;
 
-namespace WoW.Client.Components
+namespace WoW.Client.Components.Player
 {
     /// <summary>
     /// Holds persistent information strictly related to our "footprint," within the server.

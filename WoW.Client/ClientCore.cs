@@ -17,8 +17,8 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using WoW.Client.Components;
 using WoW.Client.Components.GUI;
+using WoW.Client.Components.Player;
 using WoW.Client.Content;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
@@ -26,6 +26,7 @@ using WoW.Client.Utils;
 using WoW.Framework;
 using WoW.Framework.Logging;
 using WoW.Framework.Network;
+using static WoW.Framework.Utils;
 
 namespace WoW.Client
 {
@@ -69,7 +70,10 @@ namespace WoW.Client
         {
             var assetManager = Core.GetGlobalManager<AssetManager>();
 
+            Logger.Print($"Loading game textures...", LogEntryType.Debug);
             assetManager.LoadGameTextures();
+
+            Logger.Print($"Loading Tiled maps...", LogEntryType.Debug);
             assetManager.LoadTiledMaps();
 
             Mouse.SetCursor(MouseCursor.FromTexture2D(assetManager.GetTexture("default_mouse"), 0, 0));

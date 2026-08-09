@@ -12,7 +12,7 @@ using WoW.Client.Utils;
 using WoW.Framework.Logging;
 using WoW.Framework.Shared.Components;
 
-namespace WoW.Client.Components
+namespace WoW.Client.Components.Player
 {
     /// <summary>
     /// The local player component.

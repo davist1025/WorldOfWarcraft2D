@@ -10,7 +10,7 @@ using WoW.Framework.Logging;
 using WoW.Framework.Shared.Components;
 using static WoW.Framework.Utils;
 
-namespace WoW.Client.Components
+namespace WoW.Client.Components.Player
 {
     /// <summary>
     /// Contains the networked metadata with information regarding this player.

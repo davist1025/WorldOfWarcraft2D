@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Components.Player;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
 using WoW.Framework.Network.Container;
