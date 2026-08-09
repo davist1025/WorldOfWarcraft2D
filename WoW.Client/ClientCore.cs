@@ -45,6 +45,7 @@ namespace WoW.Client
         {
             Global.Network = new NetworkManager(new NetworkEventListener());
             Global.Network.StartClient();
+            Global.Network.RunLatencySimulation();
 
             /*
              * NetState can be changed to display whichever UI is necessary, per ImGUI.

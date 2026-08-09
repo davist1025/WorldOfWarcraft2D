@@ -48,6 +48,7 @@ namespace WoW.Client.Components.GUI
                         ImGui.Text("World of Warcraft 2D - Debug");
                         ImGui.Separator();
                         ImGui.Text($"{Global.NetworkId}");
+                        ImGui.Text($"Ping: {Global.Network.GetPing()}");
 
                         ImGui.End();
                         // todo: [gui] recreate the information window.

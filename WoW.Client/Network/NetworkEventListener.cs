@@ -57,6 +57,7 @@ namespace WoW.Client.Network
                 { (byte)PacketOpCode.SMSG_REALM_ENTER_WORLD, NetPacketManager.ReadEnterWorld },
                 { (byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR,  NetPacketManager.ReadNewActor },
                 { (byte)PacketOpCode.SMSG_REALM_MOVE, NetPacketManager.ReadMovementUpdate },
+                { (byte)PacketOpCode.SMSG_REALM_MOVE_RECONCILE, NetPacketManager.ReadReconciliation },
                 { (byte)PacketOpCode.SMSG_REALM_DISCONNECT, NetPacketManager.ReadDisconnection }
             };
 

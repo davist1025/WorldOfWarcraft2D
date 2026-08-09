@@ -63,8 +63,10 @@ namespace WoW.Framework.Network
         {
             _listener = listener;
 
-            _netManager = new NetManager(listener);
-            _netManager.UnconnectedMessagesEnabled = true;
+            _netManager = new NetManager(listener)
+            {
+                UnconnectedMessagesEnabled = true
+            };
         }
 
         public void Update()
@@ -103,6 +105,31 @@ namespace WoW.Framework.Network
         public void Disconnect() => _netManager.DisconnectAll();
 
         /// <summary>
+        /// Enables latency simulation on the acting library. 
+        /// 
+        /// Can or cannot include packet loss.
+        /// </summary>
+        /// <param name="includePacketLoss"></param>
+        /// <param name="minSimLatency"></param>
+        /// <param name="maxSimLatency"></param>
+        public void RunLatencySimulation(bool includePacketLoss = true, int packetLossChanceInPercent = 10, int minSimLatency = 150, int maxSimLatency = 400)
+        {
+            _netManager.SimulateLatency = true;
+            _netManager.SimulatePacketLoss = includePacketLoss;
+            if (includePacketLoss)
+                _netManager.SimulationPacketLossChance = packetLossChanceInPercent;
+            _netManager.SimulationMinLatency = minSimLatency;
+            _netManager.SimulationMaxLatency = maxSimLatency;
+        }
+
+        /// <summary>
+        /// Returns the round-trip time to the server.
+        /// </summary>
+        /// <returns></returns>
+        public int GetPing() => _netManager.FirstPeer.Ping;
+
+
+        /// <summary>
         /// Send the data of a <see cref="NetDataWriter"/> to the server.
         /// </summary>
         /// <param name="writer"></param>
@@ -121,6 +148,16 @@ namespace WoW.Framework.Network
         public void SendToClient(NetPeer peer, NetDataWriter writer, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
         {
             peer.Send(writer, deliveryMethod);
+        }
+
+        public void SendToClient(int peerId, NetDataWriter writer, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            NetPeer peer = _netManager.Single(connection => connection.Id == peerId);
+
+            if (peer != null)
+                peer.Send(writer, deliveryMethod);
+            else
+                Logger.Print($"Unable to send packet of type '{(PacketOpCode)writer.Data[0]}' to peer: NetPeer with ID '{peerId}' does not exist!", Utils.LogEntryType.Fatal);
         }
 
         /// <summary>

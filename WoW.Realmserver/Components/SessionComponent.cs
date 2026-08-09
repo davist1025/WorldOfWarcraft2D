@@ -54,7 +54,7 @@ namespace WoW.Realmserver.Components
         private Vector2 _moveDirection = Vector2.Zero;
         private SpeedComponent _speedComponent;
 
-        private Queue<Vector2> _movementUpdates = new Queue<Vector2>();
+        private Queue<Tuple<Vector2, long>> _movementUpdates = new Queue<Tuple<Vector2, long>>();
 
         public SessionComponent(int accountId, int serverId, string networkId, string sessionId) 
         {
@@ -76,15 +76,17 @@ namespace WoW.Realmserver.Components
 
                 if (_movementUpdates.Count > 0)
                 {
-                    Vector2 input = _movementUpdates.Dequeue();
+                     Tuple<Vector2, long> movementUpdate = _movementUpdates.Dequeue();
 
-                    var moveDirection = _speedComponent.Speed * Global.DeltaTime * input;
+                    var moveDirection = _speedComponent.Speed * Global.DeltaTime * movementUpdate.Item1;
                     moveDirection.Round();
 
                     _subPixelMovement.Update(ref moveDirection);
                     _mover.ApplyMovement(moveDirection);
 
                     GetSelectedCharacter().SetPosition(Entity.Position);
+
+                    NetPacketManager.BuildReconciliation(ServerId, Entity.Position, movementUpdate.Item2);
 
                     Logger.Print($"'{GetSelectedCharacter().Name}' has moved to: {Entity.Position.X}:{Entity.Position.Y}.", LogEntryType.Debug);
                 }
@@ -117,10 +119,10 @@ namespace WoW.Realmserver.Components
         public PlayerCharacter GetSelectedCharacter()
             => Characters[_selectedCharacterIndex];
 
-        public void EnqueuePositionChange(Vector2 input)
+        public void EnqueuePositionChange(Vector2 input, long timeTick)
         {
             Logger.Print($"Queueing movement update for '{GetSelectedCharacter().Name}'.", LogEntryType.Debug);
-            _movementUpdates.Enqueue(input);
+            _movementUpdates.Enqueue(new(input, timeTick));
         }
 
         /// <summary>

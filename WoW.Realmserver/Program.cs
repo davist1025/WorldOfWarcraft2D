@@ -96,6 +96,7 @@ namespace WoW.Realmserver
 
             Global.Network = new NetworkManager(new NetworkEventListener());
             Global.Network.StartServer(ConfigurationManager.AppSettings["hostname"].Split(":"));
+            Global.Network.RunLatencySimulation();
 
             while (true)
                 Tick();

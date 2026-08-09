@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Components.Player;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
 using WoW.Framework.Logging;
@@ -22,6 +23,8 @@ namespace WoW.Client.Utils
         /// Triggers  whenever local player movement is != Vector2.Zero.
         /// </summary>
         public EventHandler<Vector2> LocalPlayerMoved;
+        private long _movementTimeTick;
+        public List<(long Tick, Vector2 Input, Vector2 ResultingClientPosition)> NetworkedMovementTicks;
 
         /// <summary>
         /// Triggers when a new actor has been sent to this client.
@@ -40,6 +43,8 @@ namespace WoW.Client.Utils
             LocalPlayerMoved += OnLocalPlayerMoved;
             NewActorRegistered += OnNewActorRegistered;
             Disconnected += OnDisconnected;
+
+            NetworkedMovementTicks = new List<(long tick, Vector2 input, Vector2 resultingPosition)>();
         }
 
         #region Default subscribers
@@ -47,7 +52,14 @@ namespace WoW.Client.Utils
         public void OnLocalPlayerMoved(object sender, Vector2 input)
         {
             if (Global.PeerState == GameNetworkState.World)
-                NetPacketManager.BuildMovementUpdate(input);
+            {
+                Entity myPlayer = Core.Scene.FindComponentOfType<MyPlayerControllerComponent>().Entity;
+                long movementTimeTick = DateTime.Now.Ticks; // used to track individual input during reconciliation.
+
+                NetworkedMovementTicks.Add(new(movementTimeTick, input, myPlayer.Position)); // stores relevant movement information at the time of processing so when the server sends us our real calcuation, we can cross-check and reconcile.
+
+                NetPacketManager.BuildMovementUpdate(input, movementTimeTick);
+            }
         }
 
         public void OnNewActorRegistered(object sender, Entity entity)

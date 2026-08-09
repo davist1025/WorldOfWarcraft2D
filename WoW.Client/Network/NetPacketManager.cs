@@ -72,12 +72,13 @@ namespace WoW.Client.Network
         /// Builds and sends a packet for local player movement updates (you!)
         /// </summary>
         /// <param name="input"></param>
-        public static void BuildMovementUpdate(Vector2 input)
+        public static void BuildMovementUpdate(Vector2 input, long timeTick)
         {
             NetDataWriter writer = new NetDataWriter(true);
             writer.Put((byte)PacketOpCode.CMSG_REALM_MOVE);
             writer.Put(input.X);
             writer.Put(input.Y);
+            writer.Put(timeTick);
 
             Global.Network.SendToServer(writer, DeliveryMethod.Unreliable);
         }
@@ -262,6 +263,22 @@ namespace WoW.Client.Network
                 Logger.Print($"'{onlinePlayer.GetComponent<OnlinePlayerControllerComponent>().Data.CharacterName}' has left the world!", LogEntryType.Network);
                 onlinePlayer.Destroy();
             }
+        }
+
+        public static void ReadReconciliation(NetDataReader reader)
+        {
+            float realX = reader.GetFloat();
+            float realY = reader.GetFloat();
+            long originalTimeTick = reader.GetLong();
+
+            var gameManager = Core.GetGlobalManager<GameManager>();
+            var tuple = gameManager.NetworkedMovementTicks.Single((tuple) => tuple.Tick == originalTimeTick);
+
+            var serverPos = new Vector2(realX, realY);
+            float syncDifference = Vector2.Distance(serverPos, tuple.ResultingClientPosition);
+
+            if (syncDifference > 1.5f)
+                Logger.Print($"We are desynchronized from the server!", LogEntryType.Fatal);
         }
         #endregion
     }

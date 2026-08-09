@@ -107,10 +107,11 @@ namespace WoW.Realmserver.Network
         {
             float xAxis = reader.GetFloat();
             float yAxis = reader.GetFloat();
+            long timeTick = reader.GetLong();
 
             Entity playerEntity = (Entity)peer.Tag;
             SessionComponent playerSession = playerEntity.GetComponent<SessionComponent>();
-            playerSession.EnqueuePositionChange(new Vector2(xAxis, yAxis));
+            playerSession.EnqueuePositionChange(new Vector2(xAxis, yAxis), timeTick);
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)PacketOpCode.SMSG_REALM_MOVE);
@@ -247,6 +248,17 @@ namespace WoW.Realmserver.Network
                     Global.Network.SendToClient(peer, writer);
                 }
             }
+        }
+
+        public static void BuildReconciliation(int peerId, Vector2 finalPosition, long timeTick)
+        {
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.SMSG_REALM_MOVE_RECONCILE);
+            writer.Put(finalPosition.X);
+            writer.Put(finalPosition.Y);
+            writer.Put(timeTick);
+
+            Global.Network.SendToClient(peerId, writer); // hack: does movement reconciliation need to be sent as reliable?
         }
 
         #endregion
