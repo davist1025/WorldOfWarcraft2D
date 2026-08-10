@@ -265,6 +265,10 @@ namespace WoW.Client.Network
             }
         }
 
+        /// <summary>
+        /// Handles the server's calculation of our position based on input sent previously.
+        /// </summary>
+        /// <param name="reader"></param>
         public static void ReadReconciliation(NetDataReader reader)
         {
             float realX = reader.GetFloat();
@@ -272,13 +276,22 @@ namespace WoW.Client.Network
             long originalTimeTick = reader.GetLong();
 
             var gameManager = Core.GetGlobalManager<GameManager>();
-            var tuple = gameManager.NetworkedMovementTicks.Single((tuple) => tuple.Tick == originalTimeTick);
+            var tuple = gameManager.FindMovementChangeByTick(originalTimeTick);
 
             var serverPos = new Vector2(realX, realY);
-            float syncDifference = Vector2.Distance(serverPos, tuple.ResultingClientPosition);
+            float syncDifference = Vector2.Distance(serverPos, tuple.Item3);
 
             if (syncDifference > 1.5f)
+            {
                 Logger.Print($"We are desynchronized from the server!", LogEntryType.Fatal);
+
+                /*
+                 * todo: movement reconciliation [client].
+                 * thinking we need to set an interal position that isn't rendered to 'serverPos',
+                 * grab all client-side movement changes up to now,
+                 * replay all changes from the server's position to now
+                 */ 
+            }
         }
         #endregion
     }

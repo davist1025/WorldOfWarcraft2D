@@ -60,7 +60,7 @@ namespace WoW.Client
             CreateGlobalManagers();
             LoadGameContent();
 
-            // create the player object.
+            // create the player object here because the same entity can be used in on/offline mode.
             // this will get added to the scene later.
             Global.Player = new Entity("thePlayer");
 

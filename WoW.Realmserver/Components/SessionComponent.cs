@@ -86,6 +86,7 @@ namespace WoW.Realmserver.Components
 
                     GetSelectedCharacter().SetPosition(Entity.Position);
 
+                    // item2 = time tick (DateTime.Now.Ticks)
                     NetPacketManager.BuildReconciliation(ServerId, Entity.Position, movementUpdate.Item2);
 
                     Logger.Print($"'{GetSelectedCharacter().Name}' has moved to: {Entity.Position.X}:{Entity.Position.Y}.", LogEntryType.Debug);

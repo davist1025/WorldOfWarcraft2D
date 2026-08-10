@@ -24,7 +24,7 @@ namespace WoW.Client.Utils
         /// </summary>
         public EventHandler<Vector2> LocalPlayerMoved;
         private long _movementTimeTick;
-        public List<(long Tick, Vector2 Input, Vector2 ResultingClientPosition)> NetworkedMovementTicks;
+        private List<(long Tick, Vector2 Input, Vector2 ResultingClientPosition)> _movementTickChanges;
 
         /// <summary>
         /// Triggers when a new actor has been sent to this client.
@@ -44,11 +44,16 @@ namespace WoW.Client.Utils
             NewActorRegistered += OnNewActorRegistered;
             Disconnected += OnDisconnected;
 
-            NetworkedMovementTicks = new List<(long tick, Vector2 input, Vector2 resultingPosition)>();
+            _movementTickChanges = new List<(long tick, Vector2 input, Vector2 resultingPosition)>();
         }
 
         #region Default subscribers
 
+        /// <summary>
+        /// Triggered when the local player moves.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="input"></param>
         public void OnLocalPlayerMoved(object sender, Vector2 input)
         {
             if (Global.PeerState == GameNetworkState.World)
@@ -56,23 +61,39 @@ namespace WoW.Client.Utils
                 Entity myPlayer = Core.Scene.FindComponentOfType<MyPlayerControllerComponent>().Entity;
                 long movementTimeTick = DateTime.Now.Ticks; // used to track individual input during reconciliation.
 
-                NetworkedMovementTicks.Add(new(movementTimeTick, input, myPlayer.Position)); // stores relevant movement information at the time of processing so when the server sends us our real calcuation, we can cross-check and reconcile.
+                _movementTickChanges.Add(new(movementTimeTick, input, myPlayer.Position)); // stores relevant movement information at the time of processing so when the server sends us our real calcuation, we can cross-check and reconcile.
 
                 NetPacketManager.BuildMovementUpdate(input, movementTimeTick);
             }
         }
 
+        /// <summary>
+        /// Queues an Actor for processing that was created by the server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="entity"></param>
         public void OnNewActorRegistered(object sender, Entity entity)
         {
             _newActorQueue.Enqueue(entity);
         }
 
+        /// <summary>
+        /// Handles a disconnection.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        [Obsolete("Unused still as of 8/9.")]
         public void OnDisconnected(object sender, EventArgs e) 
         {
             Core.StartSceneTransition(new FadeTransition(() => new LogonScene()));
         }
         #endregion
 
+        /// <summary>
+        /// Pops an Actor from the queue that was created by the server and begins processing it.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public bool PopUntrackedActor(out Entity entity)
         {
             if (_newActorQueue.TryDequeue(out var result))
@@ -84,5 +105,12 @@ namespace WoW.Client.Utils
             entity = null;
             return false;
         }
+
+        /// <summary>
+        /// Attempts to locate a movement change by it's <see cref="DateTime.Now"/> value in Ticks (long).
+        /// </summary>
+        /// <param name="timeTick"></param>
+        /// <returns></returns>
+        public Tuple<long, Vector2, Vector2> FindMovementChangeByTick(long timeTick) => _movementTickChanges.Find((tuple) => tuple.Tick == timeTick).ToTuple();
     }
 }

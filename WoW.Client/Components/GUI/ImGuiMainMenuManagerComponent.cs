@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using WoW.Client.Components.Player;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
+using WoW.Framework.Logging;
 using WoW.Framework.Network.Container;
 using static WoW.Client.Global;
 using static WoW.Framework.Utils;
@@ -60,6 +61,14 @@ namespace WoW.Client.Components.GUI
                     {
                         Global.PeerState = GameNetworkState.Auth_LoggingIn;
                         Global.Network.ConnectTo(ConfigurationManager.AppSettings["realmlist"].Split(":"));
+                    }
+
+                    if (NezImGui.CenteredButton("Offline-mode", 0.6f))
+                    {
+                        Logger.Print($"Running the game in offline-mode.", LogEntryType.Process);
+
+                        Global.PeerState = GameNetworkState.Offline_World;
+                        Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
                     }
 
                     if (NezImGui.CenteredButton("Quit", 0.6f))

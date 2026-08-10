@@ -48,7 +48,9 @@ namespace WoW.Client.Components.Player
 
             _eventManager = Core.GetGlobalManager<GameManager>();
 
-            _speed = Entity.GetComponent<SpeedComponent>();
+            _speed = (Global.PeerState == Global.GameNetworkState.Offline_World) ?
+                Entity.AddComponent(new SpeedComponent(100f)) 
+                : Entity.GetComponent<SpeedComponent>();
         }
 
         public void Update()
@@ -59,7 +61,6 @@ namespace WoW.Client.Components.Player
             {
                 _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
 
-                // todo: SpeedComponent is null here for offline mode. need to make a function to initialize everything for offline mode.
                 var moveDirection = _speed.Speed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();
 
