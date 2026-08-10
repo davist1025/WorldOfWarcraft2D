@@ -77,7 +77,6 @@ namespace WoW.Client.Components.Player
         {
             if (_movementUpdates.TryDequeue(out Vector2 input))
             {
-                // todo: have the realmserver send a speed for each player upon creating the actor.
                 var moveDirection = Data.MovementSpeed * Time.DeltaTime * input;
                 moveDirection.Round();
 

@@ -289,7 +289,8 @@ namespace WoW.Client.Network
                  * todo: movement reconciliation [client].
                  * thinking we need to set an interal position that isn't rendered to 'serverPos',
                  * grab all client-side movement changes up to now,
-                 * replay all changes from the server's position to now
+                 * replay all changes from the server's position to now,
+                 * lerp our rendered position to the reconciled position.
                  */ 
             }
         }
