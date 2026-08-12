@@ -117,12 +117,12 @@ namespace WoW.Client
         {
             var gui = Core.Scene.FindEntity("gui");
 
-            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
-            footprint.Characters.Clear();
-
+            Global.Player.Destroy();
             Global.Realmlist.Clear();
             Global.Network.Disconnect();
             Global.PeerState = Global.GameNetworkState.Offline;
+
+            Core.StartSceneTransition(new FadeTransition(() => new LogonScene()));
         }
 
         protected override void OnExiting(object sender, EventArgs args)

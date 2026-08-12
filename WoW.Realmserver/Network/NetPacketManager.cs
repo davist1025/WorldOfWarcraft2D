@@ -112,15 +112,6 @@ namespace WoW.Realmserver.Network
             Entity playerEntity = (Entity)peer.Tag;
             SessionComponent playerSession = playerEntity.GetComponent<SessionComponent>();
             playerSession.EnqueuePositionChange(new Vector2(xAxis, yAxis), timeTick);
-
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((byte)PacketOpCode.SMSG_REALM_MOVE);
-            writer.Put(playerSession.NetworkId);
-            writer.Put(xAxis);
-            writer.Put(yAxis);
-            // todo: player movement updates should probably be sent after they've moved on the server and should include their new position.
-
-            Global.Network.SendToAllExcept(writer, peer.Id, DeliveryMethod.Unreliable);
         }
         #endregion
 
@@ -259,6 +250,22 @@ namespace WoW.Realmserver.Network
             writer.Put(timeTick);
 
             Global.Network.SendToClient(peerId, writer); // hack: does movement reconciliation need to be sent as reliable?
+        }
+
+        /// <summary>
+        /// Updates a session's position change with all players AFTER input has been processed on the server.
+        /// </summary>
+        /// <param name="thisSession"></param>
+        /// <param name="serverProcessedInput"></param>
+        public static void BuildPlayerPositionChange(SessionComponent thisSession, Vector2 serverProcessedInput)
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((byte)PacketOpCode.SMSG_REALM_MOVE);
+            writer.Put(thisSession.NetworkId);
+            writer.Put(serverProcessedInput.X);
+            writer.Put(serverProcessedInput.Y);
+
+            Global.Network.SendToAllExcept(writer, thisSession.ServerId, DeliveryMethod.Unreliable);
         }
 
         #endregion

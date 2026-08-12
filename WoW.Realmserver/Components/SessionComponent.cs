@@ -87,7 +87,9 @@ namespace WoW.Realmserver.Components
                     GetSelectedCharacter().SetPosition(Entity.Position);
 
                     // item2 = time tick (DateTime.Now.Ticks)
-                    NetPacketManager.BuildReconciliation(ServerId, Entity.Position, movementUpdate.Item2);
+                    NetPacketManager.BuildReconciliation(ServerId, Entity.Position, movementUpdate.Item2); // have the client correct itself as needed.
+                    // todo: should reconciliation only be sent when the server determines the difference in position is too large?
+                    NetPacketManager.BuildPlayerPositionChange(this, movementUpdate.Item1);
 
                     Logger.Print($"'{GetSelectedCharacter().Name}' has moved to: {Entity.Position.X}:{Entity.Position.Y}.", LogEntryType.Debug);
                 }
