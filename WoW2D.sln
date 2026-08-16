@@ -32,6 +32,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Framework", "WoW.Framew
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Database", "WoW.Database\WoW.Database.csproj", "{EF378C39-5B1E-4364-89A9-27507B0CF44D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{A01510E8-F963-4CD1-B494-8B5FBB799803}"
+	ProjectSection(SolutionItems) = preProject
+		prediction + reconciliation.txt = prediction + reconciliation.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

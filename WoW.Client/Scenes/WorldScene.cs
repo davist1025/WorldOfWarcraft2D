@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoW.Client.Components.GUI;
 using WoW.Client.Components.Player;
 using WoW.Client.Utils;
 
@@ -26,6 +27,8 @@ namespace WoW.Client.Scenes
             Camera.GetComponent<FollowCamera>().FollowLerp = 0.05f;
 
             _gameManager = Core.GetGlobalManager<GameManager>();
+
+            CreateEntity("gui").AddComponent<ImGuiGameManagerComponent>();
         }
 
         public override void Update()

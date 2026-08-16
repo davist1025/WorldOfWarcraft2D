@@ -58,6 +58,14 @@ namespace WoW.Client.Components.GUI
                         //ImGui.End();
                     }
                     break;
+                case GameNetworkState.Offline:
+                    ImGui.Begin("#offline_info", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize);
+
+                    ImGui.Text("World of Warcraft 2D - Debug (Offline)");
+                    ImGui.Separator();
+
+                    ImGui.End();
+                    break;
             }
         }
     }
