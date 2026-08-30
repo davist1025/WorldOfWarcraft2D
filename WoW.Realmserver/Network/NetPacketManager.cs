@@ -113,6 +113,19 @@ namespace WoW.Realmserver.Network
             SessionComponent playerSession = playerEntity.GetComponent<SessionComponent>();
             playerSession.EnqueuePositionChange(new Vector2(xAxis, yAxis), timeTick);
         }
+
+        public static void ReadChatMessage(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            string clientInput = reader.GetString();
+
+            if (!clientInput.StartsWith("."))
+                Logger.Print($"Client is attempting to send chat message: {clientInput}", LogEntryType.Debug);
+            else
+            {
+                clientInput = clientInput.Substring(1, clientInput.Length - 1);
+                Logger.Print($"Client is attempting to execute the command string: {clientInput}", LogEntryType.Debug);
+            }
+        }
         #endregion
 
         #region Writers

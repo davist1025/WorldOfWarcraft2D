@@ -124,5 +124,7 @@ namespace WoW.Client
         {
             base.OnExiting(sender, args);
         }
+
+        
     }
 }

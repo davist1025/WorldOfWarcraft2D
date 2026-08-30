@@ -56,7 +56,7 @@ namespace WoW.Client.Components.Player
         {
             _movementInput = new Vector2(_xAxis.Value, _yAxis.Value);
 
-            if (_movementInput != Vector2.Zero)
+            if (_movementInput != Vector2.Zero && !ImGui.IsAnyItemActive())
             {
                 _gameManager.LocalPlayerMoved?.Invoke(null, _movementInput);
 

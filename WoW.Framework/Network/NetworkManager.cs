@@ -17,43 +17,44 @@ namespace WoW.Framework.Network
         /// </summary>
         public enum PacketOpCode
         {
-            CMSG_AUTH_LOGON = 0x00,
-            CMSG_REALM_CONNECT = 0x04,
-            CMSG_REALM_CHARACTER_CREATE = 0x05,
-            CMSG_REALM_CHARACTER_DELETE = 0x06,
-            CMSG_REALM_CHARACTER_LIST = 0x07,
-            CMSG_REALM_ENTER_WORLD = 0x08,
-            CMSG_REALM_MOVE = 0x09,
-
-            SMSG_AUTH_LOGON = 0x01,
+            CMSG_AUTH_LOGON = 1,
+            SMSG_AUTH_LOGON = 2,
 
             #region Auth logon response codes
-            SMSG_AUTH_LOGON_SUCCESS = 0x00, // argon2 verified.
-            SMSG_AUTH_LOGON_PASSWORD = 0x01, // incorrect password.
-            SMSG_AUTH_LOGON_MISMATCH = 0x02, // game/server version mismatch.
+            SMSG_AUTH_LOGON_SUCCESS = 101, // argon2 verified.
+            SMSG_AUTH_LOGON_PASSWORD = 102, // incorrect password.
+            SMSG_AUTH_LOGON_MISMATCH = 103, // game/server version mismatch.
             #endregion
 
-            SMSG_AUTH_REALMLIST = 0x02, // realmlist
+            SMSG_AUTH_REALMLIST = 3, // realmlist
+            CMSG_REALM_CONNECT = 4,
+            CMSG_REALM_CHARACTER_CREATE = 5,
+            CMSG_REALM_CHARACTER_DELETE = 6,
+            CMSG_REALM_CHARACTER_LIST = 7,
+            CMSG_REALM_ENTER_WORLD = 8,
+            CMSG_REALM_MOVE = 9,
 
-            SMSG_REALM_CHARACTER_CREATE = 0x0A, // parent packet to child response codes.
+            SMSG_REALM_CHARACTER_CREATE = 10, // parent packet to child response codes.
 
             #region Realm character creation response codes
 
-            SMSG_REALM_CHARACTERCREATE_SUCCESS = 0x00, // simple success; 0x10 is sent directly after this to update client-side lists.
-            SMSG_REALM_CHARACTERNAME_INUSE = 0x01, // name in-use.
-            SMSG_REALM_CHARACTERNAME_RESTRICTED = 0x02, // name restricted.
+            SMSG_REALM_CHARACTERCREATE_SUCCESS = 201, // simple success; packet #10 is sent directly after this to update client-side lists.
+            SMSG_REALM_CHARACTERNAME_INUSE = 202, // name in-use.
+            SMSG_REALM_CHARACTERNAME_RESTRICTED = 203, // name restricted.
 
             #endregion
 
-            SMSG_REALM_CREATE_ACTOR = 0x0B, // players (local and networked), npcs
-            SMSG_REALM_DISCONNECT = 0x0C, // kick
-            SMSG_REALM_ENTER_WORLD = 0x0D, // "enter world" confirmation with additional initial logon data
-            SMSG_REALM_MOVE = 0x0E, // notify all necessary players of another's movement.
-            SMSG_REALM_MOVE_RECONCILE = 0x0F, // movement correction.
-            SMSG_REALM_CHARACTER_LIST = 0x10, // the player's character list within the main menu.
+            SMSG_REALM_CREATE_ACTOR = 11, // players (local and networked), npcs
+            SMSG_REALM_DISCONNECT = 12, // kick
+            SMSG_REALM_ENTER_WORLD = 13, // "enter world" confirmation with additional initial logon data
+            SMSG_REALM_MOVE = 14, // notify all necessary players of another's movement.
+            SMSG_REALM_MOVE_RECONCILE = 15, // movement correction.
+            SMSG_REALM_CHARACTER_LIST = 16, // the player's character list within the main menu.
 
-            SMSG_REALM_SESSION_TRANSFER_AUTH = 0x11, // confirm the session transfer with the authentication server.
-            SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION = 0x12,
+            SMSG_REALM_SESSION_TRANSFER_AUTH = 17, // confirm the session transfer with the authentication server.
+            SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION = 18,
+
+            CMSG_REALM_CHAT = 19
         }
 
         private INetEventListener _listener;

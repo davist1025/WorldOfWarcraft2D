@@ -12,13 +12,6 @@ namespace WoW.Framework.Network.Container
     /// </summary>
     public class ChatMessageContainer
     {
-        public string Input { get; init; }
-        public ChatChannelType Channel { get; init; }
-
-        public ChatMessageContainer(string input, ChatChannelType channel)
-        {
-            Input = input;
-            Channel = channel;
-        }
+        public string Input { get; set; }
     }
 }

@@ -91,6 +91,16 @@ namespace WoW.Client.Network
             //_Core.GetGlobalManager<GameManager>().Network.SendToServer(writer, DeliveryMethod.Unreliable);
         }
 
+        public static void BuildChatMessage(string input)
+        {
+            QueueablePacket writer = new QueueablePacket(true);
+
+            writer.Put((byte)PacketOpCode.CMSG_REALM_CHAT);
+            writer.Put(input);
+
+            Core.GetGlobalManager<GameManager>().QueuePacket(writer);
+        }
+
         #endregion
 
         #region Readers

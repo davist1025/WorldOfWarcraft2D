@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Text;
 
+using var game = new WoW.Client.ClientCore();
+game.Run();
+
 try
 {
-    using var game = new WoW.Client.ClientCore();
-    game.Run();
+    
 }
 catch (Exception ex)
 {
