@@ -12,6 +12,7 @@ using WoW.Client.Components.Player;
 using WoW.Client.Scenes;
 using WoW.Client.Utils;
 using WoW.Framework.Logging;
+using WoW.Framework.Network;
 using WoW.Framework.Network.Container;
 using WoW.Framework.Shared;
 using WoW.Framework.Shared.Components;
@@ -23,7 +24,7 @@ namespace WoW.Client.Network
     /// <summary>
     /// Handles incoming packet data.
     /// </summary>
-    public static class NetPacketManager
+    public class NetPacketManager
     {
         /*
          * When writing packet data, the packet's OpCode always comes first to let the peer know what type of data is coming through.
@@ -41,7 +42,7 @@ namespace WoW.Client.Network
             string username = loginData[0];
             string password = WoW.Framework.Utils.ToSha256(loginData[1]);
 
-            NetDataWriter writer = new NetDataWriter(true);
+            QueueablePacket writer = new QueueablePacket(true);
             writer.Put((byte)PacketOpCode.CMSG_AUTH_LOGON);
             writer.Put(username);
             writer.Put(password);
@@ -49,9 +50,10 @@ namespace WoW.Client.Network
             // other details?
             /*
              * ex: game version, OS, etc?
-             */ 
+             */
 
-            Global.Network.SendToServer(writer);
+            Core.GetGlobalManager<GameManager>().QueuePacket(writer);
+            //_Core.GetGlobalManager<GameManager>().Network.SendToServer(writer);
         }
 
         /// <summary>
@@ -61,11 +63,12 @@ namespace WoW.Client.Network
         {
             Logger.Print($"Attempting to play on character: ({character.Name})", LogEntryType.Debug);
 
-            NetDataWriter writer = new NetDataWriter(true);
+            QueueablePacket writer = new QueueablePacket(true);
             writer.Put((byte)PacketOpCode.CMSG_REALM_ENTER_WORLD);
             writer.Put(character.Id);
 
-            Global.Network.SendToServer(writer);
+            Core.GetGlobalManager<GameManager>().QueuePacket(writer);
+            //_Core.GetGlobalManager<GameManager>().Network.SendToServer(writer);
         }
 
         /// <summary>
@@ -74,13 +77,18 @@ namespace WoW.Client.Network
         /// <param name="input"></param>
         public static void BuildMovementUpdate(Vector2 input, long timeTick)
         {
-            NetDataWriter writer = new NetDataWriter(true);
+            QueueablePacket writer = new QueueablePacket(true)
+            {
+                DeliveryMethod = DeliveryMethod.Unreliable
+            };
+
             writer.Put((byte)PacketOpCode.CMSG_REALM_MOVE);
             writer.Put(input.X);
             writer.Put(input.Y);
             writer.Put(timeTick);
 
-            Global.Network.SendToServer(writer, DeliveryMethod.Unreliable);
+            Core.GetGlobalManager<GameManager>().QueuePacket(writer);
+            //_Core.GetGlobalManager<GameManager>().Network.SendToServer(writer, DeliveryMethod.Unreliable);
         }
 
         #endregion
@@ -100,8 +108,8 @@ namespace WoW.Client.Network
                 case PacketOpCode.SMSG_AUTH_LOGON_SUCCESS:
                     string sessionId = reader.GetString();
                     string accountName = reader.GetString();
-                    NetFootprintComponent myNetFootprint = new NetFootprintComponent(accountName, sessionId);
-                    Global.Player.AddComponent(myNetFootprint);
+                    MyOnlineComponent myNetFootprint = new MyOnlineComponent(accountName, sessionId);
+                    Core.GetGlobalManager<GameManager>().Player.AddComponent(myNetFootprint);
 
                     Logger.Print($"Logged in successfully.", Framework.Utils.LogEntryType.Debug);
                     break;
@@ -123,13 +131,13 @@ namespace WoW.Client.Network
                 int port = reader.GetInt();
 
                 RealmserverContainer newRealm = new RealmserverContainer(name, hostname, port);
-                Global.Realmlist.Add(newRealm);
+                Core.GetGlobalManager<GameManager>().Realmlist.Add(newRealm);
             }
 
             Logger.Print($"Processed {realmCount} realm(s).", Framework.Utils.LogEntryType.Debug);
 
             // display the realmlist.
-            Global.PeerState = Global.GameNetworkState.Auth_Realmlist;
+            Core.GetGlobalManager<GameManager>().PeerState = GameNetworkState.Auth_Realmlist;
         }
 
         /// <summary>
@@ -139,7 +147,7 @@ namespace WoW.Client.Network
         public static void ReadCharacterList(NetDataReader reader)
         {
             int count = reader.GetInt();
-            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
+            MyOnlineComponent footprint = Core.GetGlobalManager<GameManager>().Player.GetComponent<MyOnlineComponent>();
 
             Logger.Print($"Receiving data for {count} character(s).", Framework.Utils.LogEntryType.Debug);
 
@@ -161,7 +169,7 @@ namespace WoW.Client.Network
             footprint.SetCharacterList(characters);
             footprint.SetSelectedCharacter(0);
 
-            Global.PeerState = Global.GameNetworkState.Realm_Characters;
+            Core.GetGlobalManager<GameManager>().PeerState = GameNetworkState.Realm_Characters;
         }
 
         /// <summary>
@@ -176,13 +184,13 @@ namespace WoW.Client.Network
             string myNetworkId = reader.GetString();
             float defaultSpeed = reader.GetFloat();
 
-            NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
+            MyOnlineComponent footprint = Core.GetGlobalManager<GameManager>().Player.GetComponent<MyOnlineComponent>();
             footprint.SetSelectedCharacter(index);
             footprint.Entity.AddComponent(new SpeedComponent(defaultSpeed));
 
-            Global.Player.SetPosition(new Vector2(x, y));
-            Global.PeerState = Global.GameNetworkState.World;
-            Global.NetworkId = myNetworkId;
+            Core.GetGlobalManager<GameManager>().Player.SetPosition(new Vector2(x, y));
+            Core.GetGlobalManager<GameManager>().PeerState = GameNetworkState.World;
+            Core.GetGlobalManager<GameManager>().NetworkId = myNetworkId;
 
             Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
         }
@@ -218,7 +226,7 @@ namespace WoW.Client.Network
                     break;
             }
 
-            gameManager.NewActorRegistered?.Invoke(null, newNetworkedActor);
+            Core.GetGlobalManager<GameManager>().NewActor?.Invoke(null, newNetworkedActor);
         }
 
         /// <summary>
@@ -254,7 +262,7 @@ namespace WoW.Client.Network
             //if (Global.PeerState == Global.GameNetworkState.World 
             //    && myFootprint != null
             //    && string.Equals(sessionId, myFootprint.SessionId, StringComparison.OrdinalIgnoreCase))
-            //    Core.GetGlobalManager<GameManager>().Disconnected?.Invoke(null, null);
+            //    Core.GetGlobalManager<GameManager>()>().Disconnected?.Invoke(null, null);
 
             var onlinePlayer = Core.Scene.Entities.FindEntity(sessionId);
 
@@ -278,21 +286,21 @@ namespace WoW.Client.Network
             var gameManager = Core.GetGlobalManager<GameManager>();
             var tuple = gameManager.FindMovementChangeByTick(originalTimeTick);
 
-            var serverPos = new Vector2(realX, realY);
-            float syncDifference = Vector2.Distance(serverPos, tuple.Item3);
+            //var serverPos = new Vector2(realX, realY);
+            //float syncDifference = Vector2.Distance(serverPos, tuple.Item3);
 
-            if (syncDifference > 1.5f)
-            {
-                Logger.Print($"We are desynchronized from the server!", LogEntryType.Fatal);
+            //if (syncDifference > 1.5f)
+            //{
+            //    Logger.Print($"We are desynchronized from the server!", LogEntryType.Fatal);
 
-                /*
-                 * todo: movement reconciliation [client].
-                 * thinking we need to set an interal position that isn't rendered to 'serverPos',
-                 * grab all client-side movement changes up to now,
-                 * replay all changes from the server's position to now,
-                 * lerp our rendered position to the reconciled position.
-                 */ 
-            }
+            //    /*
+            //     * todo: movement reconciliation [client].
+            //     * thinking we need to set an interal position that isn't rendered to 'serverPos',
+            //     * grab all client-side movement changes up to now,
+            //     * replay all changes from the server's position to now,
+            //     * lerp our rendered position to the reconciled position.
+            //     */ 
+            //}
         }
         #endregion
     }

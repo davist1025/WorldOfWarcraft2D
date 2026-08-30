@@ -34,6 +34,8 @@ namespace WoW.Client
     {
         public static string ActiveMapId { get; set; }
 
+        private GameManager _gameManager;
+
         public ClientCore() : base(windowTitle: "WoW Pixel Project", width: 1080, height: 640)
         {
             IsMouseVisible = true;
@@ -43,10 +45,6 @@ namespace WoW.Client
 
         protected override void Initialize()
         {
-            Global.Network = new NetworkManager(new NetworkEventListener());
-            Global.Network.StartClient();
-            Global.Network.RunLatencySimulation();
-
             /*
              * NetState can be changed to display whichever UI is necessary, per ImGUI.
              * We need to set ClientNetwork's connection state at the same time we set this so the packet flow doesn't crash the client or server.
@@ -60,9 +58,13 @@ namespace WoW.Client
             CreateGlobalManagers();
             LoadGameContent();
 
+            _gameManager.Network = new NetworkManager(new NetworkEventListener());
+            _gameManager.Network.StartClient();
+            //Global.Network.RunLatencySimulation();
+
             // create the player object here because the same entity can be used in on/offline mode.
             // this will get added to the scene later.
-            Global.Player = new Entity("thePlayer");
+            _gameManager.Player = new Entity("thePlayer");
 
             Scene = new LogonScene();
         }
@@ -96,8 +98,8 @@ namespace WoW.Client
             };
             Core.RegisterGlobalManager(guiManager);
 
-            var gameEventsManager = new GameManager();
-            Core.RegisterGlobalManager(gameEventsManager);
+            _gameManager = new GameManager();
+            Core.RegisterGlobalManager(_gameManager);
 
             var assetManager = new AssetManager();
             Core.RegisterGlobalManager(assetManager);
@@ -107,22 +109,15 @@ namespace WoW.Client
         {
             base.Update(gameTime);
 
-            Global.Network.Update();
-        }
+            _gameManager.Network.Update();
 
-        /// <summary>
-        /// Cleanly disconnects from the realmserver.
-        /// </summary>
-        public static void Disconnect()
-        {
-            var gui = Core.Scene.FindEntity("gui");
-
-            Global.Player.Destroy();
-            Global.Realmlist.Clear();
-            Global.Network.Disconnect();
-            Global.PeerState = Global.GameNetworkState.Offline;
-
-            Core.StartSceneTransition(new FadeTransition(() => new LogonScene()));
+            if (_gameManager.Network.IsConnected())
+            {
+                if (_gameManager.PopPacket(out var dataWriter))
+                {
+                    _gameManager.Network.SendToServer(dataWriter, dataWriter.DeliveryMethod);
+                }
+            }
         }
 
         protected override void OnExiting(object sender, EventArgs args)

@@ -12,8 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components.GUI;
 using WoW.Client.Components.Player;
+using WoW.Client.Utils;
 using WoW.Framework.Logging;
-using static WoW.Client.Global;
 using static WoW.Framework.Network.NetworkManager;
 
 namespace WoW.Client.Network
@@ -23,7 +23,10 @@ namespace WoW.Client.Network
     /// </summary>
     internal class NetworkEventListener : INetEventListener
     {
+        private GameManager _gameManager;
         private Dictionary<byte, Action<NetDataReader>> _packetHandlers;
+
+        public NetworkEventListener() => _gameManager = Core.GetGlobalManager<GameManager>();
 
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
         {
@@ -48,7 +51,7 @@ namespace WoW.Client.Network
         {
             Logger.Print($"Connected to server.", Framework.Utils.LogEntryType.Debug);
 
-            Global.Peer = peer;
+            _gameManager.Peer = peer;
             _packetHandlers = new Dictionary<byte, Action<NetDataReader>>
             {
                 { (byte)PacketOpCode.SMSG_AUTH_LOGON, NetPacketManager.ReadLogonResponse },
@@ -61,28 +64,22 @@ namespace WoW.Client.Network
                 { (byte)PacketOpCode.SMSG_REALM_DISCONNECT, NetPacketManager.ReadDisconnection }
             };
 
-            switch (Global.PeerState)
+            switch (_gameManager.PeerState)
             {
-                case GameNetworkState.Auth_LoggingIn:
-                    var imguiManager = Core.Scene.FindComponentOfType<ImGuiMainMenuManagerComponent>();
-                    var login = imguiManager.GetLogin();
-
-                    NetPacketManager.BuildLogon(login.Split(":"));
-                    break;
                 case GameNetworkState.Realm:
                     NetDataWriter writer = new NetDataWriter(true);
                     writer.Put((byte)PacketOpCode.CMSG_REALM_CONNECT);
 
-                    NetFootprintComponent myFootprint = Global.Player.GetComponent<NetFootprintComponent>();
+                    MyOnlineComponent myFootprint = _gameManager.Player.GetComponent<MyOnlineComponent>();
                     writer.Put(myFootprint.SessionId);
-                    Global.Network.SendToServer(writer);
+                    _gameManager.Network.SendToServer(writer);
                     break;
             }
         }
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-
+            Nez.Debug.Warn("Disconnected from server.");
         }
 
         #region Unused functions

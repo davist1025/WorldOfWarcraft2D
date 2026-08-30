@@ -123,13 +123,6 @@ namespace WoW.Framework.Network
         }
 
         /// <summary>
-        /// Returns the round-trip time to the server.
-        /// </summary>
-        /// <returns></returns>
-        public int GetPing() => _netManager.FirstPeer.Ping;
-
-
-        /// <summary>
         /// Send the data of a <see cref="NetDataWriter"/> to the server.
         /// </summary>
         /// <param name="writer"></param>
@@ -197,6 +190,23 @@ namespace WoW.Framework.Network
         }
 
         public NetPeer GetPeerWithTag(object tag) => _netManager.ConnectedPeerList.Find(peer => peer.Tag.Equals(tag));
+
+        /// <summary>
+        /// Returns the round-trip time to the server.
+        /// </summary>
+        /// <returns></returns>
+        public int GetPing() => _netManager.FirstPeer.Ping;
+
+        /// <summary>
+        /// Checks if the NetManager object is polling, and whether the this NetManager is connected to an endpoint.
+        /// 
+        /// Useful in client-mode.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsConnected() => 
+            _netManager.IsRunning 
+            && _netManager.FirstPeer != null
+            && _netManager.FirstPeer.ConnectionState == ConnectionState.Connected;
     }
 }
 

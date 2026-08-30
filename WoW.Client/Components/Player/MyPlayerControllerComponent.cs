@@ -28,7 +28,7 @@ namespace WoW.Client.Components.Player
         private PrototypeSpriteRenderer _renderer;
         private SpeedComponent _speed;
 
-        private GameManager _eventManager;
+        private GameManager _gameManager;
 
         public override void OnAddedToEntity()
         {
@@ -42,13 +42,12 @@ namespace WoW.Client.Components.Player
             _movementInput = Vector2.Zero;
             _mover = Entity.AddComponent<Mover>();
 
-            // todo: [player controller] temporarily add a prototype renderer.
             _renderer = Entity.AddComponent(new PrototypeSpriteRenderer(16f, 16f));
-            _renderer.Color = Color.MonoGameOrange;
+            _renderer.Color = Color.Cornsilk;
 
-            _eventManager = Core.GetGlobalManager<GameManager>();
+            _gameManager = Core.GetGlobalManager<GameManager>();
 
-            _speed = (Global.PeerState == Global.GameNetworkState.Offline_World) ?
+            _speed = (_gameManager.PeerState == GameNetworkState.Offline_World) ?
                 Entity.AddComponent(new SpeedComponent(100f)) 
                 : Entity.GetComponent<SpeedComponent>();
         }
@@ -59,7 +58,7 @@ namespace WoW.Client.Components.Player
 
             if (_movementInput != Vector2.Zero)
             {
-                _eventManager.LocalPlayerMoved?.Invoke(null, _movementInput);
+                _gameManager.LocalPlayerMoved?.Invoke(null, _movementInput);
 
                 var moveDirection = _speed.Speed * Time.DeltaTime * _movementInput;
                 moveDirection.Round();

@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 using WoW.Client.Components.Player;
 using WoW.Client.Network;
 using WoW.Client.Scenes;
+using WoW.Client.Utils;
 using WoW.Framework.Logging;
 using WoW.Framework.Network.Container;
-using static WoW.Client.Global;
 using static WoW.Framework.Utils;
 
 namespace WoW.Client.Components.GUI
@@ -33,16 +33,20 @@ namespace WoW.Client.Components.GUI
 
         private int _characterSelectIndex = -1;
 
+        private GameManager _gameManager;
+
         public override void OnAddedToEntity()
         {
             Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Draw);
+
+            _gameManager = Core.GetGlobalManager<GameManager>();
         }
 
         public void Draw()
         {
             var windowFlags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize;
 
-            switch (Global.PeerState)
+            switch (_gameManager.PeerState)
             {
                 case GameNetworkState.Offline:
                     var windowSize = new System.Numerics.Vector2(300f, 175f);
@@ -58,23 +62,20 @@ namespace WoW.Client.Components.GUI
                     NezImGui.SmallVerticalSpace();
 
                     if (NezImGui.CenteredButton("Login", 0.6f))
-                    {
-                        Global.PeerState = GameNetworkState.Auth_LoggingIn;
-                        Global.Network.ConnectTo(ConfigurationManager.AppSettings["realmlist"].Split(":"));
-                    }
+                        _gameManager.LogonClicked?.Invoke(null, (_accountNameInput, _accountPasswordInput));
+
 
                     if (NezImGui.CenteredButton("Offline-mode", 0.6f))
                     {
-                        Logger.Print($"Running the game in offline-mode.", LogEntryType.Process);
+                        // todo: move offline-mode button press functionality to GameManager.
+                        //Logger.Print($"Running the game in offline-mode.", LogEntryType.Process);
 
-                        Global.PeerState = GameNetworkState.Offline_World;
-                        Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
+                        //Global.PeerState = GameNetworkState.Offline_World;
+                        //Core.StartSceneTransition(new FadeTransition(() => new WorldScene()));
                     }
 
-                    if (NezImGui.CenteredButton("Quit", 0.6f))
-                    {
-                        Core.Exit();
-                    }
+                    if (NezImGui.CenteredButton("Quit", 0.6f)) Core.Exit();
+
                     ImGui.End();
                     break;
                 case GameNetworkState.Auth_LoggingIn:
@@ -96,7 +97,7 @@ namespace WoW.Client.Components.GUI
                         Core.GraphicsDevice.Viewport.Width / 2f - windowSize.X / 2f,
                         Core.GraphicsDevice.Viewport.Height / 2f - windowSize.Y / 2f));
 
-                    if (Global.Realmlist.Count > 0)
+                    if (_gameManager.Realmlist.Count > 0)
                     {
                         ImGui.Begin("Realmlist", windowFlags);
                         ImGui.Columns(3);
@@ -107,19 +108,17 @@ namespace WoW.Client.Components.GUI
                         ImGui.Text("Port");
                         ImGui.NextColumn();
 
-                        for (int i = 0; i < Global.Realmlist.Count; i++)
+                        for (int i = 0; i < _gameManager.Realmlist.Count; i++)
                         {
-                            RealmserverContainer realmserver = Global.Realmlist[i];
+                            RealmserverContainer realmserver = _gameManager.Realmlist[i];
 
                             if (ImGui.Selectable($"##{realmserver.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
-                                    Global.PeerState = GameNetworkState.Realm;
-
-                                    // todo: save last used realm for auto-connection later.
-                                    //Game1.Network.Disconnect();
-                                    Global.Network.ConnectTo(new string[] { realmserver.Hostname, realmserver.Port.ToString() });
+                                    // todo: move realmserver click functionality to GameManager.
+                                    _gameManager.PeerState = GameNetworkState.Realm;
+                                    _gameManager.Network.ConnectTo(new string[] { realmserver.Hostname, realmserver.Port.ToString() });
                                 }
                             }
 
@@ -154,9 +153,9 @@ namespace WoW.Client.Components.GUI
 
                     ImGui.Begin("characters", windowFlags);
 
-                    NetFootprintComponent footprint = Global.Player.GetComponent<NetFootprintComponent>();
+                    MyOnlineComponent localOnlineComponent = _gameManager.Player.GetComponent<MyOnlineComponent>();
 
-                    if (footprint.Characters.Count > 0)
+                    if (localOnlineComponent.Characters.Count > 0)
                     {
                         ImGui.Columns(3);
                         ImGui.Text("Name");
@@ -166,16 +165,17 @@ namespace WoW.Client.Components.GUI
                         ImGui.Text("Hair");
                         ImGui.NextColumn();
 
-                        for (int i = 0; i < footprint.Characters.Count; i++)
+                        for (int i = 0; i < localOnlineComponent.Characters.Count; i++)
                         {
-                            CharacterContainer character = footprint.Characters[i];
+                            CharacterContainer character = localOnlineComponent.Characters[i];
 
                             if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
-                                footprint.SetSelectedCharacter(i);
+                                localOnlineComponent.SetSelectedCharacter(i);
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
-                                    Global.PeerState = GameNetworkState.LoadingWorld;
+                                    // todo: move character click functionality to GameManager.
+                                    _gameManager.PeerState = GameNetworkState.LoadingWorld;
                                     NetPacketManager.BuildEnterWorld(character);
                                 }
                             }
@@ -194,21 +194,21 @@ namespace WoW.Client.Components.GUI
                     NezImGui.SmallVerticalSpace();
 
                     if (NezImGui.CenteredButton("Create Character", 0.6f))
-                        Global.PeerState = GameNetworkState.Realm_CreateCharacter;
+                        _gameManager.PeerState = GameNetworkState.Realm_CreateCharacter;
 
                     if (_characterSelectIndex > -1)
                     {
                         if (NezImGui.CenteredButton("Delete Character", 0.6f))
                         {
-                            // todo: send character deletion request.
+                            // todo: send character deletion request; move delete character functionality to GameManager.
                             //Global.Network.SendToServer(new ClientRealm_DeleteCharacter() { CharacterId = _characterSelectIndex });
-                            Global.PeerState = GameNetworkState.Realm;
+                            _gameManager.PeerState = GameNetworkState.Realm;
                             _characterSelectIndex = -1;
                         }
                     }
 
                     if (NezImGui.CenteredButton("Disconnect", 0.6f))
-                        ClientCore.Disconnect();
+                        _gameManager.Disconnected?.Invoke(null, null);
 
                     ImGui.End();
                     break;
@@ -258,14 +258,14 @@ namespace WoW.Client.Components.GUI
                         //    RaceId = _newCharacterRaceId + 1,
                         //    HairId = _newCharacterHairId
                         //});
-                        Global.PeerState = GameNetworkState.Realm;
+                        _gameManager.PeerState = GameNetworkState.Realm;
                     }
 
                     if (NezImGui.CenteredButton("Back", 0.6f))
                     {
                         // todo: send character list request.
                         //Global.Network.SendToServer(new ClientRealm_RequestCharacterList());
-                        Global.PeerState = GameNetworkState.Realm;
+                        _gameManager.PeerState = GameNetworkState.Realm;
                     }
 
                     ImGui.End();

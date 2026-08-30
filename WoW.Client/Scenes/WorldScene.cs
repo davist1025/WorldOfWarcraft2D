@@ -19,14 +19,14 @@ namespace WoW.Client.Scenes
 
         public override void Initialize()
         {
-            var thePlayer = AddEntity(Global.Player);
+            _gameManager = Core.GetGlobalManager<GameManager>();
+
+            var thePlayer = AddEntity(_gameManager.Player);
             thePlayer.AddComponent<MyPlayerControllerComponent>();
 
             Camera.Entity.AddComponent(new FollowCamera(thePlayer, Camera));
             Camera.Zoom = 0.5f;
             Camera.GetComponent<FollowCamera>().FollowLerp = 0.05f;
-
-            _gameManager = Core.GetGlobalManager<GameManager>();
 
             CreateEntity("gui").AddComponent<ImGuiGameManagerComponent>();
         }

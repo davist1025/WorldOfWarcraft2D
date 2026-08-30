@@ -9,8 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoW.Client.Components.Player;
+using WoW.Client.Utils;
 using WoW.Framework.Network.Container;
-using static WoW.Client.Global;
 
 namespace WoW.Client.Components.GUI
 {
@@ -24,9 +24,12 @@ namespace WoW.Client.Components.GUI
         private string[] _chatChannels;
         public List<ChatMessageContainer> ChatHistory = new List<ChatMessageContainer>();
 
+        private GameManager _gameManager;
+
         public override void OnAddedToEntity()
         {
             Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Draw);
+            _gameManager = Core.GetGlobalManager<GameManager>();
         }
 
         public void Update()
@@ -36,7 +39,7 @@ namespace WoW.Client.Components.GUI
 
         private void Draw()
         {
-            switch (Global.PeerState)
+            switch (_gameManager.PeerState)
             {
                 case GameNetworkState.World:
                     var thePlayerController = Entity.Scene.FindComponentOfType<MyPlayerControllerComponent>();
@@ -47,8 +50,8 @@ namespace WoW.Client.Components.GUI
                     {
                         ImGui.Text("World of Warcraft 2D - Debug");
                         ImGui.Separator();
-                        ImGui.Text($"{Global.NetworkId}");
-                        ImGui.Text($"Ping: {Global.Network.GetPing()}");
+                        ImGui.Text($"{_gameManager.NetworkId}");
+                        ImGui.Text($"Ping: {_gameManager.Network.GetPing()}");
 
                         ImGui.End();
                         // todo: [gui] recreate the information window.

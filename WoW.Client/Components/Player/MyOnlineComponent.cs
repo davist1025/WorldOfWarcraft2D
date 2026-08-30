@@ -14,7 +14,7 @@ namespace WoW.Client.Components.Player
     /// 
     /// This includes SessionId, Account Name, characters, etc,.
     /// </summary>
-    internal class NetFootprintComponent : Component
+    internal class MyOnlineComponent : Component
     {
         /// <summary>
         /// The client's account name.
@@ -29,7 +29,7 @@ namespace WoW.Client.Components.Player
         public List<CharacterContainer> Characters { get; private set; }
         private int _selectedCharacter = -1;
 
-        public NetFootprintComponent(string accountName, string sessionId)
+        public MyOnlineComponent(string accountName, string sessionId)
         {
             AccountName = accountName;
             SessionId = sessionId;

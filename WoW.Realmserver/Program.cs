@@ -30,8 +30,6 @@ namespace WoW.Realmserver
 
         public const float TickRate = 0.1f;
 
-        public static List<Entity> ItemReferences = new List<Entity>();
-
         public Program()
         {
             Console.Title = "Realmserver";
@@ -96,7 +94,7 @@ namespace WoW.Realmserver
 
             Global.Network = new NetworkManager(new NetworkEventListener());
             Global.Network.StartServer(ConfigurationManager.AppSettings["hostname"].Split(":"));
-            Global.Network.RunLatencySimulation();
+            //Global.Network.RunLatencySimulation();
 
             while (true)
                 Tick();
