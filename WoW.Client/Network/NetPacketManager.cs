@@ -224,7 +224,7 @@ namespace WoW.Client.Network
                     // character info.
                     string name = reader.GetString(); // name
                     int hairId = reader.GetInt(); // hair id
-                    int raceId =  reader.GetInt(); // race id
+                    int raceId = reader.GetInt(); // race id
                     string mapId = reader.GetString(); // map id
                     float x = reader.GetFloat(); // x
                     float y = reader.GetFloat(); // y
@@ -311,6 +311,23 @@ namespace WoW.Client.Network
             //     * lerp our rendered position to the reconciled position.
             //     */ 
             //}
+        }
+
+        public static void ReadChatMessage(NetDataReader reader)
+        {
+            string clietNetworkId = reader.GetString();
+            string input = reader.GetString();
+            GameManager gameManager = Core.GetGlobalManager<GameManager>();
+
+            if (string.Equals(gameManager.NetworkId, clietNetworkId, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log($"{gameManager.Player.GetComponent<MyOnlineComponent>().GetSelectedCharacter().Name} says: {input}");
+            }
+            else
+            {
+                Entity onlinePlayer = Core.Scene.FindEntity(clietNetworkId);
+                Debug.Log($"{onlinePlayer.GetComponent<OnlinePlayerControllerComponent>().Data.CharacterName} says: {input}");
+            }
         }
         #endregion
     }

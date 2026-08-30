@@ -40,7 +40,7 @@ namespace WoW.Client.Network
             if (_packetHandlers.ContainsKey((byte)opCode))
                 _packetHandlers[(byte)opCode]?.Invoke(reader);
             else
-                Logger.Print($"No packet handler for OpCode '0x{opCode.ToString("X2")}' does not exist; packet will not be processed.", Framework.Utils.LogEntryType.Warning);
+                Logger.Print($"No packet handler for OpCode '0x{opCode.ToString()}' does not exist; packet will not be processed.", Framework.Utils.LogEntryType.Warning);
         }
 
         /// <summary>
@@ -61,7 +61,8 @@ namespace WoW.Client.Network
                 { (byte)PacketOpCode.SMSG_REALM_CREATE_ACTOR,  NetPacketManager.ReadNewActor },
                 { (byte)PacketOpCode.SMSG_REALM_MOVE, NetPacketManager.ReadMovementUpdate },
                 { (byte)PacketOpCode.SMSG_REALM_MOVE_RECONCILE, NetPacketManager.ReadReconciliation },
-                { (byte)PacketOpCode.SMSG_REALM_DISCONNECT, NetPacketManager.ReadDisconnection }
+                { (byte)PacketOpCode.SMSG_REALM_DISCONNECT, NetPacketManager.ReadDisconnection },
+                { (byte) PacketOpCode.SMSG_REALM_CHAT, NetPacketManager.ReadChatMessage }
             };
 
             switch (_gameManager.PeerState)

@@ -54,7 +54,8 @@ namespace WoW.Framework.Network
             SMSG_REALM_SESSION_TRANSFER_AUTH = 17, // confirm the session transfer with the authentication server.
             SMSG_AUTH_SESSION_TRANSFER_CONFIRMATION = 18,
 
-            CMSG_REALM_CHAT = 19
+            CMSG_REALM_CHAT = 19,
+            SMSG_REALM_CHAT = 20
         }
 
         private INetEventListener _listener;
@@ -152,6 +153,11 @@ namespace WoW.Framework.Network
                 peer.Send(writer, deliveryMethod);
             else
                 Logger.Print($"Unable to send packet of type '{(PacketOpCode)writer.Data[0]}' to peer: NetPeer with ID '{peerId}' does not exist!", Utils.LogEntryType.Fatal);
+        }
+
+        public void SendToAll(NetDataWriter writer, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered)
+        {
+            _netManager.SendToAll(writer, deliveryMethod);
         }
 
         /// <summary>

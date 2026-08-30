@@ -119,7 +119,11 @@ namespace WoW.Realmserver.Network
             string clientInput = reader.GetString();
 
             if (!clientInput.StartsWith("."))
-                Logger.Print($"Client is attempting to send chat message: {clientInput}", LogEntryType.Debug);
+            {
+                Entity entity = (Entity)peer.Tag;
+                var sessionComponent = entity.GetComponent<SessionComponent>();
+                BuildChatMessage(sessionComponent, clientInput);
+            }
             else
             {
                 clientInput = clientInput.Substring(1, clientInput.Length - 1);
@@ -281,6 +285,15 @@ namespace WoW.Realmserver.Network
             Global.Network.SendToAllExcept(writer, thisSession.ServerId, DeliveryMethod.Unreliable);
         }
 
+        public static void BuildChatMessage(SessionComponent fromSession, string chatInput)
+        {
+            NetDataWriter writer = new NetDataWriter(true);
+            writer.Put((byte)PacketOpCode.SMSG_REALM_CHAT);
+            writer.Put(fromSession.NetworkId);
+            writer.Put(chatInput);
+
+            Global.Network.SendToAll(writer);
+        }
         #endregion
     }
 }
