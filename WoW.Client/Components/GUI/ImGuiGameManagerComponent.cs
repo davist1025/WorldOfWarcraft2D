@@ -22,9 +22,6 @@ namespace WoW.Client.Components.GUI
     internal class ImGuiGameManagerComponent : Component, IUpdatable
     {
         private string _chatInput = "";
-        private int _chatChannelIndex = 0;
-        private string[] _chatChannels;
-        public List<ChatMessageContainer> ChatHistory = new List<ChatMessageContainer>();
 
         private GameManager _gameManager;
 
@@ -73,9 +70,9 @@ namespace WoW.Client.Components.GUI
 
                     if (ImGui.BeginChild("chat_output", new System.Numerics.Vector2(0f, -30), true))
                     {
-                        for (int i = 0; i < ChatHistory.Count; i++)
+                        for (int i = 0; i < _gameManager.ChatHistory.Count; i++)
                         {
-                            var chatHistory = ChatHistory[i];
+                            var chatHistory = _gameManager.ChatHistory[i];
                             //var color = WoW.Framework.Utils.ChannelColors[chatHistory.Channel];
 
                             //ImGui.PushStyleColor(ImGuiCol.Text, color);

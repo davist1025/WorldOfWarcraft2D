@@ -171,9 +171,10 @@ namespace WoW.Client.Components.GUI
 
                             if (ImGui.Selectable($"##{character.Name}", false, ImGuiSelectableFlags.SpanAllColumns | ImGuiSelectableFlags.AllowDoubleClick))
                             {
-                                localOnlineComponent.SetSelectedCharacter(i);
                                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                                 {
+                                    localOnlineComponent.SetSelectedCharacter(i);
+
                                     // todo: move character click functionality to GameManager.
                                     _gameManager.PeerState = GameNetworkState.LoadingWorld;
                                     NetPacketManager.BuildEnterWorld(character);

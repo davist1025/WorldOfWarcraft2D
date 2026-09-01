@@ -92,6 +92,8 @@ namespace WoW.Client.Utils
         /// </summary>
         public List<RealmserverContainer> Realmlist = new List<RealmserverContainer>();
 
+        public List<ChatMessageContainer> ChatHistory = new List<ChatMessageContainer>();
+
         public GameManager(bool subscribeDefaults = true)
         {
             LocalPlayerMoved += OnLocalPlayerMoved;

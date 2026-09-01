@@ -177,7 +177,6 @@ namespace WoW.Client.Network
             }
 
             footprint.SetCharacterList(characters);
-            footprint.SetSelectedCharacter(0);
 
             Core.GetGlobalManager<GameManager>().PeerState = GameNetworkState.Realm_Characters;
         }
@@ -195,7 +194,6 @@ namespace WoW.Client.Network
             float defaultSpeed = reader.GetFloat();
 
             MyOnlineComponent footprint = Core.GetGlobalManager<GameManager>().Player.GetComponent<MyOnlineComponent>();
-            footprint.SetSelectedCharacter(index);
             footprint.Entity.AddComponent(new SpeedComponent(defaultSpeed));
 
             Core.GetGlobalManager<GameManager>().Player.SetPosition(new Vector2(x, y));
@@ -321,12 +319,15 @@ namespace WoW.Client.Network
 
             if (string.Equals(gameManager.NetworkId, clietNetworkId, StringComparison.OrdinalIgnoreCase))
             {
-                Debug.Log($"{gameManager.Player.GetComponent<MyOnlineComponent>().GetSelectedCharacter().Name} says: {input}");
+                input = $"[{gameManager.Player.GetComponent<MyOnlineComponent>().GetSelectedCharacter().Name}] says: {input}";
+                gameManager.ChatHistory.Add(new ChatMessageContainer() { Input = input });
+                //Debug.Log($"{gameManager.Player.GetComponent<MyOnlineComponent>().GetSelectedCharacter().Name} says: {input}");
             }
             else
             {
                 Entity onlinePlayer = Core.Scene.FindEntity(clietNetworkId);
-                Debug.Log($"{onlinePlayer.GetComponent<OnlinePlayerControllerComponent>().Data.CharacterName} says: {input}");
+                input = $"[{onlinePlayer.GetComponent<OnlinePlayerControllerComponent>().Data.CharacterName}] says: {input}";
+                gameManager.ChatHistory.Add(new ChatMessageContainer() { Input = input });
             }
         }
         #endregion
