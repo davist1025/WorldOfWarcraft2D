@@ -32,7 +32,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Framework", "WoW.Framew
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Database", "WoW.Database\WoW.Database.csproj", "{EF378C39-5B1E-4364-89A9-27507B0CF44D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoW.Network", "WoW.Network\WoW.Network.csproj", "{F434BA16-0987-756E-D54E-3374992E7CE1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{A01510E8-F963-4CD1-B494-8B5FBB799803}"
+	ProjectSection(SolutionItems) = preProject
+		prediction + reconciliation.txt = prediction + reconciliation.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,10 +79,6 @@ Global
 		{EF378C39-5B1E-4364-89A9-27507B0CF44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF378C39-5B1E-4364-89A9-27507B0CF44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF378C39-5B1E-4364-89A9-27507B0CF44D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F434BA16-0987-756E-D54E-3374992E7CE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F434BA16-0987-756E-D54E-3374992E7CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F434BA16-0987-756E-D54E-3374992E7CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F434BA16-0987-756E-D54E-3374992E7CE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,7 +92,6 @@ Global
 		{843ACFE5-E35F-4DF8-A4DC-CCE6608995FA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{CA77B0C6-A864-437F-BF0F-41044CF89E45} = {8293E068-EBF5-4902-B806-4F93D4250115}
 		{EF378C39-5B1E-4364-89A9-27507B0CF44D} = {8293E068-EBF5-4902-B806-4F93D4250115}
-		{F434BA16-0987-756E-D54E-3374992E7CE1} = {8293E068-EBF5-4902-B806-4F93D4250115}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8637C730-ABA5-40F2-9514-EC7BB6040FF7}

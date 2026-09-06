@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -13,9 +14,7 @@ using WoW.Database.Models;
 using WoW.Database.Models.Auth;
 using WoW.Framework;
 using WoW.Framework.Logging;
-using WoW.Network;
-using WoW.Network.Packets.Client;
-using WoW.Network.Packets.Realm;
+using WoW.Framework.Network;
 using static WoW.Framework.Utils;
 
 namespace WoW.Authserver
@@ -30,8 +29,6 @@ namespace WoW.Authserver
 
     internal class Program
     {
-        public static NetworkController Network;
-
         public Program()
         {
             Console.Title = "Authserver";
@@ -40,36 +37,39 @@ namespace WoW.Authserver
             {
                 Logger.Print("Resetting session keys...", LogEntryType.Process);
                 // hack: probably not a proper way of resetting the session.
-                RelationalQueryableExtensions
-                    .ExecuteUpdate(ctx.Accounts.Where(account => account.SessionId != string.Empty), setters => setters.SetProperty(acc => acc.SessionId, "-"));
+
+                ctx.Accounts
+                    .Where(user => user.SessionId != "-")
+                    .ExecuteUpdate(userProp => userProp
+                        .SetProperty(property => property.SessionId, "-"));
 
                 // todo: add flag in config for debug account usage.
                 Logger.Print("Verifying debug account integrity...", LogEntryType.Process);
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("admin")))
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("ADMIN")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "admin".ToUpper(),
+                        Username = "ADMIN",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("123")),
                         SecurityLevel = (int)AccountSecurityType.Administrator
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("gamemaster")))
+                if (!ctx.Accounts.Any(a => a.Username.ToUpper().Equals("GAMEMASTER")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "gamemaster".ToUpper(),
+                        Username = "GAMEMASTER",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("456")),
                         SecurityLevel = (int)AccountSecurityType.Gamemaster
                     });
                 }
 
-                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("player")))
+                if (!ctx.Accounts.Any(a => a.Username.ToLower().Equals("PLAYER")))
                 {
                     ctx.Accounts.Add(new Account()
                     {
-                        Username = "player".ToUpper(),
+                        Username = "PLAYER",
                         HashedPassword = Argon2.Hash(Utils.ToSha256("789")),
                         SecurityLevel = (int)AccountSecurityType.Player
                     });
@@ -93,22 +93,11 @@ namespace WoW.Authserver
                 Logger.Print($"Registered {ctx.Realmlist.Count()} realm(s).", LogEntryType.Process);
             }
 
-            Network = new NetworkController();
-            Network.OnProcessorSubscribe += ProcessorSubscription;
-            Network.StartServer(port: 8070);
+            Global.Network = new NetworkManager(new NetworkEventListener());
+            Global.Network.StartServer(ConfigurationManager.AppSettings["hostname"].Split(":"));
 
             while (true)
-                Network.Poll();
-        }
-
-        /// <summary>
-        /// Subscribes all manner of objects to the network processor.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void ProcessorSubscription()
-        {
-            Network.Processor.SubscribeReusable<ClientAuth_Logon, NetPeer>((newAuth, peer) => PacketManager.OnUserLogin(newAuth, peer));
+                Global.Network.Update();
         }
 
         static void Main(string[] args)

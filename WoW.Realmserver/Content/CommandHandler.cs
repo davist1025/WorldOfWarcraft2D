@@ -8,11 +8,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WoW.Network.Objects;
-using WoW.Network.Packets.Realm;
 using WoW.Realmserver.Components;
 using WoW.Realmserver.Components.Behavior;
-using static WoW.Framework.Utils;
+using WoW.Framework;
+using WoW.Framework.Network.Container;
 
 namespace WoW.Realmserver.Content
 {
@@ -34,7 +33,7 @@ namespace WoW.Realmserver.Content
     public class CommandHandler
     {
         [CommandHandler("NpcCommand_Add")]
-        public static void NpcCommand_Add(string[] commandParams, WorldSessionComponent session, NetPeer peer)
+        public static void NpcCommand_Add(string[] commandParams, SessionComponent session, NetPeer peer)
         {
             // X, Y params should be optional.
             /*
@@ -46,13 +45,11 @@ namespace WoW.Realmserver.Content
              */
             int npcId = Convert.ToInt32(commandParams[0]);
 
-            EntityFactory.CreateNPC(npcId, session.Character.MapId, session.Entity.Transform.Position, true);
-
                 // todo: send invalid id response.
         }
 
         [CommandHandler("ServerCommand_SendMessage")]
-        public static void ServerCommand_SendMessage(string[] message, WorldSessionComponent session, NetPeer peer)
+        public static void ServerCommand_SendMessage(string[] message, SessionComponent session, NetPeer peer)
         {
             string fullMsg = "";
 
@@ -66,104 +63,15 @@ namespace WoW.Realmserver.Content
                     fullMsg += $"{part} ";
             }
 
-            ChatMessageObject newServerMessage = new ChatMessageObject()
-            {
-                Input = $"{fullMsg}",
-                Channel = ChatChannelType.Server
-            };
 
-            Program.SendToAll(newServerMessage);
+            // todo: [command handler] send server message + chat message container.
+            //Program.SendToAll(newServerMessage);
 
             // todo: re-implement server messages!
             //RealmClient_Chat serverMessage = new RealmClient_Chat();
             //serverMessage.Channel = ChatChannelType.Server;
 
             //Program.SendToAll(serverMessage);
-        }
-
-        /// <summary>
-        /// Summons the given Character to this player./>
-        /// </summary>
-        /// <param name="characterName"></param>
-        /// <param name="session"></param>
-        /// <param name="peer"></param>
-        [CommandHandler("PlayerActionCommand_Summon")]
-        public static void PlayerActionCommand_Summon(string[] data, WorldSessionComponent session, NetPeer peer)
-        {
-            string characterName = "";
-
-            if (data.Length > 1)
-            {
-                // todo: send bad packet message to player.
-                return;
-            }
-
-            characterName = data[0];
-
-            // todo: crash here if none are found. catch this exception or determine the return value and handle accordingly.
-            var characterToSummon = Program.Scene
-                .FindComponentsOfType<WorldSessionComponent>()
-                .Where(s => s.Account.Id != session.Account.Id && s.Character.Name.ToLower().Equals(characterName.ToLower()))
-                .Single();
-
-            if (characterToSummon != null)
-            {
-                Program.SendToAll(new RealmClient_Teleport()
-                {
-                    WorldId = characterToSummon.Entity.Name,
-                    MapId = session.Character.MapId,
-                    X = session.Entity.Position.X,
-                    Y = session.Entity.Position.Y
-                });
-
-                var allMapProcessors = Program.Scene.FindComponentsOfType<TiledMapProcessor>();
-                var thisProcessor = allMapProcessors.Where(processor => processor.Creatures.Contains(characterToSummon.Entity)).FirstOrDefault();
-
-                if (thisProcessor != null)
-                {
-                    thisProcessor.Creatures.Remove(characterToSummon.Entity);
-
-                    // set the new tiled processor for the character being summoned.
-                    var newProcessor = allMapProcessors.Find(p => p.Map.Properties["id"].ToLower().Equals(session.Character.MapId));
-                    newProcessor.AddCreature(characterToSummon.Entity);
-
-                    characterToSummon.Entity.Position = new Vector2(session.Entity.Position.X, session.Entity.Position.Y);
-
-                    // this feels crash-prone.
-                    var playersInNewProcessor = newProcessor.Creatures
-                        .Where(creature => creature.HasComponent<WorldSessionComponent>() && !creature.Name.ToLower().Equals(characterToSummon.Entity.Name.ToLower()))
-                        .ToArray();
-
-                    // send the current positions of all players in the summoned map since we don't send input updates outside of the players' map.
-                    foreach (var player in playersInNewProcessor)
-                    {
-                        Program.SendTo(characterToSummon.Entity.Name,
-                            new RealmClient_MovementStateChange()
-                            {
-                                Id = player.Name,
-                                ResultX = player.Transform.Position.X,
-                                ResultY = player.Transform.Position.Y,
-                                MovementX = 0f,
-                                MovementY = 0f,
-                                IsTeleportUpdate = true
-                            }, DeliveryMethod.ReliableOrdered);
-                    }
-
-                    // send all NPCs to this summoned player.
-                    var npcsInNewProcessor = newProcessor.Creatures.Where(creature => creature.HasComponent<NpcControllerComponent>()).ToArray();
-
-                    foreach (var npc in npcsInNewProcessor)
-                    {
-                        var component = npc.GetComponent<NpcControllerComponent>();
-
-                        Program.SendSerializable(characterToSummon.Entity.Name,
-                            new RealmClient_CreateNPC()
-                            {
-                                Metadata = component.Metadata
-                            });
-                    }
-                }
-            }
         }
     }
 }

@@ -1,0 +1,14 @@
+Clinet Prediction:
+
+game client will always move it's position and "simulate" what it believes to be a perfect calculation 
+while simultaneously sending this input to the realmserver along with some id #; ex: { tickId, position }. 
+this information will also be stored historically until the server processes these changes.
+
+The server will then process each input change as received when it has time. e
+every so often, the server will send an authoritative state check against the client's local position.
+
+Reconciliation:
+upon receipt of this server state, the client will perform 3 actions if the server's calculation differs from the client's:
+- the client will remove old state changes from it's history and grab those that are >= to the server's calculated position tickId.
+- the client will set it's local position = to the server's processed calculation
+- the client will replay all input locally and then update it's rendered position using interpolation for smoothing.

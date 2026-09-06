@@ -80,24 +80,6 @@
 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,8,5,5,5,5,5,5,5,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 </data>
  </layer>
- <objectgroup id="3" name="spawner">
-  <object id="3" name="player" x="601.333" y="538">
-   <properties>
-    <property name="is_player" type="bool" value="true"/>
-    <property name="max_count" type="int" value="0"/>
-    <property name="npc_id" type="int" value="-1"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="4" name="mob1_spawner" x="201.333" y="236.667" width="229.333" height="112.667">
-   <properties>
-    <property name="is_player" type="bool" value="false"/>
-    <property name="max_count" type="int" value="1"/>
-    <property name="npc_id" type="int" value="1"/>
-    <property name="timer" type="float" value="12"/>
-   </properties>
-  </object>
- </objectgroup>
  <layer id="2" name="collision_layer" width="50" height="50" opacity="0.51">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
